@@ -1,0 +1,46 @@
+{
+  "source": "Microsoft HR Interview Questions",
+  "category": "HR Round",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Tell me about yourself."
+    },
+    {
+      "id": 2,
+      "question": "Why do you want to join Microsoft?"
+    },
+    {
+      "id": 3,
+      "question": "What does growth mindset mean to you?"
+    },
+    {
+      "id": 4,
+      "question": "Describe a time you failed and what you learned."
+    },
+    {
+      "id": 5,
+      "question": "How do you handle tight deadlines?"
+    },
+    {
+      "id": 6,
+      "question": "Explain a situation where you showed leadership."
+    },
+    {
+      "id": 7,
+      "question": "How do you resolve conflicts in a team?"
+    },
+    {
+      "id": 8,
+      "question": "What are your strengths and weaknesses?"
+    },
+    {
+      "id": 9,
+      "question": "Where do you see yourself in 5 years?"
+    },
+    {
+      "id": 10,
+      "question": "Do you have any questions for us?"
+    }
+  ]
+}

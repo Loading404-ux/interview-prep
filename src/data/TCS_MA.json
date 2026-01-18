@@ -1,0 +1,46 @@
+{
+  "source": "TCS Math & Aptitude Questions",
+  "category": "Math & Aptitude",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Find the next number in the series: 5, 10, 20, 40, ?"
+    },
+    {
+      "id": 2,
+      "question": "What is 25% of 320?"
+    },
+    {
+      "id": 3,
+      "question": "The ratio of boys to girls is 4:3. If the number of boys is 28, find the number of girls."
+    },
+    {
+      "id": 4,
+      "question": "Find the LCM of 12 and 18."
+    },
+    {
+      "id": 5,
+      "question": "If the cost price is 200 and the profit is 20%, find the selling price."
+    },
+    {
+      "id": 6,
+      "question": "How many seconds are there in 2.5 hours?"
+    },
+    {
+      "id": 7,
+      "question": "What is the probability of getting a head when tossing a fair coin?"
+    },
+    {
+      "id": 8,
+      "question": "Find the simple interest on 1000 at 10% per annum for 2 years."
+    },
+    {
+      "id": 9,
+      "question": "Find the missing number in the series: 2, 6, 12, 20, ?"
+    },
+    {
+      "id": 10,
+      "question": "If today is Tuesday, what day of the week will it be after 100 days?"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "source": "NVIDIA HR Interview Questions",
+  "category": "HR Round",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Tell me about yourself."
+    },
+    {
+      "id": 2,
+      "question": "Why do you want to work at NVIDIA?"
+    },
+    {
+      "id": 3,
+      "question": "What excites you about GPUs or AI?"
+    },
+    {
+      "id": 4,
+      "question": "Describe a technically challenging project."
+    },
+    {
+      "id": 5,
+      "question": "How do you debug complex problems?"
+    },
+    {
+      "id": 6,
+      "question": "How do you keep yourself updated with technology?"
+    },
+    {
+      "id": 7,
+      "question": "Explain a failure in a project."
+    },
+    {
+      "id": 8,
+      "question": "How do you collaborate with cross-functional teams?"
+    },
+    {
+      "id": 9,
+      "question": "What kind of work environment do you prefer?"
+    },
+    {
+      "id": 10,
+      "question": "What are your career goals at NVIDIA?"
+    }
+  ]
+}

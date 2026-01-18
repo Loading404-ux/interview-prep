@@ -1,0 +1,46 @@
+{
+  "source": "NVIDIA Math & Aptitude Questions",
+  "category": "Math & Aptitude",
+  "questions": [
+    {
+      "id": 1,
+      "question": "How many bits are required to represent numbers from 1 to 256?"
+    },
+    {
+      "id": 2,
+      "question": "Convert the decimal number 25 to binary."
+    },
+    {
+      "id": 3,
+      "question": "A GPU performs 2×10^6 operations per second. How many operations will it perform in 10 seconds?"
+    },
+    {
+      "id": 4,
+      "question": "What is the probability of getting exactly one head in two coin tosses?"
+    },
+    {
+      "id": 5,
+      "question": "A matrix of order 4×5 has how many elements?"
+    },
+    {
+      "id": 6,
+      "question": "Find the next number in the series: 1, 2, 4, 8, ?"
+    },
+    {
+      "id": 7,
+      "question": "If 1 GB = 1024 MB, how many MB are there in 6 GB?"
+    },
+    {
+      "id": 8,
+      "question": "If a number ANDed with 1 gives 1, what can be said about the least significant bit (LSB)?"
+    },
+    {
+      "id": 9,
+      "question": "How many subsets does a set of 5 elements have?"
+    },
+    {
+      "id": 10,
+      "question": "What is the time complexity of the binary search algorithm?"
+    }
+  ]
+}

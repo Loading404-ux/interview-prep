@@ -1,0 +1,46 @@
+{
+  "source": "TCS HR Interview Questions",
+  "category": "HR Round",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Tell me about yourself."
+    },
+    {
+      "id": 2,
+      "question": "Why do you want to join TCS?"
+    },
+    {
+      "id": 3,
+      "question": "Are you comfortable with relocation and shifts?"
+    },
+    {
+      "id": 4,
+      "question": "Explain a situation where you worked in a team."
+    },
+    {
+      "id": 5,
+      "question": "How do you handle work pressure?"
+    },
+    {
+      "id": 6,
+      "question": "What do you know about TCS?"
+    },
+    {
+      "id": 7,
+      "question": "What are your short-term and long-term goals?"
+    },
+    {
+      "id": 8,
+      "question": "Why should we hire you?"
+    },
+    {
+      "id": 9,
+      "question": "How do you handle failure?"
+    },
+    {
+      "id": 10,
+      "question": "Are you willing to learn new technologies?"
+    }
+  ]
+}

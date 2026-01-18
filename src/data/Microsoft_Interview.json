@@ -1,0 +1,82 @@
+{
+  "questions": [
+    {
+      "title": "Longest Subarray with Sum = 0",
+      "problem": "Given an integer array, find the length of the longest contiguous subarray with sum equal to 0.",
+      "approach": "Use prefix sum and a HashMap to store first occurrence of each prefix sum. If the same prefix sum appears again, the subarray between indices has sum zero.",
+      "time_complexity": "O(N)",
+      "space_complexity": "O(N)",
+      "examples": [
+        {
+          "input": [1, -1, 3, 2, -2, -3, 3],
+          "output": 6
+        },
+        {
+          "input": [4, 2, -3, 1, 6],
+          "output": 3
+        },
+        {
+          "input": [0, 0, 0],
+          "output": 3
+        }
+      ]
+    },
+    {
+      "title": "Detect and Remove Loop in Linked List",
+      "problem": "Detect a loop in a singly linked list and remove it without losing nodes.",
+      "approach": "Use Floyd’s Cycle Detection Algorithm (slow and fast pointers). Once detected, reset one pointer to head and move both pointers to find the loop start. Remove loop by setting the last node's next to NULL.",
+      "time_complexity": "O(N)",
+      "space_complexity": "O(1)",
+      "examples": [
+        "1→2→3→4→5 (loop back to 2)",
+        "1→2→3→NULL",
+        "1→1 (self loop)"
+      ]
+    },
+    {
+      "title": "Check if Binary Tree is Height Balanced",
+      "problem": "Check whether a binary tree is height balanced.",
+      "approach": "Use postorder traversal. Return -1 if any subtree is unbalanced.",
+      "time_complexity": "O(N)",
+      "space_complexity": "O(H)",
+      "examples": [
+        "Balanced tree → True",
+        "Left skewed tree → False",
+        "Single node → True"
+      ]
+    },
+    {
+      "title": "First Non-Repeating Character in a String",
+      "problem": "Find the first character that does not repeat in a string.",
+      "approach": "Count frequency using hashmap or array. Traverse string again to find first character with count 1.",
+      "time_complexity": "O(N)",
+      "space_complexity": "O(1)",
+      "examples": [
+        {
+          "input": "aabbcdd",
+          "output": "c"
+        },
+        {
+          "input": "aabb",
+          "output": "-1"
+        },
+        {
+          "input": "leetcode",
+          "output": "l"
+        }
+      ]
+    },
+    {
+      "title": "Merge K Sorted Linked Lists",
+      "problem": "Merge K sorted linked lists into one sorted list.",
+      "approach": "Use a min heap (priority queue). Push heads of all lists and repeatedly extract minimum.",
+      "time_complexity": "O(N log K)",
+      "space_complexity": "O(K)",
+      "examples": [
+        "[1→4→5], [1→3→4], [2→6]",
+        "K = 0 → NULL",
+        "K = 1 → Same list"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "source": "Microsoft Math & Aptitude Questions",
+  "category": "Math & Aptitude",
+  "questions": [
+    {
+      "id": 1,
+      "question": "A box has 5 red and 7 blue balls. Two balls are drawn without replacement. Find the probability that both are blue."
+    },
+    {
+      "id": 2,
+      "question": "If A completes work in 10 days and B in 15 days, how long will they take together?"
+    },
+    {
+      "id": 3,
+      "question": "Find the missing number in the series: 1, 4, 9, 16, ?"
+    },
+    {
+      "id": 4,
+      "question": "A value increases by 30% and then decreases by 20%. Find the net percentage change."
+    },
+    {
+      "id": 5,
+      "question": "If ALL testers are engineers and SOME engineers are managers, what conclusions follow?"
+    },
+    {
+      "id": 6,
+      "question": "The average of 5 numbers is 20. If one number is removed, the average becomes 18. Find the removed number."
+    },
+    {
+      "id": 7,
+      "question": "How many trailing zeros are there in 100! ?"
+    },
+    {
+      "id": 8,
+      "question": "If the probability of rain today is 0.4, what is the probability that it does not rain?"
+    },
+    {
+      "id": 9,
+      "question": "A car travels the first half of a journey at 40 km/hr and the second half at 60 km/hr. Find the average speed."
+    },
+    {
+      "id": 10,
+      "question": "How many rectangles are there in a 3×2 grid?"
+    }
+  ]
+}
