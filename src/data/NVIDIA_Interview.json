@@ -9,10 +9,17 @@
         "approach": "Traverse the array and track the maximum.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
-        "example": {
-          "input": [3, 1, 9, 4],
-          "output": 9
-        }
+        "example": [
+          {
+            "input": [
+              3,
+              1,
+              9,
+              4
+            ],
+            "output": 9
+          }
+        ]
       },
       {
         "id": 2,
@@ -22,8 +29,14 @@
         "time_complexity": "O(1)",
         "space_complexity": "O(1)",
         "examples": [
-          { "input": 16, "output": true },
-          { "input": 18, "output": false }
+          {
+            "input": 16,
+            "output": true
+          },
+          {
+            "input": 18,
+            "output": false
+          }
         ]
       },
       {
@@ -33,10 +46,20 @@
         "approach": "Swap elements from both ends.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
-        "example": {
-          "input": [1, 2, 3],
-          "output": [3, 2, 1]
-        }
+        "example": [
+          {
+            "input": [
+              1,
+              2,
+              3
+            ],
+            "output": [
+              3,
+              2,
+              1
+            ]
+          }
+        ]
       }
     ],
     "medium": [
@@ -47,10 +70,12 @@
         "approach": "Frequency count using array or HashMap.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
-        "example": {
-          "input": "aabbcd",
-          "output": "c"
-        }
+        "example": [
+          {
+            "input": "aabbcd",
+            "output": "c"
+          }
+        ]
       },
       {
         "id": 5,
@@ -59,10 +84,21 @@
         "approach": "Dynamic Programming.",
         "time_complexity": "O(N^2)",
         "space_complexity": "O(N)",
-        "example": {
-          "input": [10, 9, 2, 5, 3, 7, 101, 18],
-          "output": 4
-        }
+        "example": [
+          {
+            "input": [
+              10,
+              9,
+              2,
+              5,
+              3,
+              7,
+              101,
+              18
+            ],
+            "output": 4
+          }
+        ]
       },
       {
         "id": 6,
@@ -71,10 +107,12 @@
         "approach": "Postorder traversal.",
         "time_complexity": "O(N)",
         "space_complexity": "O(H)",
-        "example": {
-          "input": "Balanced Tree",
-          "output": true
-        }
+        "example": [
+          {
+            "input": "Balanced Tree",
+            "output": true
+          }
+        ]
       }
     ],
     "hard": [
@@ -85,10 +123,17 @@
         "approach": "Prefix sum with HashMap.",
         "time_complexity": "O(N)",
         "space_complexity": "O(N)",
-        "example": {
-          "input": [1, -1, 3, -3],
-          "output": 4
-        }
+        "example": [
+          {
+            "input": [
+              1,
+              -1,
+              3,
+              -3
+            ],
+            "output": 4
+          }
+        ]
       },
       {
         "id": 8,
@@ -97,10 +142,12 @@
         "approach": "Floyd’s Cycle Detection Algorithm.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
-        "example": {
-          "input": "1→2→3→4→2",
-          "output": "Loop removed"
-        }
+        "example": [
+          {
+            "input": "1→2→3→4→2",
+            "output": "Loop removed"
+          }
+        ]
       },
       {
         "id": 9,
@@ -109,10 +156,30 @@
         "approach": "Min Heap (Priority Queue).",
         "time_complexity": "O(N log K)",
         "space_complexity": "O(K)",
-        "example": {
-          "input": [[1, 4], [2, 3], [5]],
-          "output": [1, 2, 3, 4, 5]
-        }
+        "example": [
+          {
+            "input": [
+              [
+                1,
+                4
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                5
+              ]
+            ],
+            "output": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          }
+        ]
       },
       {
         "id": 10,
@@ -121,10 +188,16 @@
         "approach": "Dynamic Programming.",
         "time_complexity": "O(N^3)",
         "space_complexity": "O(N^2)",
-        "example": {
-          "input": [10, 20, 30],
-          "output": 6000
-        }
+        "example": [
+          {
+            "input": [
+              10,
+              20,
+              30
+            ],
+            "output": 6000
+          }
+        ]
       }
     ]
   }
