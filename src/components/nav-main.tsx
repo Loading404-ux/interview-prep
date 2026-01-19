@@ -18,6 +18,10 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
+import { url } from "inspector"
 
 export function NavMain({
   items,
@@ -26,26 +30,28 @@ export function NavMain({
     title: string
     url: string
     icon: LucideIcon
-    isActive?: boolean
+    // isActive?: boolean
     items?: {
       title: string
       url: string
     }[]
   }[]
 }) {
+  const path=usePathname()
+  
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
-          <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
+          <Collapsible key={item.title} asChild>
+            <SidebarMenuItem className="">
+              <SidebarMenuButton asChild tooltip={item.title} className="py-4 rounded-sm transition-all">
+                <Link href={item.url} className={cn(item.url==path && "bg-sidebar-accent")}>
+                  <item.icon className={cn(item.url==path && "text-primary")}/>
+                  <span className="font-semibold">{item.title}</span>
+                </Link>
+              </SidebarMenuButton>  
               {item.items?.length ? (
                 <>
                   <CollapsibleTrigger asChild>
