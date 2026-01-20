@@ -4,18 +4,21 @@ interface SkeletonCardProps {
   hasHeader?: boolean;
   lines?: number;
   className?: string;
+  border?: boolean;
 }
 
 export const SkeletonCard = ({
   hasHeader = true,
   lines = 3,
   className,
+  border = true,
 }: SkeletonCardProps) => {
   return (
     <div
       className={cn(
-        "rounded-2xl overflow-hidden bg-card border border-border/50",
-        className
+        "rounded-2xl overflow-hidden bg-card ",
+        className,
+        border && "border border-border/50"
       )}
     >
       {hasHeader && (

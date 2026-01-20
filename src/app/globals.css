@@ -196,6 +196,30 @@
     background-image: radial-gradient(circle, hsl(var(--foreground) / 0.15) 1px, transparent 1px);
     background-size: 8px 8px;
   }
+
+  .activity-cell {
+    @apply rounded-sm transition-colors duration-150;
+  }
+
+  .activity-cell-0 {
+    @apply bg-muted/30;
+  }
+
+  .activity-cell-1 {
+    @apply bg-primary/20;
+  }
+
+  .activity-cell-2 {
+    @apply bg-primary/40;
+  }
+
+  .activity-cell-3 {
+    @apply bg-primary/60;
+  }
+
+  .activity-cell-4 {
+    @apply bg-primary/80;
+  }
 }
 
 @layer utilities {
@@ -227,15 +251,80 @@
     animation: loading-progress 1.5s ease-in-out infinite;
   }
 
-  .animate-shimmer {
-    animation: shimmer 1.5s infinite;
+  .animate-page-enter {
+    animation: page-fade-in 0.18s ease-out;
+  }
+
+  .page-enter {
+    animation: page-fade-in 0.18s ease-out;
+  }
+
+  .animate-question-enter {
+    animation: question-slide 0.2s ease-out;
+  }
+
+  .animate-fade-up-stagger {
+    animation: fade-up 0.3s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-recording-card-enter {
+    animation: card-fade-in 0.25s ease-out;
   }
 }
+
+@keyframes card-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* fade-up-stagger */
 
 /* ================================
    ANIMATIONS
 ================================ */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes question-slide {
+  from {
+    opacity: 0;
+    transform: translateX(16px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
 
 @keyframes accordion-down {
   from {
@@ -393,4 +482,8 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+[data-problems] [aria-hidden='true'] {
+  @apply hidden;
 }

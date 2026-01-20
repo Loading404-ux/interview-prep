@@ -49,7 +49,8 @@ const HRInterview = () => {
   const [state, setState] = useState<InterviewState>("idle");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [waveformBars] = useState(Array.from({ length: 40 }, () => Math.random()));
-
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [cardKey, setCardKey] = useState(0);
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
@@ -61,10 +62,13 @@ const HRInterview = () => {
 
   const handleStartRecording = () => {
     setState("recording");
+    setCardKey(prev => prev + 1);
   };
 
   const handleStopRecording = () => {
     setState("completed");
+    setCardKey(prev => prev + 1);
+    setTimeout(() => setShowFeedback(true), 100);
   };
 
   const handleNextQuestion = () => {
@@ -72,11 +76,15 @@ const HRInterview = () => {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setState("idle");
     }
+    setShowFeedback(false);
+    setCardKey(prev => prev + 1);
   };
 
   const handleRestart = () => {
     setCurrentQuestionIndex(0);
     setState("idle");
+    setShowFeedback(false);
+    setCardKey(prev => prev + 1);
   };
 
   return (
@@ -102,8 +110,8 @@ const HRInterview = () => {
 
         {/* Question Card */}
         <div
-          key={currentQuestion.id}
-          className="question-enter p-6 rounded-2xl bg-card border border-hr/20"
+          key={`question-${currentQuestion.id}`}
+          className="animate-question-enter p-6 rounded-2xl bg-card border border-hr/20"
         >
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-xl bg-hr/10">
@@ -117,148 +125,161 @@ const HRInterview = () => {
 
         {/* Recording Section */}
         <div className="bg-card rounded-2xl border border-border/50 p-8">
-          {state === "idle" && (
-            <div className="text-center space-y-6">
-              <div className="w-20 h-20 rounded-full bg-hr/10 flex items-center justify-center mx-auto">
-                <Mic className="w-10 h-10 text-hr" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  Ready to Record
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Take a moment to think, then record your answer
-                </p>
-              </div>
-              <Button
-                onClick={handleStartRecording}
-                size="lg"
-                className="bg-hr hover:bg-hr/90 text-white rounded-xl px-8"
-              >
-                <Mic className="w-5 h-5 mr-2" />
-                Start Recording
-              </Button>
-            </div>
-          )}
-
-          {state === "recording" && (
-            <div className="text-center space-y-6">
-              {/* Waveform Visualization */}
-              <div className="flex items-center justify-center gap-1 h-20">
-                {waveformBars.map((height, i) => (
-                  <div
-                    key={i}
-                    className="waveform-bar w-1 bg-hr"
-                    style={{
-                      height: `${16 + height * 48}px`,
-                      animationDelay: `${i * 0.05}s`,
-                    }}
-                  />
-                ))}
-              </div>
-
-              <div className="flex items-center justify-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-destructive animate-pulse" />
-                <span className="text-sm text-destructive font-medium">Recording...</span>
-              </div>
-
-              <Button
-                onClick={handleStopRecording}
-                size="lg"
-                variant="destructive"
-                className="rounded-xl px-8"
-              >
-                <Square className="w-4 h-4 mr-2" />
-                Stop Recording
-              </Button>
-            </div>
-          )}
-
-          {state === "completed" && (
-            <div className="space-y-6 animate-fade-in">
-              {/* Success indicator */}
-              <div className="grid grid-cols-2 gap-4 items-center">
-                <div className="text-center">
-                  <div className="w-26 h-26 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-3">
-                    <CheckCircle2 className="w-14 h-14 text-success" />
-                  </div>
+          <div
+            key={`card-${cardKey}`}
+            className="bg-card rounded-2xl border-none p-8 animate-recording-card-enter"
+          >
+            {state === "idle" && (
+              <div className="text-center space-y-6">
+                <div className="w-20 h-20 rounded-full bg-hr/10 flex items-center justify-center mx-auto">
+                  <Mic className="w-10 h-10 text-hr" />
+                </div>
+                <div>
                   <h3 className="text-lg font-semibold text-foreground">
-                    Recording Complete
+                    Ready to Record
                   </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Take a moment to think, then record your answer
+                  </p>
+                </div>
+                <Button
+                  onClick={handleStartRecording}
+                  size="lg"
+                  className="bg-hr hover:bg-hr/90 text-white rounded-xl px-8"
+                >
+                  <Mic className="w-5 h-5 mr-2" />
+                  Start Recording
+                </Button>
+              </div>
+            )}
+
+            {state === "recording" && (
+              <div className="text-center space-y-6">
+                {/* Waveform Visualization */}
+                <div className="flex items-center justify-center gap-1 h-20">
+                  {waveformBars.map((height, i) => (
+                    <div
+                      key={i}
+                      className="waveform-bar w-1 bg-hr"
+                      style={{
+                        height: `${16 + height * 48}px`,
+                        animationDelay: `${i * 0.05}s`,
+                      }}
+                    />
+                  ))}
                 </div>
 
-                {/* Performance Scores */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-muted-foreground">Performance</h4>
-                  <div className="space-y-3">
-                    {feedbackScores.map((item) => (
-                      <div key={item.label} className="space-y-1.5">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-foreground">{item.label}</span>
-                          <span className="font-semibold text-foreground">{item.score}%</span>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-destructive animate-pulse" />
+                  <span className="text-sm text-destructive font-medium">Recording...</span>
+                </div>
+
+                <Button
+                  onClick={handleStopRecording}
+                  size="lg"
+                  variant="destructive"
+                  className="rounded-xl px-8"
+                >
+                  <Square className="w-4 h-4 mr-2" />
+                  Stop Recording
+                </Button>
+              </div>
+            )}
+
+            {state === "completed" && (
+              <div className="space-y-6 ">
+                {/* Success indicator */}
+
+                <div className="grid grid-cols-2 gap-4 items-center">
+                  <div className="text-center animate-fade-up-stagger" style={{ animationDelay: "0ms" }}>
+                    <div className="w-26 h-26 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-3">
+                      <CheckCircle2 className="w-14 h-14 text-success" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      Recording Complete
+                    </h3>
+                  </div>
+
+                  {/* Performance Scores */}
+                  <div className="space-y-4 animate-fade-up-stagger" style={{ animationDelay: "50ms" }}>
+                    <h4 className="text-sm font-medium text-muted-foreground">Performance</h4>
+                    <div className="space-y-3">
+                      {feedbackScores.map((item) => (
+                        <div key={item.label} className="space-y-1.5">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-foreground">{item.label}</span>
+                            <span className="font-semibold text-foreground">{item.score}%</span>
+                          </div>
+                          <div className="h-2 rounded-full bg-muted overflow-hidden">
+                            <div
+                              className={cn("h-full rounded-full transition-all duration-500", item.color)}
+                              style={{ width: `${item.score}%` }}
+                            />
+                          </div>
                         </div>
-                        <div className="h-2 rounded-full bg-muted overflow-hidden">
-                          <div
-                            className={cn("h-full rounded-full transition-all duration-500", item.color)}
-                            style={{ width: `${item.score}%` }}
-                          />
-                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {/* Preferred Answer */}
+                {showFeedback && (
+                  <div className="p-4 rounded-xl bg-muted/30 border border-border animate-fade-up-stagger"
+                    style={{ animationDelay: "100ms" }}>
+                    <div className="flex items-start gap-3">
+                      <Lightbulb className="w-5 h-5 text-aptitude flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="text-sm font-medium text-foreground mb-2">
+                          Preferred Answer Approach
+                        </h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {currentQuestion.preferredAnswer}
+                        </p>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
-              </div>
-              {/* Preferred Answer */}
-              <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
-                <div className="flex items-start gap-3">
-                  <Lightbulb className="w-5 h-5 text-aptitude flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-medium text-foreground mb-2">
-                      Preferred Answer Approach
-                    </h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {currentQuestion.preferredAnswer}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              {/* Improvement Tips */}
-              <div className="rounded-2xl border border-border/50 p-6 bg-muted/30">
-                <h3 className="font-semibold text-foreground mb-4">Improvement Tips</h3>
-                <ul className="space-y-3">
-                  {suggestions.map((suggestion, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-3 text-sm text-foreground/80"
-                    >
-                      <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 text-xs font-semibold">
-                        {i + 1}
-                      </span>
-                      {suggestion}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {/* Next Question CTA */}
-              <div className="flex justify-end gap-3 pt-2">
-                {isLastQuestion ? (
-                  <Button onClick={handleRestart} variant="outline" className="rounded-xl">
-                    Start Over
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleNextQuestion}
-                    className="bg-hr hover:bg-hr/90 text-white rounded-xl px-6"
-                  >
-                    Next Question
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
                 )}
+                {/* Improvement Tips */}
+                {showFeedback && (
+                  <div className="rounded-2xl border border-border/50 p-6 bg-muted/30 animate-fade-up-stagger"
+                    style={{ animationDelay: "400ms" }}>
+                    <h3 className="font-semibold text-foreground mb-4">Improvement Tips</h3>
+                    <ul className="space-y-3">
+                      {suggestions.map((suggestion, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-3 text-sm text-foreground/80"
+                        >
+                          <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 text-xs font-semibold">
+                            {i + 1}
+                          </span>
+                          {suggestion}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Next Question CTA */}
+                <div className="flex justify-end gap-3 pt-2">
+                  {isLastQuestion ? (
+                    <Button onClick={handleRestart} variant="outline" className="rounded-xl">
+                      Start Over
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleNextQuestion}
+                      className="bg-hr hover:bg-hr/90 text-white rounded-xl px-6"
+                    >
+                      Next Question
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      </div >
     </>
   );
 };

@@ -1,12 +1,18 @@
-import { clerkMiddleware } from '@clerk/nextjs/server'
+// middleware.ts
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
-export default clerkMiddleware()
+// Define protected routes
+const isProtectedRoute = createRouteMatcher([
+  '/dashboard(.*)',
+])
 
-export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
-  ],
-}
+export default clerkMiddleware(async (auth, req) => {
+  // If the route is protected and user is not signed in → block
+  // if (isProtectedRoute(req)) {
+  //   await auth.protect()
+  // }
+
+  // otherwise allow
+  return NextResponse.next()
+})

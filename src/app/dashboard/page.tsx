@@ -6,13 +6,20 @@ const stats = {
   aptitude: { accuracy: 85, completed: 28 },
   streak: 7,
 };
-
+import { StreakCalendar } from "@/components/StreakCalendar";
 import { Progress } from "@/components/ui/progress";
 import { GradientCard } from "@/components/GradientCard";
 import QuickStart from "@/components/QuickStart";
 
 export default function Page() {
-
+  const streakData = Array.from({ length: 30 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (29 - i));
+    return {
+      date: date.toISOString().split("T")[0],
+      count: Math.random() > 0.3 ? Math.floor(Math.random() * 6) : 0,
+    };
+  });
   return (
     <>
       <div className="w-full space-y-4 lg:space-y-8">
@@ -77,6 +84,7 @@ export default function Page() {
 
         <QuickStart />
 
+        <StreakCalendar data={streakData} />
       </div>
     </>
 

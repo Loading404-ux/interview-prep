@@ -17,12 +17,16 @@ import {
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import Background from '@/components/Background'
 function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <SidebarProvider className='overflow-auto max-h-dvh'>
             <AppSidebar />
-            <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2">
+            <SidebarInset className='relative'>
+                <div  className="absolute size-full left-0 md:rounded-xl overflow-hidden opacity-90">
+                    <Background />
+                </div>
+                <header className="flex h-16 shrink-0 items-center gap-2 relative z-10">
                     <div className="flex items-center gap-2 px-4">
                         <SidebarTrigger className="-ml-1" />
                         <Separator
@@ -50,9 +54,9 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
         </div> */}
-                <div className="overflow-auto max-h-dvh">
+                <div className="overflow-auto max-h-dvh h-full relative">
                     <ScrollArea className='overflow-auto h-full max-h-full'>
-                        <main className="pb-8 px-4 lg:px-8 w-full max-w-6xl mx-auto">
+                        <main className="pb-8 px-4 lg:px-8 w-full max-w-6xl mx-auto ">
                             {children}
                         </main>
                     </ScrollArea>
