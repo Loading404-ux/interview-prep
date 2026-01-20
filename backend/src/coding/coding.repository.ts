@@ -1,9 +1,11 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CodingSubmission, SubmissionVerdict } from '../schema/coding-submission.schema';
+import { Injectable } from '@nestjs/common';
 // import { SubmissionVerdict } from '../schemas/enums';
 
-export class CodingSubmissionRepository {
+@Injectable()
+export class CodingRepository {
     private data: Partial<CodingSubmission>[] = [];
     constructor(
         @InjectModel(CodingSubmission.name)

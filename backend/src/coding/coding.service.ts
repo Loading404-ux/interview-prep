@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CodingSubmissionRepository } from './coding.repository';
+import { CodingRepository } from './coding.repository';
 import { CreateCodingSubmissionDto } from './coding.dto';
 import { Types } from 'mongoose';
 import { CodingSubmissionMapper } from './coding.mapper';
@@ -7,7 +7,7 @@ import { CodingSubmissionMapper } from './coding.mapper';
 @Injectable()
 export class CodingService {
     constructor(
-        private readonly repo: CodingSubmissionRepository,
+        private readonly repo: CodingRepository,
         // private readonly activityLogService: ActivityLogService
     ) { }
 
