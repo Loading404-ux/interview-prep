@@ -1,0 +1,36 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document,Types } from 'mongoose';
+import { CodingQuestion } from './coding-questions.schema';
+import { User } from './user.schema';
+@Schema({ timestamps: true })
+export class CodingDiscussion extends Document {
+
+  @Prop({
+    type: Types.ObjectId,
+    ref: CodingQuestion.name,
+    index: true
+  })
+  questionId: Types.ObjectId;
+
+  @Prop({
+    type: Types.ObjectId,
+    ref: User.name,
+    index: true
+  })
+  userId: Types.ObjectId;
+
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'CodingDiscussion',
+    default: null
+  })
+  parentId?: Types.ObjectId;
+
+  @Prop({ required: true })
+  content: string;
+
+  @Prop({ default: 0 })
+  upvotes: number;
+}
+
+export const CodingDiscussionSchema = SchemaFactory.createForClass(CodingDiscussion);

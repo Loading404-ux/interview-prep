@@ -396,9 +396,9 @@ const ProblemDetail = () => {
                         <span className="flex items-center gap-1">
                           <ThumbsUp className="w-4 h-4" /> {Math.floor(Math.random() * 1000) + 100}
                         </span>
-                        <span className="flex items-center gap-1">
+                        {/* <span className="flex items-center gap-1">
                           <MessageSquare className="w-4 h-4" /> {Math.floor(Math.random() * 50) + 5}
-                        </span>
+                        </span> */}
                       </div>
                     </div>
                   ))}
