@@ -1,1 +1,56 @@
-hi
+[
+    {
+           
+      "question": "Introduce yourself.",
+      "preferred_answer": "A brief, structured introduction covering education, skills, strengths, and career goals aligned with Infosys.",
+      "sample_answer": "I am a Computer Science student with a strong foundation in programming, data structures, and problem-solving. I enjoy learning new technologies and applying them to real-world problems. I am a disciplined learner, adaptable to new environments, and eager to start my professional journey with Infosys where I can grow technically while contributing meaningfully to projects."
+    },
+    {
+           
+      "question": "Why IT?",
+      "preferred_answer": "Interest in IT, culture, learning environment, global presence, and long-term career growth.",
+      "sample_answer": "Infosys is known for its strong values, ethical work culture, and emphasis on continuous learning. The structured training programs and exposure to global clients make it an ideal place for freshers like me to build a strong foundation and grow as a professional."
+    },
+    {
+          
+      "question": "Explain a challenge you faced and solved.",
+      "preferred_answer": "A real example showing problem-solving, persistence, and learning mindset.",
+      "sample_answer": "During a project, I faced difficulty understanding a complex concept within a short deadline. I broke the problem into smaller parts, referred to documentation, and discussed it with peers. Eventually, I was able to resolve the issue and complete the task successfully, which improved both my technical understanding and teamwork skills."
+    },
+    {
+           
+      "question": "How do you adapt to change?",
+      "preferred_answer": "Positive attitude towards learning, flexibility, and openness to new environments.",
+      "sample_answer": "I adapt to change by staying open-minded and focusing on learning. I try to understand new requirements quickly, upskill when needed, and maintain a positive attitude. I believe change helps in personal and professional growth."
+    },
+    {
+           
+      "question": "What motivates you?",
+      "preferred_answer": "Intrinsic motivation such as learning, growth, and contributing value.",
+      "sample_answer": "I am motivated by learning new skills and seeing my efforts create meaningful outcomes. Solving problems and continuously improving myself gives me satisfaction and drives me to perform better."
+    },
+    {
+           
+      "question": "How do you handle criticism?",
+      "preferred_answer": "Maturity, openness to feedback, and willingness to improve.",
+      "sample_answer": "I take criticism positively and view it as an opportunity to improve. I listen carefully, understand where I can do better, and work on those areas to enhance my performance."
+    },
+    {
+           
+      "question": "Describe your biggest achievement.",
+      "preferred_answer": "An achievement that reflects dedication, learning, or teamwork.",
+      "sample_answer": "One of my biggest achievements was successfully completing an academic project within a tight deadline while maintaining quality. It helped me improve my technical skills, time management, and collaboration abilities."
+    },
+    {
+           
+      "question": "Are you comfortable with training and assessments?",
+      "preferred_answer": "Willingness to learn, accept evaluations, and improve.",
+      "sample_answer": "Yes, I am completely comfortable with training and assessments. I believe they help identify strengths and areas for improvement, and I am always eager to learn and upgrade my skills."
+    },
+    {
+           
+      "question": "Do you have any questions for us?",
+      "preferred_answer": "Interest in learning opportunities, growth, or team culture.",
+      "sample_answer": "Yes, I would like to know more about the learning and growth opportunities for freshers at Infosys and how performance is evaluated during the initial years."
+    }
+  ]
