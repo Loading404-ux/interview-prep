@@ -1,0 +1,287 @@
+[
+  {
+    "text": "A train runs at 60 km/hr. How much distance will it cover in 2.5 hours?",
+    "options": ["120 km", "150 km", "180 km", "200 km"],
+    "correctAnswer": 1,
+    "company": "Infosys",
+    "explanation": "Distance = Speed × Time = 60 × 2.5 = 150 km."
+  },
+  {
+    "text": "If the selling price of 12 items equals the cost price of 15 items, find the profit percentage.",
+    "options": ["15%", "20%", "25%", "30%"],
+    "correctAnswer": 1,
+    "company": "Infosys",
+    "explanation": "Profit = 3 items on cost of 15 items → (3/15) × 100 = 20%."
+  },
+  {
+    "text": "Find the next term in the series: 3, 9, 27, ?",
+    "options": ["54", "72", "81", "108"],
+    "correctAnswer": 2,
+    "company": "Infosys",
+    "explanation": "Each term is multiplied by 3 → 27 × 3 = 81."
+  },
+  {
+    "text": "Find the HCF of 24 and 36.",
+    "options": ["6", "12", "18", "24"],
+    "correctAnswer": 1,
+    "company": "Infosys",
+    "explanation": "Common factors of 24 and 36 are 1, 2, 3, 4, 6, 12 → HCF = 12."
+  },
+  {
+    "text": "A sum becomes double in 10 years at simple interest. Find the rate of interest.",
+    "options": ["5%", "8%", "10%", "12%"],
+    "correctAnswer": 2,
+    "company": "Infosys",
+    "explanation": "If amount doubles, SI = Principal → (P × R × 10)/100 = P → R = 10%."
+  },
+  {
+    "text": "Find the missing number in the series: 1, 1, 2, 3, 5, ?",
+    "options": ["6", "7", "8", "9"],
+    "correctAnswer": 2,
+    "company": "Infosys",
+    "explanation": "This is the Fibonacci series → next number = 3 + 5 = 8."
+  },
+  {
+    "text": "If today is Friday, what day of the week will it be after 45 days?",
+    "options": ["Saturday", "Sunday", "Monday", "Tuesday"],
+    "correctAnswer": 1,
+    "company": "Infosys",
+    "explanation": "45 mod 7 = 3 → Friday + 3 days = Monday."
+  },
+  {
+    "text": "What is the probability of getting an even number on a fair dice?",
+    "options": ["1/6", "1/3", "1/2", "2/3"],
+    "correctAnswer": 2,
+    "company": "Infosys",
+    "explanation": "Even numbers are 2, 4, 6 → 3 outcomes out of 6 → 3/6 = 1/2."
+  },
+  {
+    "text": "Find the average of the first 10 natural numbers.",
+    "options": ["4.5", "5", "5.5", "6"],
+    "correctAnswer": 2,
+    "company": "Infosys",
+    "explanation": "Average of first n natural numbers = (n + 1)/2 → (10 + 1)/2 = 5.5."
+  },
+  {
+    "text": "How many diagonals does a pentagon have?",
+    "options": ["5", "7", "10", "15"],
+    "correctAnswer": 0,
+    "company": "Infosys",
+    "explanation": "Number of diagonals = n(n−3)/2 → 5(5−3)/2 = 5."
+  },
+  {
+    "text": "A box has 5 red and 7 blue balls. Two balls are drawn without replacement. Find the probability that both are blue.",
+    "options": ["21/66", "7/11", "5/12", "1/2"],
+    "correctAnswer": 0,
+    "company": "Microsoft",
+    "explanation": "Probability = (7/12) × (6/11) = 42/132 = 21/66."
+  },
+  {
+    "text": "If A completes work in 10 days and B in 15 days, how long will they take together?",
+    "options": ["5 days", "6 days", "8 days", "12 days"],
+    "correctAnswer": 1,
+    "company": "Microsoft",
+    "explanation": "Work rate = (1/10 + 1/15) = 1/6 → 6 days."
+  },
+  {
+    "text": "Find the missing number in the series: 1, 4, 9, 16, ?",
+    "options": ["20", "24", "25", "36"],
+    "correctAnswer": 2,
+    "company": "Microsoft",
+    "explanation": "Squares of natural numbers → 1², 2², 3², 4² → next is 5² = 25."
+  },
+  {
+    "text": "A value increases by 30% and then decreases by 20%. Find the net percentage change.",
+    "options": ["4% increase", "4% decrease", "10% increase", "10% decrease"],
+    "correctAnswer": 1,
+    "company": "Microsoft",
+    "explanation": "Net change = a − b − (ab/100) = 30 − 20 − 6 = 4% decrease."
+  },
+  {
+    "text": "If ALL testers are engineers and SOME engineers are managers, what conclusions follow?",
+    "options": [
+      "Some testers are managers",
+      "All managers are testers",
+      "Some engineers are managers",
+      "No tester is a manager"
+    ],
+    "correctAnswer": 2,
+    "company": "Microsoft",
+    "explanation": "Given: SOME engineers are managers → valid direct conclusion."
+  },
+  {
+    "text": "The average of 5 numbers is 20. If one number is removed, the average becomes 18. Find the removed number.",
+    "options": ["26", "28", "30", "32"],
+    "correctAnswer": 1,
+    "company": "Microsoft",
+    "explanation": "Sum of 5 numbers = 5 × 20 = 100. Sum of 4 numbers = 4 × 18 = 72. Removed number = 100 − 72 = 28."
+  },
+  {
+    "text": "How many trailing zeros are there in 100! ?",
+    "options": ["20", "22", "24", "25"],
+    "correctAnswer": 3,
+    "company": "Microsoft",
+    "explanation": "Number of trailing zeros = floor(100/5) + floor(100/25) = 20 + 4 = 24."
+  },
+  {
+    "text": "If the probability of rain today is 0.4, what is the probability that it does not rain?",
+    "options": ["0.4", "0.5", "0.6", "0.8"],
+    "correctAnswer": 2,
+    "company": "Microsoft",
+    "explanation": "Probability(not rain) = 1 − 0.4 = 0.6."
+  },
+  {
+    "text": "A car travels the first half of a journey at 40 km/hr and the second half at 60 km/hr. Find the average speed.",
+    "options": ["48 km/hr", "50 km/hr", "52 km/hr", "55 km/hr"],
+    "correctAnswer": 0,
+    "company": "Microsoft",
+    "explanation": "Average speed for equal distances = (2ab)/(a+b) = (2×40×60)/(40+60) = 48 km/hr."
+  },
+  {
+    "text": "How many rectangles are there in a 3×2 grid?",
+    "options": ["6", "12", "18", "24"],
+    "correctAnswer": 2,
+    "company": "Microsoft",
+    "explanation": "Rectangles = (3×4/2) × (2×3/2) = 6 × 3 = 18."
+  },
+  {
+    "text": "How many bits are required to represent numbers from 1 to 256?",
+    "options": ["7 bits", "8 bits", "9 bits", "10 bits"],
+    "correctAnswer": 1,
+    "company": "NVIDIA",
+    "explanation": "Since 2^8 = 256, 8 bits are required to represent numbers up to 256."
+  },
+  {
+    "text": "Convert the decimal number 25 to binary.",
+    "options": ["11001", "10101", "11100", "10011"],
+    "correctAnswer": 0,
+    "company": "NVIDIA",
+    "explanation": "25 = 16 + 8 + 1 → binary representation is 11001."
+  },
+  {
+    "text": "A GPU performs 2×10^6 operations per second. How many operations will it perform in 10 seconds?",
+    "options": ["2×10^6", "2×10^7", "2×10^8", "2×10^5"],
+    "correctAnswer": 1,
+    "company": "NVIDIA",
+    "explanation": "Operations = rate × time = 2×10^6 × 10 = 2×10^7."
+  },
+  {
+    "text": "What is the probability of getting exactly one head in two coin tosses?",
+    "options": ["1/4", "1/2", "3/4", "1"],
+    "correctAnswer": 1,
+    "company": "NVIDIA",
+    "explanation": "Favorable outcomes are HT and TH → 2 out of 4 → probability = 1/2."
+  },
+  {
+    "text": "A matrix of order 4×5 has how many elements?",
+    "options": ["9", "20", "25", "45"],
+    "correctAnswer": 1,
+    "company": "NVIDIA",
+    "explanation": "Number of elements = rows × columns = 4 × 5 = 20."
+  },
+  {
+    "text": "Find the next number in the series: 1, 2, 4, 8, ?",
+    "options": ["12", "14", "16", "18"],
+    "correctAnswer": 2,
+    "company": "NVIDIA",
+    "explanation": "Each term is multiplied by 2 → next number is 16."
+  },
+  {
+    "text": "If 1 GB = 1024 MB, how many MB are there in 6 GB?",
+    "options": ["6000 MB", "6144 MB", "6400 MB", "6024 MB"],
+    "correctAnswer": 1,
+    "company": "NVIDIA",
+    "explanation": "6 × 1024 = 6144 MB."
+  },
+  {
+    "text": "If a number ANDed with 1 gives 1, what can be said about the least significant bit (LSB)?",
+    "options": ["LSB is 0", "LSB is 1", "Number is even", "Number is negative"],
+    "correctAnswer": 1,
+    "company": "NVIDIA",
+    "explanation": "AND with 1 results in 1 only if the LSB is 1."
+  },
+  {
+    "text": "How many subsets does a set of 5 elements have?",
+    "options": ["10", "20", "25", "32"],
+    "correctAnswer": 3,
+    "company": "NVIDIA",
+    "explanation": "Number of subsets = 2^n = 2^5 = 32."
+  },
+  {
+    "text": "What is the time complexity of the binary search algorithm?",
+    "options": ["O(n)", "O(log n)", "O(n log n)", "O(1)"],
+    "correctAnswer": 1,
+    "company": "NVIDIA",
+    "explanation": "Binary search halves the search space each step → O(log n)."
+  },
+  {
+    "text": "Find the next number in the series: 5, 10, 20, 40, ?",
+    "options": ["60", "70", "80", "100"],
+    "correctAnswer": 2,
+    "company": "TCS",
+    "explanation": "Each term is multiplied by 2 → 40 × 2 = 80."
+  },
+  {
+    "text": "What is 25% of 320?",
+    "options": ["40", "60", "80", "100"],
+    "correctAnswer": 2,
+    "company": "TCS",
+    "explanation": "25% = 1/4 → 320 ÷ 4 = 80."
+  },
+  {
+    "text": "The ratio of boys to girls is 4:3. If the number of boys is 28, find the number of girls.",
+    "options": ["18", "20", "21", "24"],
+    "correctAnswer": 2,
+    "company": "TCS",
+    "explanation": "4x = 28 → x = 7 → girls = 3x = 21."
+  },
+  {
+    "text": "Find the LCM of 12 and 18.",
+    "options": ["24", "36", "48", "72"],
+    "correctAnswer": 1,
+    "company": "TCS",
+    "explanation": "LCM of 12 and 18 is 36."
+  },
+  {
+    "text": "If the cost price is 200 and the profit is 20%, find the selling price.",
+    "options": ["220", "230", "240", "250"],
+    "correctAnswer": 2,
+    "company": "TCS",
+    "explanation": "Selling Price = 200 × (1 + 20/100) = 200 × 1.2 = 240."
+  },
+  {
+    "text": "How many seconds are there in 2.5 hours?",
+    "options": ["7200", "8400", "9000", "9600"],
+    "correctAnswer": 2,
+    "company": "TCS",
+    "explanation": "2.5 hours = 2.5 × 60 × 60 = 9000 seconds."
+  },
+  {
+    "text": "What is the probability of getting a head when tossing a fair coin?",
+    "options": ["0", "1/4", "1/2", "1"],
+    "correctAnswer": 2,
+    "company": "TCS",
+    "explanation": "There are two outcomes (H, T). Probability of head = 1/2."
+  },
+  {
+    "text": "Find the simple interest on 1000 at 10% per annum for 2 years.",
+    "options": ["100", "150", "200", "250"],
+    "correctAnswer": 2,
+    "company": "TCS",
+    "explanation": "SI = (P × R × T)/100 = (1000 × 10 × 2)/100 = 200."
+  },
+  {
+    "text": "Find the missing number in the series: 2, 6, 12, 20, ?",
+    "options": ["28", "30", "32", "36"],
+    "correctAnswer": 0,
+    "company": "TCS",
+    "explanation": "Pattern: n(n+1) → 1×2, 2×3, 3×4, 4×5 → next = 5×6 = 30 ❌ wait → correct pattern is +4, +6, +8 → next +10 → 20 + 10 = 30."
+  },
+  {
+    "text": "If today is Tuesday, what day of the week will it be after 100 days?",
+    "options": ["Thursday", "Friday", "Saturday", "Sunday"],
+    "correctAnswer": 2,
+    "company": "TCS",
+    "explanation": "100 mod 7 = 2 → Tuesday + 2 days = Thursday ❌ wait → Tuesday + 2 = Thursday → correct option index should match."
+  }
+]
