@@ -16,6 +16,10 @@ import { Schemas } from 'src/schema';
             { name: Schemas.UserAchievement.name, schema: Schemas.UserAchievementSchema },
             { name: Schemas.UserMetrics.name, schema: Schemas.UserMetricsSchema },
             { name: Schemas.User.name, schema: Schemas.UserSchema },
+
+            { name: Schemas.DailyActivity.name, schema: Schemas.DailyActivitySchema },
+            { name: Schemas.SubmissionVote.name, schema: Schemas.SubmissionVoteSchema },
+            { name: Schemas.DiscussionVote.name, schema: Schemas.DiscussionVoteSchema },
         ]),
     ],
     exports: [MongooseModule],

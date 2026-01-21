@@ -8,166 +8,149 @@ interface ContributionCalendarProps {
 }
 
 export const ContributionCalendar = ({ data, className }: ContributionCalendarProps) => {
-  // Generate a proper GitHub-style grid: 13 weeks (91 days) arranged by week columns
-  const { weeks, months } = useMemo(() => {
+  const { weeks, monthLabels } = useMemo(() => {
     const today = new Date();
     const days: string[] = [];
     
-    // Go back to find the start of the earliest week (Sunday)
+    // We'll show 15 weeks to better fill a standard card width
+    const numWeeks = 15;
     const startDate = new Date(today);
-    startDate.setDate(startDate.getDate() - 90);
-    // Adjust to the previous Sunday
+    startDate.setDate(startDate.getDate() - (numWeeks * 7));
+    
     const dayOfWeek = startDate.getDay();
     startDate.setDate(startDate.getDate() - dayOfWeek);
     
-    // Generate all days from start to today
     const current = new Date(startDate);
     while (current <= today) {
       days.push(current.toISOString().split("T")[0]);
       current.setDate(current.getDate() + 1);
     }
     
-    // Organize into weeks (columns)
     const weekColumns: string[][] = [];
-    let currentWeek: string[] = [];
-    
-    for (let i = 0; i < days.length; i++) {
-      const date = new Date(days[i]);
-      if (date.getDay() === 0 && currentWeek.length > 0) {
-        weekColumns.push(currentWeek);
-        currentWeek = [];
-      }
-      currentWeek.push(days[i]);
+    for (let i = 0; i < days.length; i += 7) {
+      weekColumns.push(days.slice(i, i + 7));
     }
-    if (currentWeek.length > 0) {
-      weekColumns.push(currentWeek);
-    }
-    
-    // Get month labels
-    const monthLabels: { label: string; column: number }[] = [];
-    let lastMonth = -1;
-    weekColumns.forEach((week, weekIndex) => {
-      const firstDay = new Date(week[0]);
-      const month = firstDay.getMonth();
-      if (month !== lastMonth) {
-        monthLabels.push({
-          label: firstDay.toLocaleDateString("en-US", { month: "short" }),
-          column: weekIndex,
-        });
-        lastMonth = month;
+
+    const months: { label: string; index: number }[] = [];
+    weekColumns.forEach((week, i) => {
+      const firstDayOfWeek = new Date(week[0]);
+      const monthName = firstDayOfWeek.toLocaleString("default", { month: "short" });
+      if (months.length === 0 || months[months.length - 1].label !== monthName) {
+        months.push({ label: monthName, index: i });
       }
     });
-    
-    return { weeks: weekColumns, months: monthLabels };
+
+    return { weeks: weekColumns, monthLabels: months };
   }, []);
 
-  const hasContribution = (date: string): boolean => {
-    return data.some((d) => d.date === date && d.verified);
-  };
+  const hasContribution = (date: string) => data.some((d) => d.date === date && d.verified);
 
-  const getLabel = (date: string): string => {
-    const dateObj = new Date(date);
-    const formatted = dateObj.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    });
-    return hasContribution(date)
-      ? `Verified submission on ${formatted}`
-      : `No submission on ${formatted}`;
-  };
-
-  // Count total contributions
-  const totalContributions = data.filter((d) => d.verified).length;
-
-  const dayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
+  const dayLabels = [
+    { label: "Mon", index: 1 },
+    { label: "Wed", index: 3 },
+    { label: "Fri", index: 5 },
+  ];
 
   return (
     <TooltipProvider>
-      <div className={cn("space-y-2", className)}>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm text-muted-foreground">Last 3 months</span>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-success">{totalContributions}</span>
-            <span className="text-sm text-muted-foreground">contributions</span>
+      {/* Container now uses w-full to fill the parent card */}
+      <div className={cn("", className)}>
+        
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold tracking-tight">Last 3 months</h3>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-blue-500">
+              {data.filter(d => d.verified).length}
+            </span>
+            <span className="text-xs text-muted-foreground uppercase font-medium">Contributions</span>
           </div>
         </div>
 
-        {/* Month labels */}
-        <div className="flex text-xs text-muted-foreground pl-8">
-          {months.map((m, i) => (
-            <div
-              key={`${m.label}-${i}`}
-              className="flex-shrink-0"
-              style={{ 
-                marginLeft: i === 0 ? `${m.column * 12}px` : undefined,
-                width: i < months.length - 1 
-                  ? `${(months[i + 1].column - m.column) * 12}px` 
-                  : undefined 
-              }}
-            >
-              {m.label}
+        <div className="flex flex-col w-full overflow-hidden">
+          {/* Month Labels - Positioned relative to the grid columns */}
+          <div className="flex mb-2 ml-8 h-5 relative">
+            {monthLabels.map((m, i) => (
+              <span 
+                key={i} 
+                className="text-[11px] text-muted-foreground absolute transform -translate-x-1/2"
+                style={{ 
+                  left: `${(m.index / weeks.length) * 100}%`,
+                  marginLeft: '8px' 
+                }}
+              >
+                {m.label}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex gap-4 w-full">
+            {/* Day Labels Column */}
+            <div className="grid grid-rows-7 gap-[4px] h-full pt-[2px]">
+              {dayLabels.map((day) => (
+                <span
+                  key={day.label}
+                  className="text-[11px] text-muted-foreground flex items-center justify-end pr-2 h-full"
+                  style={{ gridRowStart: day.index + 1 }}
+                >
+                  {day.label}
+                </span>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Calendar grid */}
-        <div className="flex gap-0.5">
-          {/* Day labels */}
-          <div className="flex flex-col gap-0.5 text-xs text-muted-foreground pr-1">
-            {dayLabels.map((label, i) => (
-              <div key={i} className="h-[11px] flex items-center justify-end w-6">
-                {label}
-              </div>
-            ))}
-          </div>
-
-          {/* Weeks grid */}
-          <div className="flex gap-0.5 overflow-hidden">
-            {weeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="flex flex-col gap-0.5">
-                {Array.from({ length: 7 }).map((_, dayIndex) => {
-                  const date = week[dayIndex];
-                  if (!date) {
-                    return <div key={dayIndex} className="w-[11px] h-[11px]" />;
-                  }
-                  const hasActivity = hasContribution(date);
-                  return (
-                    <Tooltip key={date} delayDuration={100}>
-                      <TooltipTrigger asChild>
-                        <div
-                          className={cn(
-                            "w-[11px] h-[11px] rounded-sm transition-colors duration-150",
-                            hasActivity
-                              ? "bg-success/70 hover:bg-success"
-                              : "bg-muted/40 hover:bg-muted/60"
-                          )}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="text-xs">
-                        {getLabel(date)}
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                })}
-              </div>
-            ))}
+            {/* Flexible Grid - Uses flex-1 to stretch across the card */}
+            <div className="flex flex-1 gap-[4px]">
+              {weeks.map((week, wkIdx) => (
+                <div key={wkIdx} className="flex flex-col flex-1 gap-[4px]">
+                  {week.map((date) => {
+                    const active = hasContribution(date);
+                    return (
+                      <Tooltip key={date}>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={cn(
+                              "w-full aspect-square rounded-[6px] transition-all hover:ring-2 hover:ring-primary/20 cursor-pointer",
+                              active 
+                                ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]" 
+                                : "bg-zinc-800/50"
+                            )}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p className="text-xs font-medium">
+                            {active ? "1 contribution" : "No contributions"}
+                          </p>
+                          <p className="text-[10px] opacity-70">{date}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center justify-between pt-2">
+        {/* Legend Section */}
+        <div className="flex flex-wrap items-center justify-between mt-6 pt-4 border-t border-border/50 gap-4">
           <p className="text-xs text-muted-foreground">
             Earn 1 contribution per verified submission
           </p>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
             <span>Less</span>
-            <div className="flex gap-0.5">
-              <div className="w-[11px] h-[11px] rounded-sm bg-muted/40" />
-              <div className="w-[11px] h-[11px] rounded-sm bg-success/30" />
-              <div className="w-[11px] h-[11px] rounded-sm bg-success/50" />
-              <div className="w-[11px] h-[11px] rounded-sm bg-success/70" />
-              <div className="w-[11px] h-[11px] rounded-sm bg-success" />
+            <div className="flex gap-[3px]">
+              {[0, 1, 2, 3, 4].map((v) => (
+                <div 
+                  key={v} 
+                  className={cn(
+                    "w-3 h-3 rounded-[2px]",
+                    v === 0 ? "bg-zinc-800" : 
+                    v === 1 ? "bg-emerald-900" :
+                    v === 2 ? "bg-emerald-700" :
+                    v === 3 ? "bg-emerald-500" : "bg-emerald-300"
+                  )} 
+                />
+              ))}
             </div>
             <span>More</span>
           </div>

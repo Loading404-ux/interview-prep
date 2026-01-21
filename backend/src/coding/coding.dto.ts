@@ -21,3 +21,19 @@ export class CodingSubmissionResponseDto {
   reviewedBy: string;
   createdAt: Date;
 }
+
+
+export class CodingDiscussionDto {
+  @IsMongoId()
+  questionId: string;
+
+  @IsMongoId()
+  userId: string;
+
+  @IsString()
+  content: string;
+
+  @IsMongoId()
+  @IsOptional()
+  parentId?: string;
+}

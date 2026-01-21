@@ -1,4 +1,4 @@
-import { Document,Schema as MongooseSchema  } from "mongoose";
+import { Document, Schema as MongooseSchema } from "mongoose";
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ _id: false }) // IMPORTANT: prevents Mongo from creating _id
@@ -31,7 +31,7 @@ const ExampleSchema = SchemaFactory.createForClass(Example);
 @Schema({ timestamps: true })
 export class CodingQuestion extends Document {
 
-  @Prop({type:String, required: true })
+  @Prop({ type: String, required: true })
   title: string;
 
   @Prop({ enum: ['Easy', 'Medium', 'Hard'], required: true })
@@ -51,6 +51,12 @@ export class CodingQuestion extends Document {
 
   @Prop({ type: [ExampleSchema], default: [] })
   examples: Example[];
+
+  @Prop()
+  constraints?: string;
+
+  @Prop({ default: false })
+  isPremium: boolean;
 
 }
 

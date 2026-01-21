@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { Schemas } from "./schema"
 import { CodingModule } from './coding/coding.module';
 import { DatabaseModule } from './database/database.module';
+import { ActivityModule } from './activity/activity.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,6 +22,7 @@ import { DatabaseModule } from './database/database.module';
   
     CodingModule,
     DatabaseModule,
+    ActivityModule,
   ],
   controllers: [AppController],
   providers: [AppService, ClerkProvider, MongooseConfigService],
