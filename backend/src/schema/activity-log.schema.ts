@@ -28,6 +28,9 @@ export class ActivityLog extends Document {
 
   @Prop({ type: Map, of: String })
   metadata?: Record<string, any>;
+
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date
 }
 
 export const ActivityLogSchema = SchemaFactory.createForClass(ActivityLog);
