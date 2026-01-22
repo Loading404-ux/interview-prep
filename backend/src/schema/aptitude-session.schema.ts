@@ -1,36 +1,36 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
-import { AptitudeQuestion } from './aptitude-question.schema';
-import { User } from './user.schema';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { User } from "./user.schema";
+import { Types ,Document} from "mongoose";
 
 @Schema({ timestamps: true })
 export class AptitudeSession extends Document {
+  @Prop({ type: Types.ObjectId, ref: User.name, index: true })
+  userId: Types.ObjectId;
 
-    @Prop({ type: Types.ObjectId, ref: User.name, index: true })
-    userId: Types.ObjectId;
+  @Prop({ required: true })
+  clerkUserId: string;
 
-    @Prop({ required: true, index: true, type: String })
-    clerkUserId: string
+  @Prop({ enum: ['RAPID', 'STANDARD'], required: true })
+  mode: string;
 
-    @Prop({ enum: ['rapid', 'standard'], required: true })
-    mode: string;
+  @Prop({ default: 0 })
+  totalQuestions: number;
 
-    @Prop([{
-        questionId: { type: Types.ObjectId, ref: AptitudeQuestion.name },
-        selectedOption: Number,
-        isCorrect: Boolean
-    }])
-    responses: {
-        questionId: Types.ObjectId;
-        selectedOption: number;
-        isCorrect: boolean;
-    }[];
+  @Prop({ default: 0 })
+  correctCount: number;
 
-    @Prop({ type: Number, default: 0 })
-    score: number;
+  @Prop({ default: 0 })
+  wrongCount: number;
 
-    @Prop({ type: Number, default: 0 })
-    accuracy: number;
+  @Prop({ default: 0 })
+  timeTakenSeconds: number;
+
+  @Prop({
+    enum: ['STARTED', 'COMPLETED'],
+    default: 'STARTED',
+  })
+  status: string;
 }
 
-export const AptitudeSessionSchema = SchemaFactory.createForClass(AptitudeSession);
+export const AptitudeSessionSchema =
+  SchemaFactory.createForClass(AptitudeSession);

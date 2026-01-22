@@ -10,6 +10,7 @@ import { HrModule } from './hr/hr.module';
 import { UserModule } from './user/user.module';
 import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
+import { AptitudeModule } from './aptitude/aptitude.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,6 +28,7 @@ import { AuthModule } from './auth/auth.module';
     ActivityModule,
     HrModule,
     AiModule,
+    AptitudeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

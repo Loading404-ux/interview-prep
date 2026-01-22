@@ -22,6 +22,9 @@ export class AptitudeQuestion extends Document {
 
   @Prop({ enum: ['Easy', 'Medium', 'Hard'], default: 'Easy' })
   difficulty: string;
+
+  @Prop({ type: [String], index: true })
+  tags?: string[];
 }
 
 

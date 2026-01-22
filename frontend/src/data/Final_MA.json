@@ -6,13 +6,13 @@
     "company": "Infosys",
     "explanation": "Distance = Speed × Time = 60 × 2.5 = 150 km."
   },
-  {
-    "text": "If the selling price of 12 items equals the cost price of 15 items, find the profit percentage.",
-    "options": ["15%", "20%", "25%", "30%"],
-    "correctAnswer": 1,
-    "company": "Infosys",
-    "explanation": "Profit = 3 items on cost of 15 items → (3/15) × 100 = 20%."
-  },
+    {
+      "text": "If the selling price of 12 items equals the cost price of 15 items, find the profit percentage.",
+      "options": ["15%", "20%", "25%", "30%"],
+      "correctAnswer": 1,
+      "company": "Infosys",
+      "explanation": "Profit = 3 items on cost of 15 items → (3/15) × 100 = 20%."
+    },
   {
     "text": "Find the next term in the series: 3, 9, 27, ?",
     "options": ["54", "72", "81", "108"],
