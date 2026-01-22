@@ -9,6 +9,8 @@ import { Schemas } from "./schema"
 import { CodingModule } from './coding/coding.module';
 import { DatabaseModule } from './database/database.module';
 import { ActivityModule } from './activity/activity.module';
+import { HrModule } from './hr/hr.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -23,6 +25,8 @@ import { ActivityModule } from './activity/activity.module';
     CodingModule,
     DatabaseModule,
     ActivityModule,
+    HrModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, ClerkProvider, MongooseConfigService],

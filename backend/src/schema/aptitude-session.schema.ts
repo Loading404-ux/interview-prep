@@ -9,6 +9,9 @@ export class AptitudeSession extends Document {
     @Prop({ type: Types.ObjectId, ref: User.name, index: true })
     userId: Types.ObjectId;
 
+    @Prop({ required: true, index: true, type: String })
+    clerkUserId: string
+
     @Prop({ enum: ['rapid', 'standard'], required: true })
     mode: string;
 

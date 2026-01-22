@@ -8,7 +8,7 @@
         ],
         "company": "Infosys",
         "problem": "Given an integer N, determine whether it is a prime number.",
-        "approach": "Check divisibility from 2 to square root of N.",
+        "hint": "Check divisibility from 2 to square root of N.",
         "time_complexity": "O(sqrt(N))",
         "space_complexity": "O(1)",
         "example": [
@@ -30,7 +30,7 @@
         ],
         "company": "Infosys",
         "problem": "Given a number N, count the total number of digits.",
-        "approach": "Repeatedly divide the number by 10.",
+        "hint": "Repeatedly divide the number by 10.",
         "time_complexity": "O(log N)",
         "space_complexity": "O(1)",
         "example": [
@@ -52,7 +52,7 @@
         ],
         "company": "Infosys",
         "problem": "Find the sum of all elements in an array.",
-        "approach": "Traverse array and accumulate sum.",
+        "hint": "Traverse array and accumulate sum.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -83,7 +83,7 @@
         ],
         "company": "Infosys",
         "problem": "Reverse the order of words in a string.",
-        "approach": "Split string by spaces and reverse word order.",
+        "hint": "Split string by spaces and reverse word order.",
         "time_complexity": "O(N)",
         "space_complexity": "O(N)",
         "example": [
@@ -105,7 +105,7 @@
         ],
         "company": "Infosys",
         "problem": "Find the second smallest distinct element in an array.",
-        "approach": "Track smallest and second smallest values.",
+        "hint": "Track smallest and second smallest values.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -138,7 +138,7 @@
         ],
         "company": "Infosys",
         "problem": "Check whether two strings are anagrams.",
-        "approach": "Use frequency array of size 26.",
+        "hint": "Use frequency array of size 26.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -166,7 +166,7 @@
         ],
         "company": "Infosys",
         "problem": "Find the longest common prefix among an array of strings.",
-        "approach": "Compare characters column-wise.",
+        "hint": "Compare characters column-wise.",
         "time_complexity": "O(N*M)",
         "space_complexity": "O(1)",
         "example": [
@@ -197,7 +197,7 @@
         ],
         "company": "Infosys",
         "problem": "Detect whether a linked list contains a cycle.",
-        "approach": "Use Floyd’s Cycle Detection Algorithm.",
+        "hint": "Use Floyd’s Cycle Detection Algorithm.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -220,7 +220,7 @@
         ],
         "company": "Infosys",
         "problem": "One number is missing and one is repeating in array from 1 to N.",
-        "approach": "Use XOR or mathematical equations.",
+        "hint": "Use XOR or mathematical equations.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -261,7 +261,7 @@
         ],
         "company": "Infosys",
         "problem": "Merge two sorted linked lists into one sorted list.",
-        "approach": "Compare nodes and link the smaller node.",
+        "hint": "Compare nodes and link the smaller node.",
         "time_complexity": "O(N + M)",
         "space_complexity": "O(1)",
         "example": [
@@ -318,7 +318,7 @@
         ],
         "company": "Infosys",
         "problem": "Given an integer array, find the length of the longest contiguous subarray with sum equal to 0.",
-        "approach": "Use prefix sum and a HashMap to store first occurrence of each prefix sum. If the same prefix sum appears again, the subarray between indices has sum zero.",
+        "hint": "Use prefix sum and a HashMap to store first occurrence of each prefix sum. If the same prefix sum appears again, the subarray between indices has sum zero.",
         "time_complexity": "O(N)",
         "space_complexity": "O(N)",
         "example": [
@@ -364,7 +364,7 @@
         ],
         "company": "Infosys",
         "problem": "Detect a loop in a singly linked list and remove it without losing nodes.",
-        "approach": "Use Floyd’s Cycle Detection Algorithm. Once detected, reset one pointer to head and move both pointers to find loop start. Remove loop by setting the last node's next to NULL.",
+        "hint": "Use Floyd’s Cycle Detection Algorithm. Once detected, reset one pointer to head and move both pointers to find loop start. Remove loop by setting the last node's next to NULL.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -392,7 +392,7 @@
         ],
         "company": "Infosys",
         "problem": "Check whether a binary tree is height balanced.",
-        "approach": "Use postorder traversal. Return -1 if any subtree is unbalanced.",
+        "hint": "Use postorder traversal. Return -1 if any subtree is unbalanced.",
         "time_complexity": "O(N)",
         "space_complexity": "O(H)",
         "example": [
@@ -420,7 +420,7 @@
         ],
         "company": "Infosys",
         "problem": "Find the first character that does not repeat in a string.",
-        "approach": "Count frequency using hashmap or array. Traverse string again to find first character with count 1.",
+        "hint": "Count frequency using hashmap or array. Traverse string again to find first character with count 1.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -448,7 +448,7 @@
         ],
         "company": "Infosys",
         "problem": "Merge K sorted linked lists into one sorted list.",
-        "approach": "Use a min heap (priority queue). Push heads of all lists and repeatedly extract minimum.",
+        "hint": "Use a min heap (priority queue). Push heads of all lists and repeatedly extract minimum.",
         "time_complexity": "O(N log K)",
         "space_complexity": "O(K)",
         "example": [
@@ -481,7 +481,7 @@
         ],
         "company": "NVIDIA",
         "problem": "Given an array of integers, find the maximum element.",
-        "approach": "Traverse the array and track the maximum.",
+        "hint": "Traverse the array and track the maximum.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -514,7 +514,7 @@
         ],
         "company": "NVIDIA",
         "problem": "Determine if a number is a power of two.",
-        "approach": "Use bitwise operation (n & (n - 1)).",
+        "hint": "Use bitwise operation (n & (n - 1)).",
         "time_complexity": "O(1)",
         "space_complexity": "O(1)",
         "example": [
@@ -538,7 +538,7 @@
         ],
         "company": "NVIDIA",
         "problem": "Reverse the given array in-place.",
-        "approach": "Swap elements from both ends.",
+        "hint": "Swap elements from both ends.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -576,7 +576,7 @@
         ],
         "company": "NVIDIA",
         "problem": "Find the first non-repeating character in a string.",
-        "approach": "Frequency count using array or HashMap.",
+        "hint": "Frequency count using array or HashMap.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -600,7 +600,7 @@
         ],
         "company": "NVIDIA",
         "problem": "Find the length of the longest increasing subsequence.",
-        "approach": "Dynamic Programming.",
+        "hint": "Dynamic Programming.",
         "time_complexity": "O(N^2)",
         "space_complexity": "O(N)",
         "example": [
@@ -640,7 +640,7 @@
         ],
         "company": "NVIDIA",
         "problem": "Check if the height difference of subtrees is at most 1.",
-        "approach": "Postorder traversal.",
+        "hint": "Postorder traversal.",
         "time_complexity": "O(N)",
         "space_complexity": "O(H)",
         "example": [
@@ -665,7 +665,7 @@
         ],
         "company": "NVIDIA",
         "problem": "Find the length of the longest subarray with sum equal to zero.",
-        "approach": "Prefix sum with HashMap.",
+        "hint": "Prefix sum with HashMap.",
         "time_complexity": "O(N)",
         "space_complexity": "O(N)",
         "example": [
@@ -699,7 +699,7 @@
         ],
         "company": "NVIDIA",
         "problem": "Detect and remove a loop in a linked list without losing nodes.",
-        "approach": "Floyd’s Cycle Detection Algorithm.",
+        "hint": "Floyd’s Cycle Detection Algorithm.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -723,7 +723,7 @@
         ],
         "company": "NVIDIA",
         "problem": "Merge K sorted arrays into one sorted array.",
-        "approach": "Min Heap (Priority Queue).",
+        "hint": "Min Heap (Priority Queue).",
         "time_complexity": "O(N log K)",
         "space_complexity": "O(K)",
         "example": [
@@ -777,7 +777,7 @@
         ],
         "company": "NVIDIA",
         "problem": "Find the minimum number of scalar multiplications.",
-        "approach": "Dynamic Programming.",
+        "hint": "Dynamic Programming.",
         "time_complexity": "O(N^3)",
         "space_complexity": "O(N^2)",
         "example": [
@@ -810,7 +810,7 @@
         ],
         "company": "TCS",
         "problem": "Reverse the given integer.",
-        "approach": "Use modulo and division.",
+        "hint": "Use modulo and division.",
         "time_complexity": "O(log N)",
         "space_complexity": "O(1)",
         "example": [
@@ -834,7 +834,7 @@
         ],
         "company": "TCS",
         "problem": "Check if string reads same forward and backward.",
-        "approach": "Two pointer comparison.",
+        "hint": "Two pointer comparison.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -857,7 +857,7 @@
         ],
         "company": "TCS",
         "problem": "Find largest element in array.",
-        "approach": "Traverse and track maximum value.",
+        "hint": "Traverse and track maximum value.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -889,7 +889,7 @@
         ],
         "company": "TCS",
         "problem": "Find second largest distinct element in array.",
-        "approach": "Track largest and second largest values.",
+        "hint": "Track largest and second largest values.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -922,7 +922,7 @@
         ],
         "company": "TCS",
         "problem": "Find first unique character in string.",
-        "approach": "Use frequency array or hashmap.",
+        "hint": "Use frequency array or hashmap.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -945,7 +945,7 @@
         ],
         "company": "TCS",
         "problem": "Check whether array is sorted in ascending order.",
-        "approach": "Compare adjacent elements.",
+        "hint": "Compare adjacent elements.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -975,7 +975,7 @@
         ],
         "company": "TCS",
         "problem": "Find the greatest common divisor of two numbers.",
-        "approach": "Use Euclidean Algorithm.",
+        "hint": "Use Euclidean Algorithm.",
         "time_complexity": "O(log N)",
         "space_complexity": "O(1)",
         "example": [
@@ -1005,7 +1005,7 @@
         ],
         "company": "TCS",
         "problem": "Find length of longest subarray with sum equal to zero.",
-        "approach": "Use prefix sum with HashMap.",
+        "hint": "Use prefix sum with HashMap.",
         "time_complexity": "O(N)",
         "space_complexity": "O(N)",
         "example": [
@@ -1038,7 +1038,7 @@
         ],
         "company": "TCS",
         "problem": "Detect and remove cycle in linked list.",
-        "approach": "Use Floyd’s Cycle Detection Algorithm.",
+        "hint": "Use Floyd’s Cycle Detection Algorithm.",
         "time_complexity": "O(N)",
         "space_complexity": "O(1)",
         "example": [
@@ -1061,7 +1061,7 @@
         ],
         "company": "TCS",
         "problem": "Merge K sorted arrays into one sorted array.",
-        "approach": "Use Min Heap (Priority Queue).",
+        "hint": "Use Min Heap (Priority Queue).",
         "time_complexity": "O(N log K)",
         "space_complexity": "O(K)",
         "example": [

@@ -11,6 +11,8 @@ export class CodingDiscussion extends Document {
   @Prop({ type: Types.ObjectId, ref: User.name, index: true })
   userId: Types.ObjectId;
 
+  @Prop({ required: true, index: true, type: String })
+  clerkUserId: string
   @Prop({ type: Types.ObjectId, ref: CodingDiscussion.name, default: null })
   parentId: Types.ObjectId | null;
 
@@ -19,7 +21,7 @@ export class CodingDiscussion extends Document {
 
   @Prop({ default: 0 })
   upvotes: number;
-  
+
   @Prop({ default: 0 })
   replyCount: number;
 

@@ -41,6 +41,9 @@ export class CodingSubmission extends Document {
     index: true
   })
   userId: Types.ObjectId;
+  
+  @Prop({ required: true, index: true, type: String })
+  clerkUserId: string
 
   @Prop({
     type: Types.ObjectId,
@@ -73,10 +76,10 @@ export class CodingSubmission extends Document {
   @Prop({ type: AiFeedbackSchema })
   aiFeedback?: AiFeedback;
 
-  @Prop({type :Date,default:Date.now})
+  @Prop({ type: Date, default: Date.now })
   createdAt: Date
 }
 
-export const CodingSubmissionSchema =SchemaFactory.createForClass(CodingSubmission);
+export const CodingSubmissionSchema = SchemaFactory.createForClass(CodingSubmission);
 
 

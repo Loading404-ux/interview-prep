@@ -8,16 +8,16 @@ export class HrQuestion extends Document {
   question: string;
 
   @Prop()
-  preferredAnswer: string;
+  preferred_answer: string;
 
   @Prop()
-  sampleAnswer: string;
+  sample_answer: string;
 
-  @Prop()
+  @Prop({type:String,default:null})
   company?: string;
 
-  @Prop({ enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' })
-  difficulty: string;
+  // @Prop({ enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' })
+  // difficulty: string;
 }
 
 export const HrQuestionSchema = SchemaFactory.createForClass(HrQuestion);

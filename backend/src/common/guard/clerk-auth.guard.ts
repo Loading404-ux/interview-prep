@@ -7,29 +7,33 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import type { ClerkClient } from '@clerk/backend';
+import { verifyToken } from '@clerk/backend';
 
 @Injectable()
 export class ClerkAuthGuard implements CanActivate {
   constructor(
     @Inject('CLERK_CLIENT')
-    private readonly clerkClient: ClerkClient,
-  ) {}
+    private readonly clerkClient: ClerkClient, // optional, for later use
+  ) { }
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest<Request>();
+  async canActivate(ctx: ExecutionContext): Promise<boolean> {
+    const req = ctx.switchToHttp().getRequest();
 
-    // Comes from clerkMiddleware()
-    const auth = (req as any).auth;
-
-    if (!auth || !auth.isAuthenticated) {
-      throw new UnauthorizedException('User not authenticated');
+    const authHeader = req.headers.authorization;
+    console.log(authHeader)
+    if (!authHeader) {
+      throw new UnauthorizedException('Missing Authorization header');
     }
 
-    // Optional but recommended: fetch backend user
-    const user = await this.clerkClient.users.getUser(auth.userId);
+    const token = authHeader.replace('Bearer ', '');
 
-    // Attach for downstream use
-    (req as any).user = user;
+    const payload = await verifyToken(token, {
+      secretKey: process.env.CLERK_SECRET_KEY!,
+    });
+
+    req.user = {
+      clerkUserId: payload.sub,
+    };
 
     return true;
   }

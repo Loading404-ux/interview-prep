@@ -566,7 +566,7 @@ const ProblemDetail = () => {
       <div className="max-w-5xl mx-auto space-y-4 h-full">
         {/* Back button */}
         <button
-          onClick={() => router.push("/coding")}
+          onClick={() => router.push("/dashboard/coding")}
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -672,7 +672,7 @@ const ProblemDetail = () => {
                             onChange={(e) =>
                               setNewSolution((prev) => ({ ...prev, solutionText: e.target.value }))
                             }
-                            className="min-h-[200px] font-mono text-sm bg-muted/30 border-border/50"
+                            className="min-h-[200px] text-sm bg-muted/30 border-border/50 font-mono!"
                           />
                         </div>
                         <div className="space-y-2">
@@ -752,7 +752,7 @@ const ProblemDetail = () => {
                 <div className="p-6 space-y-4">
                   {/* New Comment Input */}
                   <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                       <span className="text-sm font-semibold text-primary">Y</span>
                     </div>
                     <div className="flex-1 flex gap-2">

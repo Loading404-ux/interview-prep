@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document,Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { HrQuestion } from './hr-questions.schema';
 import { User } from './user.schema';
 @Schema({ _id: false })
@@ -18,7 +18,7 @@ export class HrQuestionResponse {
 export const HrQuestionResponseSchema =
   SchemaFactory.createForClass(HrQuestionResponse);
 
-  @Schema({ _id: false })
+@Schema({ _id: false })
 export class HrAiEvaluation {
 
   @Prop({ min: 0, max: 100 })
@@ -48,6 +48,9 @@ export class HrSession extends Document {
     index: true
   })
   userId: Types.ObjectId;
+  
+  @Prop({ required: true, index: true, type: String })
+  clerkUserId: string;
 
   @Prop({
     type: [HrQuestionResponseSchema],

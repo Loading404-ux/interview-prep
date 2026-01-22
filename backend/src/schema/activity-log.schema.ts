@@ -9,6 +9,9 @@ export class ActivityLog extends Document {
   @Prop({ type: Types.ObjectId, ref: User.name, index: true })
   userId: Types.ObjectId;
 
+  @Prop({ required: true, index: true, type: String })
+  clerkUserId: string
+  
   @Prop({ enum: ['coding', 'hr', 'aptitude'], index: true })
   type: string;
 

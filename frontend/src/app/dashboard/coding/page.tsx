@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useTransition } from "react";
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ import {
     Filter,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 type Difficulty = "Easy" | "Medium" | "Hard";
 
@@ -67,6 +68,30 @@ function RowComponent({
     const problem = items[index];
     const handleProblemClick = useCallback((slug: number) => {
         router.push(`/dashboard/coding/${slug}`);
+    }, []);
+    const [prending, startTransition] = useTransition()
+    const auth = useAuth()
+    console.log(auth)
+    async function getProfile() {
+        try {
+            const token=await auth.getToken()
+            const res = await fetch(`http://10.5.146.66:8000/auth/profile`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            const data = await res.json()
+            console.log(data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    useEffect(() => {
+        startTransition(async () => {
+            await getProfile()
+        })
     }, []);
     return (
         <button

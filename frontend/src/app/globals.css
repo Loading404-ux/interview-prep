@@ -9,7 +9,7 @@
 ================================ */
 @theme inline {
   --font-sans: var(--font-quicksand);
-
+  --font-mono: var(--font-cascadia-code);
   /* Radius */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -273,6 +273,13 @@
   }
 }
 
+
+/* fade-up-stagger */
+
+/* ================================
+   ANIMATIONS
+================================ */
+
 @keyframes card-fade-in {
   from {
     opacity: 0;
@@ -296,12 +303,6 @@
     transform: translateY(0);
   }
 }
-
-/* fade-up-stagger */
-
-/* ================================
-   ANIMATIONS
-================================ */
 @keyframes fade-up {
   from {
     opacity: 0;

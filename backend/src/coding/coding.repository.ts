@@ -1,11 +1,12 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CodingSubmission, SubmissionVerdict } from '../schema/coding-submission.schema';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {Injectable } from '@nestjs/common';
 import { SubmissionVote } from 'src/schema/coding-submission-vote.schema';
 import { DiscussionVote } from 'src/schema/coding-discussion-vote.schema';
 import { CodingDiscussion } from 'src/schema/coding-discussion.schema';
 import { CodingDiscussionDto } from './coding.dto';
+import { CodingQuestion } from 'src/schema/coding-questions.schema';
 // import { SubmissionVerdict } from '../schemas/enums';
 
 @Injectable()
@@ -20,7 +21,26 @@ export class CodingRepository {
         private readonly discussionModel: Model<CodingDiscussion>,
         @InjectModel(SubmissionVote.name)
         private readonly discussionVoteModel: Model<DiscussionVote>,
+
+        @InjectModel(CodingQuestion.name)
+        private readonly questionModel: Model<CodingQuestion>,
     ) { }
+
+
+    insertQuestion(data: Partial<CodingQuestion>) {
+        return this.questionModel.create(data);
+    }
+    insertMultipleQuestion(data: Partial<CodingQuestion[]>) {
+        return this.questionModel.insertMany(data);
+    }
+
+    getAllQuestion() {
+        return this.questionModel.find().select(['-__v']);
+    }
+    getQuestionById(id: string) {
+        return this.questionModel.findById(id);
+    }
+
 
     createInitialSubmission(data: Partial<CodingSubmission>): Promise<CodingSubmission> {
         return this.submissionModel.create({
@@ -150,8 +170,5 @@ export class CodingRepository {
             .sort({ createdAt: -1 })
             .limit(limit + 1); // fetch extra for nextCursor
     }
-    // async createDiscussion(data: Partial<CodingDiscussion>): Promise<CodingDiscussion> {
-
-    // }
 
 }

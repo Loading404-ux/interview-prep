@@ -4,9 +4,9 @@ import { ClerkAuthGuard } from './common/guard/clerk-auth.guard';
 import { RolesGuard } from './common/guard/roles.guard';
 import { Roles } from './common/decorators/roles.decorator';
 
-// @Controller()
-@Controller('admin')
-@UseGuards(ClerkAuthGuard, RolesGuard)
+// @Controller('admin')
+@Controller()
+// @UseGuards(ClerkAuthGuard, RolesGuard)
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
@@ -17,9 +17,9 @@ export class AppController {
 
 
 
-  @Get()
-  @Roles('admin')
-  getAdminData() {
-    return { message: 'Admin access granted' }
-  }
+  // @Get()
+  // @Roles('admin')
+  // getAdminData() {
+  //   return { message: 'Admin access granted' }
+  // }
 }

@@ -20,7 +20,7 @@ export class AptitudeQuestion extends Document {
   @Prop()
   company?: string;
 
-  @Prop({ enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' })
+  @Prop({ enum: ['Easy', 'Medium', 'Hard'], default: 'Easy' })
   difficulty: string;
 }
 

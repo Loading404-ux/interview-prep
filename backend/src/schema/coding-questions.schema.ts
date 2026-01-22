@@ -26,6 +26,16 @@ export class Example {
   @Prop({ type: MongooseSchema.Types.Mixed, required: true })
   output: any;
 }
+@Schema({ _id: false }) // IMPORTANT
+export class Constraints {
+
+
+  @Prop({ type: String, required: true })
+  time_complexity: string;
+
+  @Prop({ type: String, required: true })
+  space_complexity: string;
+}
 
 const ExampleSchema = SchemaFactory.createForClass(Example);
 @Schema({ timestamps: true })
@@ -46,18 +56,20 @@ export class CodingQuestion extends Document {
   @Prop({ required: true })
   problem: string;
 
-  @Prop({ type: EditorialSchema, required: true })
-  editorial: Editorial;
+  @Prop({ required: true,type:String })
+  hint: string;
+
+  @Prop({ type: EditorialSchema, default: {} })
+  editorial?: Editorial;
 
   @Prop({ type: [ExampleSchema], default: [] })
   examples: Example[];
 
-  @Prop()
-  constraints?: string;
+  @Prop({type:Constraints,default:{}})
+  constraints: Constraints;
 
   @Prop({ default: false })
   isPremium: boolean;
-
 }
 
 export const CodingQuestionSchema = SchemaFactory.createForClass(CodingQuestion);

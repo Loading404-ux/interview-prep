@@ -12,6 +12,9 @@ export class SubmissionVote extends Document {
     @Prop({ type: Types.ObjectId, ref: User.name, required: true, index: true })
     userId: Types.ObjectId;
 
+    @Prop({ required: true, index: true, type: String })
+    clerkUserId: string
+
 }
 
 export const SubmissionVoteSchema =

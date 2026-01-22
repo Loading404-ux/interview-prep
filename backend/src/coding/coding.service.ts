@@ -6,6 +6,8 @@ import { CodingSubmissionMapper } from './coding.mapper';
 import { SubmissionVerdict } from 'src/schema/coding-submission.schema';
 import { CodingDiscussion } from 'src/schema/coding-discussion.schema';
 
+//BUG: use clearUserId not mongoId(currently configured with userId not clerkUserId😭)
+
 @Injectable()
 export class CodingService {
     constructor(
