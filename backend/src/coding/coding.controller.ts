@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { ClerkAuthGuard } from 'src/common/guard/clerk-auth.guard';
-import { CreateCodingSubmissionDto } from './coding.dto';
+import { CodingSubmissionDto } from './coding.dto';
 import { CodingService } from './coding.service';
 
 @Controller('coding')
@@ -9,7 +9,7 @@ export class CodingController {
     constructor(private readonly service: CodingService) { }
 
     @Post("new-submission")
-    async subbmition(@Req() req: any, @Body() dto: CreateCodingSubmissionDto) {
-        return this.service.submitSolution(req.user.userId, dto);
+    async subbmition(@Req() req: any, @Body() dto: CodingSubmissionDto) {
+        return this.service.submitSolution(req.user.clerkUserId, req.user._id, dto);
     }
 }

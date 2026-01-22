@@ -1,11 +1,11 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CodingSubmission, SubmissionVerdict } from '../schema/coding-submission.schema';
-import {Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SubmissionVote } from 'src/schema/coding-submission-vote.schema';
 import { DiscussionVote } from 'src/schema/coding-discussion-vote.schema';
 import { CodingDiscussion } from 'src/schema/coding-discussion.schema';
-import { CodingDiscussionDto } from './coding.dto';
+import { CodingDiscussionDto, CodingSubmissionDto, DiscussionVoteDto, SubmisstionVoteDto, UserIDsDto } from './coding.dto';
 import { CodingQuestion } from 'src/schema/coding-questions.schema';
 // import { SubmissionVerdict } from '../schemas/enums';
 
@@ -42,7 +42,7 @@ export class CodingRepository {
     }
 
 
-    createInitialSubmission(data: Partial<CodingSubmission>): Promise<CodingSubmission> {
+    createInitialSubmission(data: CodingSubmissionDto & UserIDsDto): Promise<CodingSubmission> {
         return this.submissionModel.create({
             ...data,
             verdict: SubmissionVerdict.NEEDS_IMPROVEMENT,
@@ -76,8 +76,8 @@ export class CodingRepository {
         return this.submissionVoteModel.findOne({ userId, submissionId });
     }
 
-    newSubmissionVote(userId: string, submissionId: string) {
-        return this.submissionVoteModel.create({ userId, submissionId });
+    newSubmissionVote(data: SubmisstionVoteDto) {
+        return this.submissionVoteModel.create(data);
     }
 
     updateSubmissionVoteCount(
@@ -100,8 +100,8 @@ export class CodingRepository {
         return this.discussionVoteModel.findOne({ userId, discussionId });
     }
 
-    newDiscussionVote(userId: string, discussionId: string) {
-        return this.discussionVoteModel.create({ userId, discussionId });
+    newDiscussionVote(data: DiscussionVoteDto) {
+        return this.discussionVoteModel.create(data);
     }
 
     updateDiscussionVoteCount({ discussionId, userId, value }: { discussionId: Types.ObjectId, userId: string, value: number }) {
@@ -112,7 +112,7 @@ export class CodingRepository {
         );
     }
 
-    createDiscussion(data: CodingDiscussionDto): Promise<CodingDiscussion> {
+    createDiscussion(data: CodingDiscussionDto & UserIDsDto): Promise<CodingDiscussion> {
         return this.discussionModel.create(data);
     }
 
@@ -120,7 +120,7 @@ export class CodingRepository {
         return this.discussionModel.findById(id);
     }
     findByDiscussionsByQuestionId(id: string): Promise<CodingDiscussion[] | null> {
-        return this.discussionModel.find({questionId:id});
+        return this.discussionModel.find({ questionId: id });
     }
 
     incrementDiscussionReplyCount(id: Types.ObjectId): Promise<void> {

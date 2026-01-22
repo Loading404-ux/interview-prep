@@ -42,7 +42,7 @@ describe('CodingService', () => {
 
     repo.createInitialSubmission.mockResolvedValue(mockSubmission as any);
 
-    const result = await service.submitSolution(fakeUserId, dto);
+    const result = await service.submitSolution(fakeUserId, fakeUserId, dto);
 
     expect(repo.createInitialSubmission).toHaveBeenCalledWith({
       userId: expect.any(Types.ObjectId),

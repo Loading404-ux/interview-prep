@@ -14,7 +14,7 @@ export class ActivityRepository {
     async newActivityLog(userId: string, submissionId: string, date: Date) {
         await this.activityLogModel.create({
             userId,
-            type: 'coding',
+            eventType: "CODING_SUBMIT",
             referenceId: submissionId,
             description: 'Submitted coding solution'
         });

@@ -1,7 +1,6 @@
 import { IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class CreateCodingSubmissionDto {
-
+export class CodingSubmissionDto {
   @IsMongoId()
   questionId: string;
 
@@ -22,13 +21,10 @@ export class CodingSubmissionResponseDto {
   createdAt: Date;
 }
 
-
 export class CodingDiscussionDto {
   @IsMongoId()
   questionId: string;
 
-  @IsMongoId()
-  userId: string;
 
   @IsString()
   content: string;
@@ -36,4 +32,21 @@ export class CodingDiscussionDto {
   @IsMongoId()
   @IsOptional()
   parentId?: string;
+}
+
+export class UserIDsDto {
+  @IsMongoId()
+  userId: string;
+  @IsString()
+  clerkUserId: string;
+}
+
+export class DiscussionVoteDto extends UserIDsDto {
+  @IsMongoId()
+  discussionId: string
+}
+
+export class SubmisstionVoteDto extends UserIDsDto {
+  @IsMongoId()
+  submissionId: string
 }

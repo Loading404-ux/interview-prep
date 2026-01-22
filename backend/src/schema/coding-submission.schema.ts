@@ -43,7 +43,7 @@ export class CodingSubmission extends Document {
   userId: Types.ObjectId;
   
   @Prop({ required: true, index: true, type: String })
-  clerkUserId: string
+  clerkUserId: string;
 
   @Prop({
     type: Types.ObjectId,

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document,Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { User } from './user.schema';
 
 
@@ -11,15 +11,23 @@ export class ActivityLog extends Document {
 
   @Prop({ required: true, index: true, type: String })
   clerkUserId: string
-  
-  @Prop({ enum: ['coding', 'hr', 'aptitude'], index: true })
-  type: string;
+
+  @Prop({
+    type: String,
+    enum: ['CODING_SUBMIT', 'HR_SESSION_COMPLETE', 'APTITUDE_ATTEMPT'],
+    required: true,
+    index: true,
+  })
+  eventType: string;
 
   @Prop()
   referenceId: Types.ObjectId;
 
   @Prop()
   description: string;
+
+  @Prop({ type: Map, of: String })
+  metadata?: Record<string, any>;
 }
 
 export const ActivityLogSchema = SchemaFactory.createForClass(ActivityLog);

@@ -1,11 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Mic, Square, ArrowRight, MessageSquare, Lightbulb, CheckCircle2 } from "lucide-react";
+import { Microphone } from "@/utils/Microphone";
 
-type InterviewState = "idle" | "recording" | "completed";
+type InterviewState = "idle" | "recording" | "completed" | "waiting";
 
 interface Question {
   id: number;
@@ -54,21 +55,30 @@ const HRInterview = () => {
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
+  const mic = useRef<Microphone>(null)
+  if (!mic.current) {
+    mic.current = new Microphone()
+  }
   const feedbackScores: FeedbackScore[] = [
     { label: "Clarity", score: 78, color: "bg-coding" },
     { label: "Structure", score: 65, color: "bg-hr" },
     { label: "Confidence", score: 72, color: "bg-aptitude" },
   ];
 
-  const handleStartRecording = () => {
+  const handleStartRecording = async () => {
+    // setState("waiting");
+    await Promise.resolve(() => setTimeout(() => { }, 1000))
     setState("recording");
     setCardKey(prev => prev + 1);
+    mic.current?.startRecording();
   };
 
-  const handleStopRecording = () => {
+  const handleStopRecording = async () => {
     setState("completed");
     setCardKey(prev => prev + 1);
     setTimeout(() => setShowFeedback(true), 100);
+    const blob = await mic.current?.stopRecording();
+
   };
 
   const handleNextQuestion = () => {

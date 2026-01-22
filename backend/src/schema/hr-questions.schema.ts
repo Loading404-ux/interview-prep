@@ -13,8 +13,18 @@ export class HrQuestion extends Document {
   @Prop()
   sample_answer: string;
 
-  @Prop({type:String,default:null})
+  @Prop({ type: String, default: null })
   company?: string;
+  
+  // HrQuestion
+  @Prop({ enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' })
+  difficulty: string;
+
+  @Prop({ type: [String], index: true })
+  tags: string[];
+
+  @Prop({ enum: ['Behavioral', 'Leadership', 'Conflict', 'Culture'] })
+  category: string;
 
   // @Prop({ enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' })
   // difficulty: string;

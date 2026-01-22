@@ -5,6 +5,7 @@ import {
   Bell,
   ChevronsUpDown,
   CreditCard,
+  Loader2Icon,
   LogOut,
   Sparkles,
 } from "lucide-react"
@@ -30,7 +31,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
-
+import { useAuth } from "@clerk/nextjs"
+import { useTransition } from "react"
+import { useRouter } from "next/navigation"
 export function NavUser({
   user,
 }: {
@@ -41,7 +44,15 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-
+  const { signOut } = useAuth()
+  const [loading, startTransaction] = useTransition()
+  const route = useRouter()
+  async function Logout() {
+    startTransaction(async () => {
+      await signOut()
+      route.push("/")
+    })
+  }
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -89,23 +100,23 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => route.push("/dashboard/profile")}>
                 <BadgeCheck />
-                <Link href="/dashboard/profile">Account</Link>
+                <Link href="">Account</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem disabled={loading}>
                 <CreditCard />
                 <Link href="#">Billing</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem disabled={loading}>
                 <Bell />
                 <Link href="#">Notifications</Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              <Link href="#">Log out</Link>
+            <DropdownMenuItem onClick={() => signOut()} disabled={loading}>
+              {loading ? <Loader2Icon className="animate-spin" /> : <LogOut />}
+              <span >Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CodingRepository } from './coding.repository';
-import { CodingDiscussionDto, CreateCodingSubmissionDto } from './coding.dto';
+import { CodingDiscussionDto, CodingSubmissionDto, DiscussionVoteDto, SubmisstionVoteDto } from './coding.dto';
 import { Types } from 'mongoose';
 import { CodingSubmissionMapper } from './coding.mapper';
 import { SubmissionVerdict } from 'src/schema/coding-submission.schema';
@@ -20,12 +20,14 @@ export class CodingService {
 
     async submitSolution(
         userId: string,
-        dto: CreateCodingSubmissionDto
+        clerkUserId: string,
+        dto: CodingSubmissionDto
     ) {
         // 1️⃣ Create submission
         const submission = await this.repo.createInitialSubmission({
-            userId: new Types.ObjectId(userId),
-            questionId: new Types.ObjectId(dto.questionId),
+            userId,
+            clerkUserId,
+            questionId: dto.questionId,
             solutionText: dto.solutionText,
             explanation: dto.explanation,
         });
@@ -44,7 +46,7 @@ export class CodingService {
     }
 
     async toggleSubmissionVote(
-        data: { submissionId: string; userId: string }
+        data: SubmisstionVoteDto
     ): Promise<{ voted: boolean }> {
 
         const vote = await this.repo.findSubmissionVote(
@@ -59,7 +61,7 @@ export class CodingService {
         }
 
         // 👍 Vote
-        await this.repo.newSubmissionVote(data.userId, data.submissionId);
+        await this.repo.newSubmissionVote(data);
 
         const submission = await this.repo.findBySubmissionId(data.submissionId);
 
@@ -72,8 +74,7 @@ export class CodingService {
     }
 
 
-
-    async createDiscussion(data: CodingDiscussionDto): Promise<CodingDiscussion> {
+    async createDiscussion({ userId, clerkUserId, data }: { userId: string, clerkUserId: string, data: CodingDiscussionDto }): Promise<CodingDiscussion> {
 
         let parent: CodingDiscussion | null = null;
 
@@ -94,7 +95,7 @@ export class CodingService {
         }
 
         // 2️⃣ Create discussion
-        const discussion = await this.repo.createDiscussion(data);
+        const discussion = await this.repo.createDiscussion({ ...data, userId, clerkUserId });
 
         // 3️⃣ Update reply count (cached)
         if (parent) {
@@ -105,7 +106,7 @@ export class CodingService {
     }
 
     async toggleDiscussionVote(
-        data: { discussionId: string; userId: string }
+        data: DiscussionVoteDto
     ): Promise<{ voted: boolean }> {
 
         const vote = await this.repo.findDiscussionVote(
@@ -120,7 +121,7 @@ export class CodingService {
         }
 
         // 👍 Vote
-        await this.repo.newDiscussionVote(data.userId, data.discussionId);
+        await this.repo.newDiscussionVote(data);
 
         const discussion = await this.repo.findByDiscussionId(data.discussionId);
 

@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ClerkProvider } from './common/providers/clerk.provider';
-import { MongooseConfigService } from './config/mongo.config.service';
 import { ConfigModule } from '@nestjs/config';
-import { Schemas } from "./schema"
+
 import { CodingModule } from './coding/coding.module';
 import { DatabaseModule } from './database/database.module';
 import { ActivityModule } from './activity/activity.module';
 import { HrModule } from './hr/hr.module';
+import { UserModule } from './user/user.module';
+import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
@@ -17,18 +16,19 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
     }),
 
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useClass: MongooseConfigService,
-    }),
-  
-    CodingModule,
+    // MongooseModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useClass: MongooseConfigService,
+    // }),
     DatabaseModule,
+    AuthModule,
+    UserModule,
+    CodingModule,
     ActivityModule,
     HrModule,
-    AuthModule,
+    AiModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ClerkProvider, MongooseConfigService],
+  providers: [AppService],
 })
 export class AppModule { }
