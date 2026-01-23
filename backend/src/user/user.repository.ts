@@ -21,4 +21,8 @@ export class UserRepository {
     createUser(user: CreateUser) {
         return this.userModel.create(user);
     }
+    updateById(userId: string, data: Partial<User>) {
+        return this.userModel.updateOne({ _id: userId }, data);
+    }
+
 }

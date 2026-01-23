@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cascadia_Code, Quicksand } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs"
+import { Toaster } from "sonner";
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
 //   subsets: ["latin"],
@@ -31,10 +32,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en dark">
       <body
         className={`${quicksand.variable} ${cascadiaCode.variable}  antialiased`}
       >
+        <Toaster theme="dark" position="bottom-right"/>
         <ClerkProvider>
           {children}
         </ClerkProvider>

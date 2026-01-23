@@ -1,57 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ActivityLog } from 'src/schema/activity-log.schema';
 import { ActivityRepository } from './activity.repository';
+import { InjectModel } from '@nestjs/mongoose';
+import { UserMetrics } from 'src/schema/user_metrics.schema';
+import { ActivityHistoryDto, ContributionDayDto } from './activity.dto';
 
 @Injectable()
 export class ActivityService {
-  constructor(private readonly repo: ActivityRepository) {}
+  constructor(
+    private readonly repo: ActivityRepository,
+    @InjectModel(UserMetrics.name)
+    private readonly metricsModel: Model<UserMetrics>,
+  ) {}
 
-  /* ---------- WRITE (CALLED FROM OTHER MODULES) ---------- */
+  /* ---------- WRITE ---------- */
 
-  async recordActivity({
-    userId,
-    clerkUserId,
-    eventType,
-    referenceId,
-    metadata,
-  }: {
+  async record(event: {
     userId: Types.ObjectId;
     clerkUserId: string;
-    eventType: 'CODING_SUBMIT' | 'HR_SESSION_COMPLETE' | 'APTITUDE_ATTEMPT';
+    eventType: 'CODING_SUBMIT' | 'CODING_APPROVED' | 'HR_SESSION_COMPLETE' | 'APTITUDE_ATTEMPT';
     referenceId?: Types.ObjectId;
     metadata?: Record<string, any>;
   }) {
-    const date = new Date().toISOString().split('T')[0];
-
-    const typeMap = {
-      CODING_SUBMIT: 'coding',
-      HR_SESSION_COMPLETE: 'hr',
-      APTITUDE_ATTEMPT: 'aptitude',
-    } as const;
-
-    const type = typeMap[eventType];
-
-    await this.repo.logEvent({
-      userId,
-      clerkUserId,
-      eventType,
-      referenceId,
-      metadata,
-    });
-
-    await this.repo.upsertDailyActivity({
-      userId,
-      clerkUserId,
-      date,
-      type,
-    });
+    return this.repo.logAndAggregate(event);
   }
 
-  /* ---------- HISTORY ---------- */
+  /* ---------- READ: HISTORY ---------- */
 
-  async getHistory(userId: Types.ObjectId) {
-    const logs = await this.repo.getRecentActivities(userId);
+  async getHistory(clerkUserId: string): Promise<ActivityHistoryDto[]> {
+    const logs = await this.repo.getRecentActivities(clerkUserId);
 
     return logs.map(log => ({
       id: log._id.toString(),
@@ -63,14 +41,17 @@ export class ActivityService {
     }));
   }
 
-  /* ---------- CONTRIBUTIONS ---------- */
+  /* ---------- READ: CONTRIBUTIONS ---------- */
 
-  async getContributionCalendar(userId: Types.ObjectId, days = 90) {
+  async getContributionCalendar(
+    clerkUserId: string,
+    days = 90,
+  ): Promise<ContributionDayDto[]> {
     const from = new Date();
     from.setDate(from.getDate() - days);
 
     const daily = await this.repo.getDailyActivities(
-      userId,
+      clerkUserId,
       from.toISOString().split('T')[0],
     );
 
@@ -80,52 +61,50 @@ export class ActivityService {
     }));
   }
 
-  async getStreakData(userId: Types.ObjectId, days = 30) {
-    const from = new Date();
-    from.setDate(from.getDate() - days);
+  /* ---------- READ: STREAK ---------- */
 
-    const daily = await this.repo.getDailyActivities(
-      userId,
-      from.toISOString().split('T')[0],
-    );
-
-    return daily.map(d => ({
-      date: d.date,
-      count: d.contributionCount,
-    }));
+  async getStreak(clerkUserId: string) {
+    const metrics = await this.metricsModel.findOne({ clerkUserId });
+    return metrics?.streak ?? { current: 0, longest: 0 };
   }
 
   /* ---------- HELPERS ---------- */
 
-  private mapType(eventType: string) {
+  private mapType(eventType: string): 'coding' | 'hr' | 'aptitude' {
     if (eventType.startsWith('CODING')) return 'coding';
     if (eventType.startsWith('HR')) return 'hr';
     return 'aptitude';
   }
 
-  private buildTitle(log: ActivityLog) {
+  private buildTitle(log: ActivityLog): string {
     switch (log.eventType) {
       case 'CODING_SUBMIT':
-        return log.metadata?.problemTitle ?? 'Coding Problem';
+      case 'CODING_APPROVED':
+        return log.metadata?.title ?? 'Coding Problem';
       case 'HR_SESSION_COMPLETE':
         return 'HR Mock Interview';
       case 'APTITUDE_ATTEMPT':
-        return log.metadata?.quizTitle ?? 'Aptitude Quiz';
+        return log.metadata?.title ?? 'Aptitude Quiz';
       default:
         return 'Activity';
     }
   }
 
-  private buildResult(log: ActivityLog) {
+  private buildResult(log: ActivityLog): string | undefined {
+    if (log.eventType === 'CODING_APPROVED') {
+      return 'Accepted';
+    }
     if (log.eventType === 'HR_SESSION_COMPLETE') {
-      return `${log.metadata?.confidence ?? 0}% confidence`;
+      return log.metadata?.confidence
+        ? `${log.metadata.confidence}% confidence`
+        : undefined;
     }
     if (log.eventType === 'APTITUDE_ATTEMPT') {
-      return `${log.metadata?.score ?? '—'} correct`;
-    }
-    if (log.eventType === 'CODING_SUBMIT') {
-      return log.metadata?.verdict ?? 'Submitted';
+      return log.metadata?.score != null
+        ? `${log.metadata.score} correct`
+        : undefined;
     }
     return undefined;
   }
 }
+

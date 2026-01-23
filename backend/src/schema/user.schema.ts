@@ -4,7 +4,6 @@ import { Document } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class User extends Document {
-
   @Prop({ type: String, required: true, unique: true, index: true })
   clerkUserId: string;
 
@@ -25,6 +24,9 @@ export class User extends Document {
 
   @Prop({ type: Boolean, default: true })
   isActive: boolean;
+
+  @Prop({ type: Date, default: Date.now() })
+  createdAt: Date
 }
 
 

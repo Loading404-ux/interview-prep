@@ -2,10 +2,12 @@ import { Injectable } from "@nestjs/common";
 import { AptitudeRepository } from "./aptitude.repository";
 import { StartAptitudeSessionDto, SubmitAptitudeAnswerDto } from "./aptitude.dto";
 import { Types } from "mongoose";
+import { ActivityService } from "src/activity/activity.service";
+import { UserProgressService } from "src/user/user-progress.service";
 
 @Injectable()
 export class AptitudeService {
-  constructor(private readonly repo: AptitudeRepository) {}
+  constructor(private readonly repo: AptitudeRepository, private readonly activityService: ActivityService, private readonly progressService: UserProgressService) { }
 
   async startSession(input: {
     userId: string;
@@ -53,4 +55,34 @@ export class AptitudeService {
       explanation: question.explanation,
     };
   }
+
+  async completeSession(input: {
+    userId: string;
+    clerkUserId: string;
+    sessionId: string;
+  }) {
+    const session = await this.repo.markCompleted(input.sessionId);
+    if (!session) throw new Error('Session not found or already completed');
+
+    await this.activityService.record({
+      userId: session.userId,
+      clerkUserId: session.clerkUserId,
+      eventType: 'APTITUDE_ATTEMPT',
+      referenceId: session._id,
+    });
+
+    await this.progressService.onAptitudeCompleted(session);
+
+    return {
+      sessionId: session._id,
+      status: session.status,
+      accuracy:
+        session.totalQuestions > 0
+          ? Math.round(
+            (session.correctCount / session.totalQuestions) * 100,
+          )
+          : 0,
+    };
+  }
+
 }

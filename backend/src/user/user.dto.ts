@@ -23,3 +23,19 @@ export class CreateUser {
     targetCompanies?: string[];
 
 }
+
+export class UpdateProfileDto {
+    @IsOptional()
+    @IsString()
+    name?: string;
+
+    @IsOptional()
+    @IsString()
+    university?: string;
+}
+
+export class UpdateTargetsDto {
+  @IsString({ each: true })
+  targetCompanies: string[];
+}
+

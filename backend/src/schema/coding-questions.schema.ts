@@ -28,8 +28,6 @@ export class Example {
 }
 @Schema({ _id: false }) // IMPORTANT
 export class Constraints {
-
-
   @Prop({ type: String, required: true })
   time_complexity: string;
 
@@ -41,7 +39,7 @@ const ExampleSchema = SchemaFactory.createForClass(Example);
 @Schema({ timestamps: true })
 export class CodingQuestion extends Document {
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true ,unique:true})
   title: string;
 
   @Prop({ enum: ['Easy', 'Medium', 'Hard'], required: true })

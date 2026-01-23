@@ -11,7 +11,7 @@ export class AptitudeRepository {
     private readonly questionModel: Model<AptitudeQuestion>,
     @InjectModel(AptitudeSession.name)
     private readonly sessionModel: Model<AptitudeSession>,
-  ) {}
+  ) { }
 
   getRandomQuestions(limit: number) {
     return this.questionModel.aggregate([{ $sample: { size: limit } }]);
@@ -35,4 +35,18 @@ export class AptitudeRepository {
       },
     );
   }
+
+  markCompleted(sessionId: string) {
+    return this.sessionModel.findOneAndUpdate(
+      {
+        _id: sessionId,
+        status: 'STARTED',
+      },
+      {
+        $set: { status: 'COMPLETED' },
+      },
+      { new: true },
+    );
+  }
+
 }

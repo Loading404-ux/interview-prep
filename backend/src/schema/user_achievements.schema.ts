@@ -8,6 +8,9 @@ export class UserAchievement extends Document {
 
   @Prop({ type: Types.ObjectId, ref: User.name, index: true })
   userId: Types.ObjectId;
+  
+  @Prop({ type: String, index: true })
+  clerkUserId: string;
 
   @Prop({ type: String, required: true })
   achievementKey: string;

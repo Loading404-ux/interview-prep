@@ -27,6 +27,10 @@ export class CodingDiscussion extends Document {
 
   @Prop({ default: false })
   isDeleted: boolean;
+
+  @Prop({ type: Date, default: Date.now })
+  createAt: Date;
+ 
 }
 
 export const CodingDiscussionSchema = SchemaFactory.createForClass(CodingDiscussion);

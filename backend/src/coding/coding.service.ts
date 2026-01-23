@@ -1,152 +1,174 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { CodingRepository } from './coding.repository';
-import { CodingDiscussionDto, CodingSubmissionDto, DiscussionVoteDto, SubmisstionVoteDto } from './coding.dto';
+import {
+    BadRequestException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { Types } from 'mongoose';
-import { CodingSubmissionMapper } from './coding.mapper';
+import { CodingRepository } from './coding.repository';
+import {
+    CodingDiscussionDto,
+    CodingSubmissionDto,
+    DiscussionVoteDto,
+    SubmisstionVoteDto,
+} from './coding.dto';
+import { ActivityService } from 'src/activity/activity.service';
+import { AiService } from 'src/ai/ai.service';
 import { SubmissionVerdict } from 'src/schema/coding-submission.schema';
+import { CodingDiscussionMapper, CodingSubmissionMapper } from './coding.mapper';
 import { CodingDiscussion } from 'src/schema/coding-discussion.schema';
-
-//BUG: use clearUserId not mongoId(currently configured with userId not clerkUserId😭)
+import { UserProgressService } from 'src/user/user-progress.service';
 
 @Injectable()
 export class CodingService {
     constructor(
         private readonly repo: CodingRepository,
-        // private readonly activityLogService: ActivityLogService
+        private readonly activityService: ActivityService,
+        private readonly aiService: AiService,
+        private readonly progressService: UserProgressService,
     ) { }
 
-
-
-
-    async submitSolution(
-        userId: string,
-        clerkUserId: string,
-        dto: CodingSubmissionDto
-    ) {
-        // 1️⃣ Create submission
-        const submission = await this.repo.createInitialSubmission({
-            userId,
-            clerkUserId,
-            questionId: dto.questionId,
-            solutionText: dto.solutionText,
+    async submitSolution(user: any, dto: CodingSubmissionDto) {
+        const submission = await this.repo.createSubmission({
+            userId: user._id,
+            clerkUserId: user.clerkUserId,
+            questionId: new Types.ObjectId(dto.questionId),
+            solution: dto.solutionText,
             explanation: dto.explanation,
         });
 
-        // 2️⃣ Trigger async AI evaluation (DO NOT BLOCK)
-        this.triggerAiReview(submission._id.toString());
+        await this.activityService.record({
+            userId: new Types.ObjectId(user._id),
+            clerkUserId: user.clerkUserId,
+            eventType: 'CODING_SUBMIT',
+            referenceId: submission._id,
+        });
 
-        // 3️⃣ Log activity
-        // await this.activityLogService.logCoding(
-        //     userId,
-        //     submission._id,
-        //     'Submitted coding solution'
-        // );
+        void this.triggerAiReview(submission._id.toString(), user);
 
         return CodingSubmissionMapper.toResponse(submission);
     }
 
-    async toggleSubmissionVote(
-        data: SubmisstionVoteDto
-    ): Promise<{ voted: boolean }> {
+    async toggleSubmissionVote(user: any, dto: SubmisstionVoteDto) {
+        const submission = await this.repo.findSubmissionById(dto.submissionId);
+        if (!submission) throw new NotFoundException('Submission not found');
 
-        const vote = await this.repo.findSubmissionVote(
-            data.userId,
-            data.submissionId,
-        );
-        if (vote) {
-            // 👎 Unvote
-            await this.repo.updateSubmissionVoteCount({ submissionId: new Types.ObjectId(data.submissionId), userId: data.userId, value: -1 });
-            //TODO: delete vote
-            return { voted: false };
-        }
-
-        // 👍 Vote
-        await this.repo.newSubmissionVote(data);
-
-        const submission = await this.repo.findBySubmissionId(data.submissionId);
-
-        if (submission?.verdict !== SubmissionVerdict.ACCEPTED) {
+        if (submission.verdict !== SubmissionVerdict.ACCEPTED) {
             throw new ForbiddenException('Only accepted solutions can be upvoted');
         }
 
-        await this.repo.updateSubmissionVoteCount({ submissionId: submission._id, userId: data.userId, value: 1 });
-        return { voted: true };
-    }
-
-
-    async createDiscussion({ userId, clerkUserId, data }: { userId: string, clerkUserId: string, data: CodingDiscussionDto }): Promise<CodingDiscussion> {
-
-        let parent: CodingDiscussion | null = null;
-
-        // 1️⃣ Validate parent (if reply)
-        if (data.parentId) {
-            parent = await this.repo.findByDiscussionId(data.parentId);
-
-            if (!parent || parent.isDeleted) {
-                throw new NotFoundException('Parent comment not found');
-            }
-
-            // ❌ No replies to replies
-            if (parent.parentId) {
-                throw new BadRequestException(
-                    'Replies to replies are not allowed',
-                );
-            }
-        }
-
-        // 2️⃣ Create discussion
-        const discussion = await this.repo.createDiscussion({ ...data, userId, clerkUserId });
-
-        // 3️⃣ Update reply count (cached)
-        if (parent) {
-            await this.repo.incrementDiscussionReplyCount(parent._id);
-        }
-
-        return discussion;
-    }
-
-    async toggleDiscussionVote(
-        data: DiscussionVoteDto
-    ): Promise<{ voted: boolean }> {
-
-        const vote = await this.repo.findDiscussionVote(
-            data.userId,
-            data.discussionId,
+        const vote = await this.repo.findSubmissionVote(
+            user._id,
+            dto.submissionId,
         );
+
         if (vote) {
-            // 👎 Unvote
-            await this.repo.updateDiscussionVoteCount({ userId: data.userId, discussionId: new Types.ObjectId(data.discussionId), value: -1 });
-            //TODO: delete vote
+            await this.repo.deleteSubmissionVote(vote._id);
+            await this.repo.incrementSubmissionUpvotes(submission._id, -1);
             return { voted: false };
         }
 
-        // 👍 Vote
-        await this.repo.newDiscussionVote(data);
-
-        const discussion = await this.repo.findByDiscussionId(data.discussionId);
-
-        if (!discussion) {
-            throw new NotFoundException('Discussion not found');
-        }
-
-        await this.repo.updateDiscussionVoteCount({
-            userId: data.userId,
-            discussionId: discussion._id,
-            value: 1
-        });
+        await this.repo.createSubmissionVote(
+            user._id,
+            dto.submissionId,
+            user.clerkUserId,
+        );
+        await this.repo.incrementSubmissionUpvotes(submission._id, 1);
         return { voted: true };
     }
 
-    async getDiscussionsByQuestionId(questionId: string) {
-        return await this.repo.findByDiscussionsByQuestionId(questionId);
+    async createDiscussion(user: any, dto: CodingDiscussionDto) {
+        let parent: CodingDiscussion | null = null;
+
+        if (dto.parentId) {
+            parent = await this.repo.findDiscussionById(dto.parentId);
+            if (!parent || parent.parentId) {
+                throw new BadRequestException('Invalid parent discussion');
+            }
+        }
+
+        const discussion = await this.repo.createDiscussion({
+            userId: user._id,
+            clerkUserId: user.clerkUserId,
+            questionId: new Types.ObjectId(dto.questionId),
+            parentId: new Types.ObjectId(dto.parentId) ?? null,
+            content: dto.content,
+        });
+
+        if (parent) {
+            await this.repo.incrementReplyCount(parent._id);
+        }
+
+        return CodingDiscussionMapper.toResponse(discussion);
     }
 
-    async getRepliesByDiscussionId(parentId: string) {
-        return await this.repo.findDiscussionReplies(new Types.ObjectId(parentId));
+    async toggleDiscussionVote(user: any, dto: DiscussionVoteDto) {
+        const discussion = await this.repo.findDiscussionById(dto.discussionId);
+        if (!discussion) throw new NotFoundException('Discussion not found');
+
+        const vote = await this.repo.findDiscussionVote(
+            user._id,
+            dto.discussionId,
+        );
+
+        if (vote) {
+            await this.repo.deleteDiscussionVote(vote._id);
+            await this.repo.incrementDiscussionUpvotes(discussion._id, -1);
+            return { voted: false };
+        }
+
+        await this.repo.createDiscussionVote(
+            user._id,
+            dto.discussionId,
+            user.clerkUserId,
+        );
+        await this.repo.incrementDiscussionUpvotes(discussion._id, 1);
+        return { voted: true };
     }
 
-    private async triggerAiReview(submissionId: string) {
-        // LangGraph / Queue / Event goes here
-        // DO NOT IMPLEMENT NOW
+    async getAcceptedSubmissions(questionId: string) {
+        return this.repo.getAcceptedSubmissions(questionId);
+    }
+
+    async getDiscussions(questionId: string) {
+        return this.repo.getDiscussionsByQuestion(questionId);
+    }
+
+    async getReplies(discussionId: string) {
+        return this.repo.getReplies(discussionId);
+    }
+
+    private async triggerAiReview(submissionId: string, user: any) {
+        const submission = await this.repo.findSubmissionWithQuestion(submissionId);
+        if (!submission) return;
+
+        const review = await this.aiService.aiCodeReview({
+            title: submission.questionId.title,
+            problem: submission.questionId.problem,
+            constraints: submission.questionId.constraints,
+            examples: submission.questionId.examples,
+            topics: submission.questionId.topics,
+            solution: submission.solution,
+            explanation: submission.explanation,
+        });
+
+        const updated = await this.repo.updateAiReview(
+            submission._id,
+            review.verdict,
+            review.aiFeedback,
+        );
+
+        if (updated?.verdict === SubmissionVerdict.ACCEPTED) {
+            await this.activityService.record({
+                userId: user._id,
+                clerkUserId: user.clerkUserId,
+                eventType: 'CODING_APPROVED',
+                referenceId: updated._id,
+            });
+            await this.progressService.onCodingAccepted({
+                userId: user._id,
+                clerkUserId: user.clerkUserId,
+            });
+        }
     }
 }

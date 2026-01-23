@@ -3,7 +3,7 @@ import { AssemblyAI } from "assemblyai";
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
-export class AssemblyAiService{
+export class AssemblyAiService {
   private client: AssemblyAI;
 
   constructor(config: ConfigService) {
@@ -12,12 +12,16 @@ export class AssemblyAiService{
     });
   }
 
-  async transcribe(filePath: string): Promise<string> {
+  async transcribe(filePath: string): Promise<{ durationSeconds?: number, text: string }> {
     const transcript = await this.client.transcripts.transcribe({
       audio: filePath,
       speech_models: ["universal"],
     });
 
-    return transcript.text ?? "";
+    return {
+      durationSeconds: transcript.audio_duration
+        ? Math.round(transcript.audio_duration)
+        : undefined, text: transcript.text ?? ""
+    };
   }
 }

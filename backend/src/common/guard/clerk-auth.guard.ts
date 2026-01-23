@@ -23,7 +23,7 @@ export class ClerkAuthGuard implements CanActivate {
     const req = ctx.switchToHttp().getRequest();
 
     const authHeader = req.headers.authorization;
-    //console.log(authHeader)
+  
     if (!authHeader) {
       throw new UnauthorizedException('Missing Authorization header');
     }
@@ -34,7 +34,7 @@ export class ClerkAuthGuard implements CanActivate {
       secretKey: process.env.CLERK_SECRET_KEY!,
     });
 
-    req.user = req.user = await this.authService.getOrCreateUserFromToken(payload.sub);
+    req.user = req.user = await this.authService.getOrCreateUserFromToken(payload.sub); //Entire UserSchema
     return true;
   }
 }

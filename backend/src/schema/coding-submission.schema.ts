@@ -16,7 +16,7 @@ export class AiFeedback {
   suggestions?: string;
 }
 
-export const AiFeedbackSchema = SchemaFactory.createForClass(AiFeedback);
+const AiFeedbackSchema = SchemaFactory.createForClass(AiFeedback);
 
 export enum ReviewSource {
   AI = 'ai',
@@ -41,7 +41,7 @@ export class CodingSubmission extends Document {
     index: true
   })
   userId: Types.ObjectId;
-  
+
   @Prop({ required: true, index: true, type: String })
   clerkUserId: string;
 
@@ -54,7 +54,7 @@ export class CodingSubmission extends Document {
   questionId: Types.ObjectId;
 
   @Prop({ required: true })
-  solutionText: string;
+  solution: string;
 
   @Prop()
   explanation?: string;
@@ -72,12 +72,15 @@ export class CodingSubmission extends Document {
     index: true
   })
   verdict: SubmissionVerdict;
-
+  @Prop({ default: 0, type: Number })
+  upvotes: number
   @Prop({ type: AiFeedbackSchema })
   aiFeedback?: AiFeedback;
 
   @Prop({ type: Date, default: Date.now })
   createdAt: Date
+
+
 }
 
 export const CodingSubmissionSchema = SchemaFactory.createForClass(CodingSubmission);

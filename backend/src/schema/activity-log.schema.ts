@@ -14,7 +14,7 @@ export class ActivityLog extends Document {
 
   @Prop({
     type: String,
-    enum: ['CODING_SUBMIT', 'HR_SESSION_COMPLETE', 'APTITUDE_ATTEMPT'],
+    enum: ['CODING_SUBMIT', 'HR_SESSION_COMPLETE', 'APTITUDE_ATTEMPT', 'CODING_APPROVED',],
     required: true,
     index: true,
   })

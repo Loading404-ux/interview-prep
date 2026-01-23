@@ -1,10 +1,11 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { HrService } from './hr.service';
 import {
   CompleteSessionDto,
   StartHrSessionDto,
   SubmitHrAnswerDto,
 } from './hr.dto';
+import { FileInterceptor } from "@nestjs/platform-express"
 
 @Controller('hr')
 export class HrController {
@@ -16,8 +17,17 @@ export class HrController {
   }
 
   @Post('answer/submit')
-  submitAnswer(@Body() dto: SubmitHrAnswerDto) {
-    return this.hrService.submitAnswer(dto);
+  @UseInterceptors(FileInterceptor('audio'))
+  submitAnswer(
+    @UploadedFile() audio: Express.Multer.File,
+    @Body() dto: SubmitHrAnswerDto,
+  ) {
+    return this.hrService.submitAnswer({
+      sessionId: dto.sessionId,
+      questionId: dto.questionId,
+      audioFile: audio,
+      transcript: dto.transcript, // optional fallback
+    });
   }
   @Post('session/complete')
   completeSession(@Body() dto: CompleteSessionDto) {

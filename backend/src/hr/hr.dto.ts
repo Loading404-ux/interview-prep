@@ -33,15 +33,12 @@ export class SubmitHrAnswerDto {
   @IsMongoId()
   questionId: string;
 
-  // transcript comes from AssemblyAI
-  @IsNotEmpty()
-  @IsString()
-  transcript: string;
-
+  // Optional fallback (dev/admin only)
   @IsOptional()
-  @IsNumber()
-  durationSeconds?: number;
+  @IsString()
+  transcript?: string;
 }
+
 
 /* ---------- AI RESULT ---------- */
 

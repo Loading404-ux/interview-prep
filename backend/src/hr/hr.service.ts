@@ -11,6 +11,9 @@ import {
 import { HrMapper } from './hr.mapper';
 import { AiService } from 'src/ai/ai.service';
 import { Types } from 'mongoose';
+import { ActivityService } from 'src/activity/activity.service';
+import { UserProgressService } from 'src/user/user-progress.service';
+import { AssemblyAiService } from 'src/ai/assemblyai.service';
 
 @Injectable()
 export class HrService {
@@ -18,6 +21,9 @@ export class HrService {
     private readonly sessionRepo: HrSessionRepository,
     private readonly questionRepo: HrQuestionRepository,
     private readonly aiService: AiService,
+    private readonly activityService: ActivityService,
+    private readonly progressService: UserProgressService,
+    private readonly assemblyAiService: AssemblyAiService,
   ) { }
 
   /* ---------- START SESSION ---------- */
@@ -38,32 +44,60 @@ export class HrService {
   }
 
   /* ---------- SUBMIT ANSWER ---------- */
-  async submitAnswer(dto: SubmitHrAnswerDto) {
-    const session = await this.sessionRepo.findById(dto.sessionId);
+  async submitAnswer(input: {
+    sessionId: string;
+    questionId: string;
+    audioFile?: Express.Multer.File;
+    transcript?: string;
+  }) {
+    const session = await this.sessionRepo.findById(input.sessionId);
     if (!session) throw new BadRequestException('Session not found');
-
     if (session.status !== 'STARTED')
       throw new BadRequestException('Session not active');
 
-    const question = await this.questionRepo.findById(dto.questionId);
+    const question = await this.questionRepo.findById(input.questionId);
     if (!question) throw new BadRequestException('Question not found');
 
-    // 🔥 LLM evaluation
+    let transcript = input.transcript;
+    let durationSeconds: number | undefined;
+
+    // 🎙️ AUDIO PATH (PRIMARY)
+    if (!transcript) {
+      if (!input.audioFile) {
+        throw new BadRequestException(
+          'Either audio file or transcript must be provided',
+        );
+      }
+
+      const result = await this.assemblyAiService.transcribe(
+        input.audioFile.path,
+      );
+
+      transcript = result.text;
+      durationSeconds = result.durationSeconds;
+
+      if (!transcript || transcript.length < 5) {
+        throw new BadRequestException('Audio transcription failed');
+      }
+    }
+
+    // 🤖 AI evaluation
     const aiResult = await this.aiService.hrAIEvaluate({
       question: question.question,
       preferredAnswer: question.preferred_answer,
-      userAnswer: dto.transcript,
+      userAnswer: transcript,
     });
 
-    await this.sessionRepo.addQuestionResponse(dto.sessionId, {
-      questionId: dto.questionId,
-      transcript: dto.transcript,
-      durationSeconds: dto.durationSeconds,
+    await this.sessionRepo.addQuestionResponse(input.sessionId, {
+      questionId: input.questionId,
+      transcript,
+      durationSeconds,
       aiResult,
     });
 
     return aiResult;
   }
+
 
   async completeSession(dto: CompleteSessionDto) {
     const session = await this.sessionRepo.markCompleted(
@@ -72,22 +106,19 @@ export class HrService {
     );
 
     if (!session) {
-      throw new BadRequestException(
-        'Session not found or already completed',
-      );
+      throw new BadRequestException('Session not found or already completed');
     }
 
-    /**
-     * 🚫 DO NOT DO THESE YET:
-     * - AI evaluation
-     * - streak updates
-     * - achievements
-     * - activity logs
-     *
-     * These will be added AFTER:
-     * HR module ✅
-     * Aptitude module ✅
-     */
+    // ✅ Activity
+    await this.activityService.record({
+      userId: session.userId,
+      clerkUserId: session.clerkUserId,
+      eventType: 'HR_SESSION_COMPLETE',
+      referenceId: session._id,
+    });
+
+    // ✅ Metrics + achievements
+    await this.progressService.onHrSessionCompleted(session);
 
     return {
       sessionId: session._id,
@@ -95,4 +126,5 @@ export class HrService {
       completedAt: session.completedAt,
     };
   }
+
 }

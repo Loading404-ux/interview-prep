@@ -1,4 +1,39 @@
-import { IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+
+/* ---------- QUESTIONS ---------- */
+
+export class CreateCodingQuestionDto {
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  difficulty: string;
+
+  @IsOptional()
+  @IsString({ each: true })
+  topics?: string[];
+
+  @IsOptional()
+  @IsString()
+  company?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  problem: string;
+
+  @IsString()
+  @IsNotEmpty()
+  hint: string;
+}
+
+/* ---------- SUBMISSION ---------- */
 
 export class CodingSubmissionDto {
   @IsMongoId()
@@ -13,40 +48,27 @@ export class CodingSubmissionDto {
   explanation?: string;
 }
 
-export class CodingSubmissionResponseDto {
-  id: string;
-  questionId: string;
-  verdict: string;
-  reviewedBy: string;
-  createdAt: Date;
+export class SubmisstionVoteDto {
+  @IsMongoId()
+  submissionId: string;
 }
+
+/* ---------- DISCUSSION ---------- */
 
 export class CodingDiscussionDto {
   @IsMongoId()
   questionId: string;
 
-
-  @IsString()
-  content: string;
-
-  @IsMongoId()
   @IsOptional()
+  @IsMongoId()
   parentId?: string;
-}
 
-export class UserIDsDto {
-  @IsMongoId()
-  userId: string;
   @IsString()
-  clerkUserId: string;
+  @IsNotEmpty()
+  content: string;
 }
 
-export class DiscussionVoteDto extends UserIDsDto {
+export class DiscussionVoteDto {
   @IsMongoId()
-  discussionId: string
-}
-
-export class SubmisstionVoteDto extends UserIDsDto {
-  @IsMongoId()
-  submissionId: string
+  discussionId: string;
 }

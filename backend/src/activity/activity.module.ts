@@ -4,6 +4,7 @@ import { ActivityService } from './activity.service';
 import { ClerkProvider } from 'src/common/providers/clerk.provider';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Schemas } from 'src/schema';
+import { ActivityRepository } from './activity.repository';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { Schemas } from 'src/schema';
     ]),
   ],
   controllers: [ActivityController],
-  providers: [ActivityService],
+  providers: [ActivityService,ActivityRepository],
 })
 export class ActivityModule { }

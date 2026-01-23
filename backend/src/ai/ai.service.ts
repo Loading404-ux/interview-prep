@@ -1,7 +1,33 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HrAiResultDto } from 'src/hr/hr.dto';
 import { LlmFactory } from './llm.factory';
+import { CodingSubmission } from 'src/schema/coding-submission.schema';
+import { CodingQuestion, Constraints, Example } from 'src/schema/coding-questions.schema';
 
+function isValidScore(value: any): value is number {
+    return (
+        typeof value === 'number' &&
+        Number.isFinite(value) &&
+        value >= 0 &&
+        value <= 100
+    );
+}
+export enum SubmissionVerdict {
+    ACCEPTED = 'accepted',
+    REJECTED = 'rejected',
+    NEEDS_IMPROVEMENT = 'needs_improvement',
+}
+
+export interface AiFeedback {
+    clarityScore?: number;
+    correctnessScore?: number;
+    suggestions?: string;
+}
+
+export interface AiReviewResponse {
+    verdict: SubmissionVerdict;
+    aiFeedback: AiFeedback;
+}
 @Injectable()
 export class AiService {
     constructor(private readonly llmFactory: LlmFactory) { }
@@ -29,7 +55,122 @@ export class AiService {
 
         return this.safeJsonParse(response.content as string);
     }
+    async aiCodeReview(data: {
+        title: string;
+        problem: string;
+        constraints: Constraints;
+        examples: Example[];
+        topics: string[];
+        solution: string;
+        explanation?: string;
+    }): Promise<AiReviewResponse> {
+        const llm = this.llmFactory.getLLM({
+            model: "meta/llama-3.3-70b-instruct",
+            temperature: 0.5,
+        });
+        const prompt = this.bbuildCodeReviewPrompt(data);
+        const response = await llm.invoke(prompt);
+        const preprocess = this.preprocess(response.content as string);
 
+        return this.validateAiReviewShape(this.safeJsonParse(preprocess));
+
+    }
+
+
+    private bbuildCodeReviewPrompt(data: {
+        title: string;
+        problem: string;
+        constraints: Constraints;
+        examples: Example[];
+        topics: string[];
+        solution: string;
+        explanation?: string;
+    }) {
+        return `
+You are a strict senior software engineer reviewing a coding interview solution.
+Your task is to evaluate the submission objectively and return a structured JSON response.
+
+--------------------
+PROBLEM STATEMENT:
+${data.title}
+
+${data.problem}
+
+--------------------
+CONSTRAINTS:
+${data.constraints}
+
+--------------------
+TEST_CASES:
+${data.examples.map((example) => `- ${example.input} -> ${example.output}`).join('\n')}
+
+--------------------
+TOPICS_USED:
+${data.constraints}
+
+--------------------
+USER SOLUTION:
+${data.solution ?? 'N/A'}
+
+--------------------
+EXPLANATION (if any):
+${data.explanation ?? 'N/A'}
+
+--------------------
+EVALUATION CRITERIA:
+
+1. Correctness (0–100)
+- Does the solution fully solve the problem?
+- Handles edge cases?
+- Produces correct output for all valid inputs?
+
+2. Clarity (0–100)
+- Readability of code
+- Naming, structure, comments
+- Logical flow
+
+--------------------
+VERDICT RULES (MANDATORY):
+
+- ACCEPTED:
+  correctnessScore >= 80 AND clarityScore >= 60
+
+- REJECTED:
+  correctnessScore < 40
+
+- NEEDS_IMPROVEMENT:
+  All other cases
+
+--------------------
+OUTPUT FORMAT (STRICT):
+
+Strictly Return ONLY valid JSON.
+DO NOT include explanations outside JSON.
+DO NOT include markdown.
+DO NOT include trailing commas.
+
+The JSON schema MUST be:
+
+{
+  "verdict": "accepted | rejected | needs_improvement",
+  "aiFeedback": {
+    "clarityScore": number (0-100),
+    "correctnessScore": number (0-100),
+    "suggestions": string
+  }
+}
+
+--------------------
+IMPORTANT:
+- suggestions must be concise, concrete, and actionable
+- do NOT praise the user
+- do NOT mention that you are an AI
+- if the solution is rejected, clearly explain why in suggestions
+- if accepted, still give at least one improvement suggestion
+
+Return the JSON now.
+`;
+    }
 
     private buildStrictPrompt({
         question,
@@ -130,4 +271,52 @@ export class AiService {
             throw new Error('Invalid AI response shape');
         }
     }
+
+    private validateAiReviewShape(
+        raw: any,
+    ): AiReviewResponse {
+        if (!raw || typeof raw !== 'object') {
+            throw new Error('AI response is not an object');
+        }
+
+        // -------- verdict --------
+        if (
+            !raw.verdict ||
+            !Object.values(SubmissionVerdict).includes(raw.verdict)
+        ) {
+            throw new Error('Invalid or missing verdict');
+        }
+
+        // -------- aiFeedback --------
+        if (!raw.aiFeedback || typeof raw.aiFeedback !== 'object') {
+            throw new Error('Missing aiFeedback object');
+        }
+
+        const { clarityScore, correctnessScore, suggestions } = raw.aiFeedback;
+
+        if (!isValidScore(clarityScore)) {
+            throw new Error('Invalid clarityScore');
+        }
+
+        if (!isValidScore(correctnessScore)) {
+            throw new Error('Invalid correctnessScore');
+        }
+
+        if (
+            typeof suggestions !== 'string' ||
+            suggestions.trim().length === 0
+        ) {
+            throw new Error('Invalid suggestions');
+        }
+
+        return {
+            verdict: raw.verdict,
+            aiFeedback: {
+                clarityScore,
+                correctnessScore,
+                suggestions: suggestions.trim(),
+            },
+        };
+    }
+
 }

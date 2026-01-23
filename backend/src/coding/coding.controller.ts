@@ -1,15 +1,58 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ClerkAuthGuard } from 'src/common/guard/clerk-auth.guard';
-import { CodingSubmissionDto } from './coding.dto';
 import { CodingService } from './coding.service';
+import {
+  CodingDiscussionDto,
+  CodingSubmissionDto,
+  DiscussionVoteDto,
+  SubmisstionVoteDto,
+} from './coding.dto';
 
-@Controller('coding')
 @UseGuards(ClerkAuthGuard)
+@Controller('coding')
 export class CodingController {
-    constructor(private readonly service: CodingService) { }
+  constructor(private readonly service: CodingService) {}
 
-    @Post("new-submission")
-    async subbmition(@Req() req: any, @Body() dto: CodingSubmissionDto) {
-        return this.service.submitSolution(req.user.clerkUserId, req.user._id, dto);
-    }
+  @Post('submissions')
+  submit(@Req() req: any, @Body() dto: CodingSubmissionDto) {
+    return this.service.submitSolution(req.user, dto);
+  }
+
+  @Post('submissions/vote')
+  voteSubmission(@Req() req: any, @Body() dto: SubmisstionVoteDto) {
+    return this.service.toggleSubmissionVote(req.user, dto);
+  }
+
+  @Get('questions/:id/submissions')
+  getAccepted(@Param('id') id: string) {
+    return this.service.getAcceptedSubmissions(id);
+  }
+
+  @Post('discussions')
+  createDiscussion(@Req() req: any, @Body() dto: CodingDiscussionDto) {
+    return this.service.createDiscussion(req.user, dto);
+  }
+
+  @Post('discussions/vote')
+  voteDiscussion(@Req() req: any, @Body() dto: DiscussionVoteDto) {
+    return this.service.toggleDiscussionVote(req.user, dto);
+  }
+
+  @Get('questions/:id/discussions')
+  getDiscussions(@Param('id') id: string) {
+    return this.service.getDiscussions(id);
+  }
+
+  @Get('discussions/:id/replies')
+  getReplies(@Param('id') id: string) {
+    return this.service.getReplies(id);
+  }
 }
