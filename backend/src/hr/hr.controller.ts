@@ -1,19 +1,21 @@
-import { Controller, Post, Body, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFile, Req, UseGuards } from '@nestjs/common';
 import { HrService } from './hr.service';
 import {
   CompleteSessionDto,
-  StartHrSessionDto,
   SubmitHrAnswerDto,
 } from './hr.dto';
 import { FileInterceptor } from "@nestjs/platform-express"
+import { ClerkAuthGuard } from 'src/common/guard/clerk-auth.guard';
 
 @Controller('hr')
+@UseGuards(ClerkAuthGuard)
 export class HrController {
   constructor(private readonly hrService: HrService) { }
 
   @Post('session/start')
-  startSession(@Body() dto: StartHrSessionDto) {
-    return this.hrService.startSession(dto);
+  startSession(@Req() req) {
+
+    return this.hrService.startSession({ userId: req.user._id, clerkUserId: req.user.clerkUserId });
   }
 
   @Post('answer/submit')

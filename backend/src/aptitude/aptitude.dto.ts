@@ -16,3 +16,8 @@ export class SubmitAptitudeAnswerDto {
     @IsNumber()
     selectedOption: number;
 }
+
+export class CompleteAptitudeSessionDto {
+  @IsMongoId()
+  sessionId: string;
+}

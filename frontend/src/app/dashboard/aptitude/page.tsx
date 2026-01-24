@@ -99,15 +99,15 @@ const AptitudeQuiz = () => {
     questions,
     currentIndex,
     answers,
-    lastResult,
     accuracy,
     start,
     submitAnswer,
     next,
     complete,
     reset,
+    results
   } = useAptitude()
-
+  console.log(questions)
   const [mode, setMode] = useState<Mode>("select")
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [timeRemaining, setTimeRemaining] = useState(180)
@@ -352,10 +352,11 @@ const AptitudeQuiz = () => {
           <div className="space-y-4">
             <h2 className="font-semibold text-foreground">Review Your Answers</h2>
             {questions.map((question, index) => {
-              const userAnswer = answers[index];
-              const isCorrect = lastResult?.correct
-              const wasAnswered = userAnswer !== null;
+              const userAnswer = answers[index]
+              const correctIndex = question.correctAnswerIndex
 
+              const isCorrect = userAnswer === correctIndex
+              const result = results[index]
               return (
                 <div
                   key={question.id}
@@ -381,16 +382,18 @@ const AptitudeQuiz = () => {
                         <p className="text-muted-foreground">
                           Your answer:{" "}
                           <span className={isCorrect ? "text-success" : "text-destructive"}>
-                            {wasAnswered ? question.options[userAnswer] : "Not answered"}
+                            {userAnswer !== null
+                              ? question.options[userAnswer]
+                              : "Not answered"}
                           </span>
                         </p>
-                        {lastResult?.correctAnswer !== undefined && (
+                        {result?.correctAnswer !== undefined && (
                           <p className="text-success">
-                            Correct: {currentQuestion.options[lastResult.correctAnswer]}
+                            Correct: {question.options[correctIndex]}
                           </p>
                         )}
                         <p className="text-muted-foreground mt-2 text-xs">
-                          {lastResult?.explanation}
+                          {result?.explanation}
                         </p>
                       </div>
                     </div>
@@ -551,10 +554,10 @@ const AptitudeQuiz = () => {
           <div className="p-6 space-y-3">
             {currentQuestion.options.map((option, index) => {
               const isSelected = selectedOption === index;
+              const result = results[currentIndex]
               const isCorrectOption =
                 showResult &&
-                lastResult?.correctAnswer === index
-
+                result?.correctAnswer === index
 
               return (
                 <button
@@ -603,12 +606,14 @@ const AptitudeQuiz = () => {
           </div>
 
           {/* Explanation (shown after submit) */}
-          {showResult && (
+          {showResult && results[currentIndex] && (
             <div className="mx-6 mb-6 p-4 rounded-xl bg-muted/30 border border-border/50 animate-fade-in">
               <p className="text-sm font-medium text-foreground mb-1">
-                {lastResult?.correct ? "✓ Correct!" : "✗ Incorrect"}
+                {results[currentIndex].correct ? "✓ Correct!" : "✗ Incorrect"}
               </p>
-              <p className="text-sm text-muted-foreground">{lastResult?.explanation}</p>
+              <p className="text-sm text-muted-foreground">
+                {results[currentIndex].explanation}
+              </p>
             </div>
           )}
 

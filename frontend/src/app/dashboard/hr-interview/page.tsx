@@ -6,14 +6,16 @@ import { cn } from "@/lib/utils";
 import { Mic, Square, ArrowRight, MessageSquare, Lightbulb, CheckCircle2 } from "lucide-react";
 import { Microphone } from "@/utils/Microphone";
 import { useHrInterview } from "@/hooks/useHrInterview";
+import ShinyText from "@/components/ShinyText";
+import { useRouter } from "next/navigation";
 
 type InterviewState = "idle" | "recording" | "completed" | "waiting";
 
-interface Question {
-  id: number;
-  text: string;
-  preferredAnswer: string;
-}
+// interface Question {
+//   id: number;
+//   text: string;
+//   preferredAnswer: string;
+// }
 // const suggestions = [
 //   "Try to use the STAR method when answering behavioral questions",
 //   "Practice pausing before answering to gather your thoughts",
@@ -55,6 +57,7 @@ const HRInterview = () => {
     start,
     submitAnswer,
     nextQuestion,
+    isLoading
 
   } = useHrInterview()
   const [state, setState] = useState<InterviewState>("idle");
@@ -108,11 +111,49 @@ const HRInterview = () => {
   useEffect(() => {
     start()
   }, [])
+  if (isLoading) {
+    <div className="text-center text-sm text-muted-foreground">
+      Please Wait
+    </div>
+  }
+  const router = useRouter()
+  if (questions?.length === 0) {
+    return (<>
+      <Button variant={"secondary"} className="float-right" onClick={() => router.push("/dashboard/interview")}>
+        <ShinyText text="✨HR Interview" speed={2}
+          delay={0}
+          color="#b5b5b5"
+          shineColor="#3c83f6"
+          spread={120}
+          direction="left"
+          yoyo={false}
+          pauseOnHover={false}
+          disabled={false} />
+      </Button>
 
+      <div className="text-center text-sm text-muted-foreground">
+        No Question Found
+      </div>
+    </>
+    )
+  }
   return (
     <>
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Progress indicator */}
+        <div className="flex w-full justify-end">
+          <Button variant={"secondary"} onClick={() => router.push("/dashboard/interview")}>
+            <ShinyText text="✨HR Interview" speed={2}
+              delay={0}
+              color="#b5b5b5"
+              shineColor="#3c83f6"
+              spread={120}
+              direction="left"
+              yoyo={false}
+              pauseOnHover={false}
+              disabled={false} />
+          </Button>
+        </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">
             Question {currentQuestionIndex + 1} of {questions.length}
@@ -132,7 +173,7 @@ const HRInterview = () => {
 
         {/* Question Card */}
         <div
-          key={`question-${currentQuestion.id}`}
+          key={`question-${currentQuestion?.id}`}
           className="animate-question-enter p-6 rounded-2xl bg-card border border-hr/20"
         >
           <div className="flex items-start gap-4">
@@ -140,7 +181,7 @@ const HRInterview = () => {
               <MessageSquare className="w-5 h-5 text-hr" />
             </div>
             <p className="text-lg text-foreground leading-relaxed pt-1">
-              {currentQuestion.question}
+              {currentQuestion?.question}
             </p>
           </div>
         </div>

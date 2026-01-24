@@ -16,7 +16,7 @@ export function useHrInterview() {
       token,
       body: {},
     })
-
+    console.log(res)
     store.startSession(res.sessionId, res.questions)
   }
 

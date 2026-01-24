@@ -6,12 +6,14 @@ type AptitudeState = {
   questions: AptitudeQuestion[]
   currentIndex: number
   answers: (number | null)[]
-  lastResult: AptitudeAnswerResult | null
   accuracy: number | null
 
+
+
+  results: (AptitudeAnswerResult | null)[]
   start: (sessionId: string, questions: AptitudeQuestion[]) => void
   answer: (index: number, selected: number) => void
-  setResult: (r: AptitudeAnswerResult) => void
+  setResult: (index: number, r: AptitudeAnswerResult) => void
   next: () => void
   complete: (accuracy: number) => void
   reset: () => void
@@ -22,7 +24,7 @@ export const useAptitudeStore = create<AptitudeState>((set) => ({
   questions: [],
   currentIndex: 0,
   answers: [],
-  lastResult: null,
+  results: [], // 🔥 ADD THIS
   accuracy: null,
 
   start: (sessionId, questions) =>
@@ -30,8 +32,8 @@ export const useAptitudeStore = create<AptitudeState>((set) => ({
       sessionId,
       questions,
       answers: Array(questions.length).fill(null),
+      results: Array(questions.length).fill(null), // 🔥
       currentIndex: 0,
-      lastResult: null,
       accuracy: null,
     }),
 
@@ -42,12 +44,20 @@ export const useAptitudeStore = create<AptitudeState>((set) => ({
       return { answers: next }
     }),
 
-  setResult: (r) => set({ lastResult: r }),
+  setResult: (index, r) =>
+    set((s) => {
+      const next = [...s.results]
+      next[index] = {
+        correct: r.correct,
+        correctAnswer: r.correctAnswer,
+        explanation: r.explanation,
+      }
+      return { results: next }
+    }),
 
   next: () =>
     set((s) => ({
       currentIndex: s.currentIndex + 1,
-      lastResult: null,
     })),
 
   complete: (accuracy) => set({ accuracy }),
@@ -58,7 +68,7 @@ export const useAptitudeStore = create<AptitudeState>((set) => ({
       questions: [],
       currentIndex: 0,
       answers: [],
-      lastResult: null,
+      results: [],
       accuracy: null,
     }),
 }))

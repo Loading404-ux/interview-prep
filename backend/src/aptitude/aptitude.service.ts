@@ -24,14 +24,23 @@ export class AptitudeService {
       mode: input.mode,
       totalQuestions: count,
     });
-
-    return {
+    console.log({
       sessionId: session.id,
       questions: questions.map(q => ({
-        id: q.id,
+        id: q._id,
         text: q.text,
         options: q.options,
       })),
+    })
+    return {
+      sessionId: session.id,
+      questions: questions.map(q => ({
+        id: q._id,
+        text: q.text,
+        options: q.options,
+        correctAnswerIndex: q.correctAnswerIndex,
+        explanation: q.explanation,
+      }))
     };
   }
 
@@ -44,7 +53,7 @@ export class AptitudeService {
   }) {
     const question = await this.repo.findQuestionById(input.questionId);
     if (!question) throw new Error('Question not found');
-
+    console.log(question.correctAnswerIndex, input.selectedOption)
     const isCorrect = question.correctAnswerIndex === input.selectedOption;
 
     await this.repo.updateStats(input.sessionId, isCorrect);

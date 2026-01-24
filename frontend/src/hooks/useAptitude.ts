@@ -43,7 +43,8 @@ export function useAptitude() {
       }
     )
 
-    store.setResult(res)
+    store.answer(store.currentIndex, selectedOption)
+    store.setResult(store.currentIndex, res)
     return res
   }
 

@@ -48,5 +48,17 @@ export class AptitudeRepository {
       { new: true },
     );
   }
+  // async findActiveSession(sessionId: string) {
+  //   return this.sessionModel.findOne({
+  //     _id: sessionId,
+  //     status: "STARTED",
+  //   });
+  // }
+  // async findAnswer(sessionId: string, questionId: string) {
+  //   return this.answerModel.findOne({
+  //     sessionId,
+  //     questionId,
+  //   });
+  // }
 
 }

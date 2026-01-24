@@ -140,7 +140,8 @@ interface HrFeedback {
 interface AptitudeQuestion {
   id: string
   text: string
-  options: string[]
+  options: string[],
+  correctAnswerIndex: number
 }
 
 interface AptitudeSession {
@@ -151,7 +152,7 @@ interface AptitudeSession {
 interface AptitudeAnswerResult {
   correct: boolean
   correctAnswer: number
-  explanation?: string
+  explanation: string
 }
 
 // types/activity.ts

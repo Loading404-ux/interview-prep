@@ -44,11 +44,11 @@ const data = [
     url: "/dashboard/aptitude",
     icon: Brain,
   },
-  {
-    title: "History",
-    url: "/dashboard/history",
-    icon: History,
-  },
+  // {
+  //   title: "History",
+  //   url: "/dashboard/history",
+  //   icon: History,
+  // },
 ];
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUserStore()

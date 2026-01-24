@@ -6,7 +6,8 @@ export const bindLoadingBar = (ref: any) => {
   loadingRef = ref
 }
 
-export const BASE_URL = "http://10.5.146.66:8000"
+export const BASE_URL = "http://localhost:8000"
+// export const BASE_URL = "http://10.5.146.66:8000"
 
 export async function api<T>(
   endpoint: string,
@@ -43,6 +44,7 @@ export async function api<T>(
 
     if (!res.ok) {
       // toast("Request failed", data?.message || "Something went wrong")
+      console.log(res,data)
       throw new Error(data?.message)
     }
 
