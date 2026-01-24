@@ -14,5 +14,5 @@ type ActivityEventType =
 
 export class ContributionDayDto {
   date: string;       // YYYY-MM-DD
-  verified: boolean;  // did anything that day
+  contributionCount: number;  // did anything that day
 }

@@ -11,7 +11,6 @@ import { UpdateProfileDto, UpdateTargetsDto } from './user.dto';
 export class UserController {
 
     constructor(private readonly service: UserService, private readonly progressService: UserProgressService) { }
-
     @Post('profile')
     async getUserProfile(@Req() req: any) {
         return this.service.getUser(req.user._id);

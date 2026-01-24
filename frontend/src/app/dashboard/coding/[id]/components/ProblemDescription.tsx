@@ -3,12 +3,12 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock } from "lucide-react";
 
-export default function ProblemDescription({ problem }:{problem: ProblemDetail}) {
+export default function ProblemDescription({ problem }: { problem: CodingProblemDetail }) {
   return (
     <ScrollArea className="h-[calc(100vh-20rem)]">
       <div className="p-6">
         <div className="whitespace-pre-wrap text-foreground/90 leading-relaxed">
-          {problem.description}
+          {problem.problem}
         </div>
 
         <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
@@ -17,7 +17,8 @@ export default function ProblemDescription({ problem }:{problem: ProblemDetail})
             Expected Complexity
           </h4>
           <p className="text-sm text-muted-foreground mt-2">
-            {problem.expectedComplexity}
+            Space Complexity: {problem.constraints.space_complexity}
+            Time Complexity: {problem.constraints.time_complexity}
           </p>
         </div>
       </div>

@@ -19,13 +19,21 @@ import {
 @UseGuards(ClerkAuthGuard)
 @Controller('coding')
 export class CodingController {
-  constructor(private readonly service: CodingService) {}
+  constructor(private readonly service: CodingService) { }
 
   @Post('submissions')
   submit(@Req() req: any, @Body() dto: CodingSubmissionDto) {
     return this.service.submitSolution(req.user, dto);
   }
 
+  @Get('questions')
+  getQuestions() {
+    return this.service.getQuestions();
+  }
+  @Get('questions/:id')
+  getQuestion(@Param('id') id: string) {
+    return this.service.getQuestion(id);
+  }
   @Post('submissions/vote')
   voteSubmission(@Req() req: any, @Body() dto: SubmisstionVoteDto) {
     return this.service.toggleSubmissionVote(req.user, dto);
@@ -45,7 +53,7 @@ export class CodingController {
   voteDiscussion(@Req() req: any, @Body() dto: DiscussionVoteDto) {
     return this.service.toggleDiscussionVote(req.user, dto);
   }
-
+  // /coding/problems/697401d43fb5894d915d7362/discussions
   @Get('questions/:id/discussions')
   getDiscussions(@Param('id') id: string) {
     return this.service.getDiscussions(id);

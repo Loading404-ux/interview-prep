@@ -37,7 +37,7 @@ function RowComponent({
     items,
     style
 }: RowComponentProps<{
-    items: Problem[];
+    items: CodingProblem[];
 }>) {
     const router = useRouter();
     const problem = items[index];
@@ -53,7 +53,7 @@ function RowComponent({
         >
             <div className="flex items-center gap-3">
                 <span className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
-                    {problem.id}. {problem.title}
+                    {index+1}. {problem.title}
                 </span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </div>
@@ -63,14 +63,14 @@ function RowComponent({
                 </Badge>
             </div>
             <span className="text-sm text-muted-foreground truncate">{problem.company}</span>
-            <span className="text-sm text-muted-foreground">{problem.acceptance}%</span>
+            {/* <span className="text-sm text-muted-foreground">{problem.acceptance}%</span>
             <div className="flex justify-center">
                 {problem.solved ? (
                     <Check className="w-5 h-5 text-success" />
                 ) : (
                     <span className="w-5 h-5" />
                 )}
-            </div>
+            </div> */}
         </button>
     );
 }
@@ -195,12 +195,12 @@ export default function CodingPractice() {
 
             {/* List */}
             <div className="bg-card rounded-2xl border border-border/50 overflow-hidden h-full" data-problems>
-                <div className="grid grid-cols-[1fr_100px_140px_100px_60px] gap-4 px-5 py-3 border-b border-border/50 text-sm font-medium text-muted-foreground">
+                <div className="grid grid-cols-[1fr_100px_1fr] gap-4 px-5 py-3 border-b border-border/50 text-sm font-medium text-muted-foreground">
                     <span>Problem</span>
                     <span>Difficulty</span>
                     <span>Company</span>
-                    <span>Acceptance</span>
-                    <span>Status</span>
+                    {/* <span>Acceptance</span>
+                    <span>Status</span> */}
                 </div>
                 {isLoading ? (
                     <>

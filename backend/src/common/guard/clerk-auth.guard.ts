@@ -23,7 +23,7 @@ export class ClerkAuthGuard implements CanActivate {
     const req = ctx.switchToHttp().getRequest();
 
     const authHeader = req.headers.authorization;
-  
+    console.log(authHeader);
     if (!authHeader) {
       throw new UnauthorizedException('Missing Authorization header');
     }

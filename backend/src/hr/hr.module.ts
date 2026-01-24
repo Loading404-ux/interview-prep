@@ -6,6 +6,8 @@ import { Schemas } from 'src/schema';
 import { AiModule } from 'src/ai/ai.module';
 import { HrQuestionRepository, HrSessionRepository } from './hr.repository';
 import { AiService } from 'src/ai/ai.service';
+import { ActivityModule } from 'src/activity/activity.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { AiService } from 'src/ai/ai.service';
       { name: Schemas.HrSession.name, schema: Schemas.HrSessionSchema },
     ]),
     AiModule,
+    UserModule,
+    ActivityModule
   ],
   controllers: [HrController],
   providers: [HrService,HrSessionRepository,HrQuestionRepository,AiService]

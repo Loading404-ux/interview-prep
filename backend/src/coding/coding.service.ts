@@ -26,8 +26,14 @@ export class CodingService {
         private readonly activityService: ActivityService,
         private readonly aiService: AiService,
         private readonly progressService: UserProgressService,
-    ) { }
 
+    ) { }
+    async getQuestions() {
+        return await this.repo.getQuestions();
+    }
+    async getQuestion(id: string) {
+        return await this.repo.getQuestionById(id);
+    }
     async submitSolution(user: any, dto: CodingSubmissionDto) {
         const submission = await this.repo.createSubmission({
             userId: user._id,
@@ -79,21 +85,23 @@ export class CodingService {
 
     async createDiscussion(user: any, dto: CodingDiscussionDto) {
         let parent: CodingDiscussion | null = null;
+        console.log(parent)
+        const data = {
+            userId: user._id,
+            clerkUserId: user.clerkUserId,
+            questionId: new Types.ObjectId(dto.questionId),
 
+            content: dto.content,
+        }
         if (dto.parentId) {
             parent = await this.repo.findDiscussionById(dto.parentId);
             if (!parent || parent.parentId) {
                 throw new BadRequestException('Invalid parent discussion');
             }
+            data['parentId'] = parent._id
         }
 
-        const discussion = await this.repo.createDiscussion({
-            userId: user._id,
-            clerkUserId: user.clerkUserId,
-            questionId: new Types.ObjectId(dto.questionId),
-            parentId: new Types.ObjectId(dto.parentId) ?? null,
-            content: dto.content,
-        });
+        const discussion = await this.repo.createDiscussion(data);
 
         if (parent) {
             await this.repo.incrementReplyCount(parent._id);
@@ -131,7 +139,9 @@ export class CodingService {
     }
 
     async getDiscussions(questionId: string) {
-        return this.repo.getDiscussionsByQuestion(questionId);
+        console.log("kiiii")
+        const data = await this.repo.getDiscussionsByQuestion(questionId);
+        return data ?? [];
     }
 
     async getReplies(discussionId: string) {

@@ -1,10 +1,11 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Mic, Square, ArrowRight, MessageSquare, Lightbulb, CheckCircle2 } from "lucide-react";
 import { Microphone } from "@/utils/Microphone";
+import { useHrInterview } from "@/hooks/useHrInterview";
 
 type InterviewState = "idle" | "recording" | "completed" | "waiting";
 
@@ -13,32 +14,32 @@ interface Question {
   text: string;
   preferredAnswer: string;
 }
-const suggestions = [
-  "Try to use the STAR method when answering behavioral questions",
-  "Practice pausing before answering to gather your thoughts",
-  "Include more specific examples from your experience",
-  "Maintain a consistent pace throughout your response",
-];
-const questions: Question[] = [
-  {
-    id: 1,
-    text: "Tell me about yourself and your background. What motivated you to pursue a career in software development?",
-    preferredAnswer:
-      "Start with your current role and recent accomplishments. Briefly mention your educational background and how you got into software development. Focus on your passion for problem-solving and building impactful products. Keep it under 2 minutes and end with why you're excited about this opportunity.",
-  },
-  {
-    id: 2,
-    text: "Describe a challenging project you worked on. How did you overcome the obstacles?",
-    preferredAnswer:
-      "Use the STAR method: Situation, Task, Action, Result. Choose a project that demonstrates technical skills and soft skills like collaboration. Be specific about your contributions and quantify the impact if possible. End with what you learned.",
-  },
-  {
-    id: 3,
-    text: "Where do you see yourself in 5 years?",
-    preferredAnswer:
-      "Show ambition while being realistic. Mention growth in technical expertise and potential leadership roles. Connect your goals to the company's mission. Demonstrate that you're looking for a long-term opportunity to grow.",
-  },
-];
+// const suggestions = [
+//   "Try to use the STAR method when answering behavioral questions",
+//   "Practice pausing before answering to gather your thoughts",
+//   "Include more specific examples from your experience",
+//   "Maintain a consistent pace throughout your response",
+// ];
+// const questions: Question[] = [
+//   {
+//     id: 1,
+//     text: "Tell me about yourself and your background. What motivated you to pursue a career in software development?",
+//     preferredAnswer:
+//       "Start with your current role and recent accomplishments. Briefly mention your educational background and how you got into software development. Focus on your passion for problem-solving and building impactful products. Keep it under 2 minutes and end with why you're excited about this opportunity.",
+//   },
+//   {
+//     id: 2,
+//     text: "Describe a challenging project you worked on. How did you overcome the obstacles?",
+//     preferredAnswer:
+//       "Use the STAR method: Situation, Task, Action, Result. Choose a project that demonstrates technical skills and soft skills like collaboration. Be specific about your contributions and quantify the impact if possible. End with what you learned.",
+//   },
+//   {
+//     id: 3,
+//     text: "Where do you see yourself in 5 years?",
+//     preferredAnswer:
+//       "Show ambition while being realistic. Mention growth in technical expertise and potential leadership roles. Connect your goals to the company's mission. Demonstrate that you're looking for a long-term opportunity to grow.",
+//   },
+// ];
 
 interface FeedbackScore {
   label: string;
@@ -47,23 +48,33 @@ interface FeedbackScore {
 }
 
 const HRInterview = () => {
+  const {
+    questions,
+    currentIndex,
+    feedback,
+    start,
+    submitAnswer,
+    nextQuestion,
+
+  } = useHrInterview()
   const [state, setState] = useState<InterviewState>("idle");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [waveformBars] = useState(Array.from({ length: 40 }, () => Math.random()));
   const [showFeedback, setShowFeedback] = useState(false);
   const [cardKey, setCardKey] = useState(0);
-  const currentQuestion = questions[currentQuestionIndex];
+  const currentQuestion = questions[currentIndex]
+
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
   const mic = useRef<Microphone>(null)
   if (!mic.current) {
     mic.current = new Microphone()
   }
-  const feedbackScores: FeedbackScore[] = [
-    { label: "Clarity", score: 78, color: "bg-coding" },
-    { label: "Structure", score: 65, color: "bg-hr" },
-    { label: "Confidence", score: 72, color: "bg-aptitude" },
-  ];
+  // const feedbackScores: FeedbackScore[] = [
+  //   { label: "Clarity", score: 78, color: "bg-coding" },
+  //   { label: "Structure", score: 65, color: "bg-hr" },
+  //   { label: "Confidence", score: 72, color: "bg-aptitude" },
+  // ];
 
   const handleStartRecording = async () => {
     // setState("waiting");
@@ -74,20 +85,18 @@ const HRInterview = () => {
   };
 
   const handleStopRecording = async () => {
-    setState("completed");
-    setCardKey(prev => prev + 1);
-    setTimeout(() => setShowFeedback(true), 100);
-    const blob = await mic.current?.stopRecording();
+    setState("completed")
+    const blob = await mic.current?.stopRecording()
 
-  };
+    if (blob) {
+      await submitAnswer(blob, currentQuestion.id)
+      setShowFeedback(true)
+    }
+  }
 
   const handleNextQuestion = () => {
-    if (!isLastQuestion) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setState("idle");
-    }
-    setShowFeedback(false);
-    setCardKey(prev => prev + 1);
+    nextQuestion()
+    setState("idle")
   };
 
   const handleRestart = () => {
@@ -96,6 +105,9 @@ const HRInterview = () => {
     setShowFeedback(false);
     setCardKey(prev => prev + 1);
   };
+  useEffect(() => {
+    start()
+  }, [])
 
   return (
     <>
@@ -128,7 +140,7 @@ const HRInterview = () => {
               <MessageSquare className="w-5 h-5 text-hr" />
             </div>
             <p className="text-lg text-foreground leading-relaxed pt-1">
-              {currentQuestion.text}
+              {currentQuestion.question}
             </p>
           </div>
         </div>
@@ -209,25 +221,65 @@ const HRInterview = () => {
                       Recording Complete
                     </h3>
                   </div>
-
-                  {/* Performance Scores */}
                   <div className="space-y-4 animate-fade-up-stagger" style={{ animationDelay: "50ms" }}>
                     <h4 className="text-sm font-medium text-muted-foreground">Performance</h4>
                     <div className="space-y-3">
-                      {feedbackScores.map((item) => (
-                        <div key={item.label} className="space-y-1.5">
+                      <div className="space-y-3">
+                        {/* {feedbackScores.map((item) => ( */}
+                        <div className="space-y-1.5">
                           <div className="flex justify-between text-sm">
-                            <span className="text-foreground">{item.label}</span>
-                            <span className="font-semibold text-foreground">{item.score}%</span>
+                            <span className="text-foreground">Clarity</span>
+                            <span className="font-semibold text-foreground">
+                              {feedback?.clarity}%
+                            </span>
                           </div>
                           <div className="h-2 rounded-full bg-muted overflow-hidden">
                             <div
-                              className={cn("h-full rounded-full transition-all duration-500", item.color)}
-                              style={{ width: `${item.score}%` }}
+                              className={cn(
+                                "h-full rounded-full transition-all duration-500",
+                                "bg-coding"
+                              )}
+                              style={{ width: `${feedback?.clarity}%` }}
                             />
                           </div>
                         </div>
-                      ))}
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-foreground">Structure</span>
+                            <span className="font-semibold text-foreground">
+                              {feedback?.structure}%
+                            </span>
+                          </div>
+                          <div className="h-2 rounded-full bg-muted overflow-hidden">
+                            <div
+                              className={cn(
+                                "h-full rounded-full transition-all duration-500",
+                                "bg-coding"
+                              )}
+                              style={{ width: `${feedback?.structure}%` }}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-foreground">Confidence</span>
+                            <span className="font-semibold text-foreground">
+                              {feedback?.confidence}%
+                            </span>
+                          </div>
+                          <div className="h-2 rounded-full bg-muted overflow-hidden">
+                            <div
+                              className={cn(
+                                "h-full rounded-full transition-all duration-500",
+                                "bg-coding"
+                              )}
+                              style={{ width: `${feedback?.confidence}%` }}
+                            />
+                          </div>
+                        </div>
+                        {/* ))} */}
+                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -242,19 +294,19 @@ const HRInterview = () => {
                           Preferred Answer Approach
                         </h4>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          {currentQuestion.preferredAnswer}
+                          {currentQuestion.preferred_answer}
                         </p>
                       </div>
                     </div>
                   </div>
                 )}
                 {/* Improvement Tips */}
-                {showFeedback && (
+                {feedback?.improvementTips && (
                   <div className="rounded-2xl border border-border/50 p-6 bg-muted/30 animate-fade-up-stagger"
                     style={{ animationDelay: "400ms" }}>
                     <h3 className="font-semibold text-foreground mb-4">Improvement Tips</h3>
                     <ul className="space-y-3">
-                      {suggestions.map((suggestion, i) => (
+                      {feedback?.improvementTips.map((suggestion, i) => (
                         <li
                           key={i}
                           className="flex items-start gap-3 text-sm text-foreground/80"

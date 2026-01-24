@@ -3,7 +3,8 @@ import ProblemDescription from "./ProblemDescription";
 import SolutionsPanel from "./SolutionsPanel";
 import DiscussionsPanel from "./DiscussionsPanel";
 
-export default function ProblemTabs({ problem }: { problem: ProblemDetail }) {
+export default function ProblemTabs({ problem }: { problem: CodingProblemDetail }) {
+  console.log(problem)
   return (
     <Tabs defaultValue="description" className="flex-1 flex flex-col">
       <TabsList className="w-full justify-start rounded-none border-b border-border/50 bg-transparent p-0 h-auto">

@@ -70,7 +70,7 @@ export class AiService {
         });
         const prompt = this.bbuildCodeReviewPrompt(data);
         const response = await llm.invoke(prompt);
-        const preprocess = this.preprocess(response.content as string);
+       const preprocess=this.preprocess(response.content as string);
 
         return this.validateAiReviewShape(this.safeJsonParse(preprocess));
 

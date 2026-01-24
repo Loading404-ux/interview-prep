@@ -36,11 +36,26 @@ export class CodingRepository {
     }
 
     getQuestions() {
-        return this.questionModel.find().sort({ createdAt: -1 });
+        return this.questionModel.find().sort({ createdAt: -1 }).lean()
+            .then(docs =>
+                docs.map(({ _id, ...rest }) => ({
+                    id: _id.toString(),
+                    ...rest,
+                }))
+            );
     }
 
-    getQuestionById(id: string) {
-        return this.questionModel.findById(id);
+    async getQuestionById(id: string) {
+        const doc = await this.questionModel.findById(id).lean();
+
+        if (!doc) return null;
+
+        const { _id, ...rest } = doc;
+
+        return {
+            id: _id.toString(),
+            ...rest,
+        };
     }
 
     /* ---------- SUBMISSIONS ---------- */
@@ -140,7 +155,7 @@ export class CodingRepository {
 
     getDiscussionsByQuestion(questionId: string) {
         return this.discussionModel
-            .find({ questionId, parentId: null, isDeleted: false })
+            .find({ questionId: new Types.ObjectId(questionId), parentId: null, isDeleted: false })
             .sort({ createdAt: -1 });
     }
 

@@ -5,209 +5,208 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Clock, CheckCircle2, XCircle, ArrowRight, Brain, RotateCcw, Zap, BookOpen, AlertCircle, ArrowLeft } from "lucide-react";
+import { useAptitude } from "@/hooks/useAptitude"
 
-interface Question {
-  id: number;
-  text: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
+// interface Question {
+//   id: number;
+//   text: string;
+//   options: string[];
+//   correctAnswer: number;
+//   explanation: string;
+// }
+
+// const questions: Question[] = [
+//   {
+//     id: 1,
+//     text: "A train travels 360 km in 4 hours. What is its speed in km/hr?",
+//     options: ["80 km/hr", "90 km/hr", "100 km/hr", "85 km/hr"],
+//     correctAnswer: 1,
+//     explanation: "Speed = Distance / Time = 360 km / 4 hr = 90 km/hr",
+//   },
+//   {
+//     id: 2,
+//     text: "If 15% of a number is 45, what is the number?",
+//     options: ["300", "450", "200", "350"],
+//     correctAnswer: 0,
+//     explanation: "Let the number be x. 15% of x = 45 → 0.15x = 45 → x = 45/0.15 = 300",
+//   },
+//   {
+//     id: 3,
+//     text: "A shopkeeper sells an article at 20% profit. If the cost price is ₹500, what is the selling price?",
+//     options: ["₹550", "₹600", "₹650", "₹580"],
+//     correctAnswer: 1,
+//     explanation: "Selling Price = Cost Price × (1 + Profit%) = 500 × 1.20 = ₹600",
+//   },
+//   {
+//     id: 4,
+//     text: "The ratio of ages of A and B is 3:5. If B is 25 years old, how old is A?",
+//     options: ["12 years", "15 years", "18 years", "20 years"],
+//     correctAnswer: 1,
+//     explanation: "If B = 25 years and ratio is 3:5, then A = (3/5) × 25 = 15 years",
+//   },
+//   {
+//     id: 5,
+//     text: "A car travels at 60 km/hr for 2 hours and 40 km/hr for 3 hours. What is the average speed?",
+//     options: ["48 km/hr", "50 km/hr", "52 km/hr", "45 km/hr"],
+//     correctAnswer: 0,
+//     explanation: "Total distance = (60×2) + (40×3) = 120 + 120 = 240 km. Total time = 5 hours. Average = 240/5 = 48 km/hr",
+//   },
+//   {
+//     id: 6,
+//     text: "What is the compound interest on ₹10,000 at 10% per annum for 2 years?",
+//     options: ["₹2,000", "₹2,100", "₹2,200", "₹1,900"],
+//     correctAnswer: 1,
+//     explanation: "CI = P(1 + r/100)^n - P = 10000(1.1)^2 - 10000 = 12100 - 10000 = ₹2,100",
+//   },
+//   {
+//     id: 7,
+//     text: "If A can complete a work in 12 days and B can complete it in 18 days, in how many days can they complete it together?",
+//     options: ["6.5 days", "7.2 days", "8 days", "9 days"],
+//     correctAnswer: 1,
+//     explanation: "Combined rate = 1/12 + 1/18 = 5/36. Time = 36/5 = 7.2 days",
+//   },
+//   {
+//     id: 8,
+//     text: "A mixture contains milk and water in the ratio 5:3. If 16 liters of the mixture is replaced by water, the ratio becomes 3:5. Find the initial quantity of milk.",
+//     options: ["35 liters", "40 liters", "45 liters", "50 liters"],
+//     correctAnswer: 1,
+//     explanation: "Let total = 8x. Initial milk = 5x. After replacement: (5x - 10)/(3x + 10) = 3/5. Solving: x = 8. Milk = 40 liters",
+//   },
+//   {
+//     id: 9,
+//     text: "The average of 5 numbers is 42. If one number is excluded, the average becomes 40. What is the excluded number?",
+//     options: ["48", "50", "52", "54"],
+//     correctAnswer: 1,
+//     explanation: "Sum of 5 numbers = 5 × 42 = 210. Sum of 4 numbers = 4 × 40 = 160. Excluded number = 210 - 160 = 50",
+//   },
+//   {
+//     id: 10,
+//     text: "A boat can travel 20 km upstream in 4 hours and 20 km downstream in 2 hours. What is the speed of the current?",
+//     options: ["2.5 km/hr", "3 km/hr", "3.5 km/hr", "4 km/hr"],
+//     correctAnswer: 0,
+//     explanation: "Upstream speed = 20/4 = 5 km/hr. Downstream speed = 20/2 = 10 km/hr. Current speed = (10-5)/2 = 2.5 km/hr",
+//   },
+// ];
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
-
-const questions: Question[] = [
-  {
-    id: 1,
-    text: "A train travels 360 km in 4 hours. What is its speed in km/hr?",
-    options: ["80 km/hr", "90 km/hr", "100 km/hr", "85 km/hr"],
-    correctAnswer: 1,
-    explanation: "Speed = Distance / Time = 360 km / 4 hr = 90 km/hr",
-  },
-  {
-    id: 2,
-    text: "If 15% of a number is 45, what is the number?",
-    options: ["300", "450", "200", "350"],
-    correctAnswer: 0,
-    explanation: "Let the number be x. 15% of x = 45 → 0.15x = 45 → x = 45/0.15 = 300",
-  },
-  {
-    id: 3,
-    text: "A shopkeeper sells an article at 20% profit. If the cost price is ₹500, what is the selling price?",
-    options: ["₹550", "₹600", "₹650", "₹580"],
-    correctAnswer: 1,
-    explanation: "Selling Price = Cost Price × (1 + Profit%) = 500 × 1.20 = ₹600",
-  },
-  {
-    id: 4,
-    text: "The ratio of ages of A and B is 3:5. If B is 25 years old, how old is A?",
-    options: ["12 years", "15 years", "18 years", "20 years"],
-    correctAnswer: 1,
-    explanation: "If B = 25 years and ratio is 3:5, then A = (3/5) × 25 = 15 years",
-  },
-  {
-    id: 5,
-    text: "A car travels at 60 km/hr for 2 hours and 40 km/hr for 3 hours. What is the average speed?",
-    options: ["48 km/hr", "50 km/hr", "52 km/hr", "45 km/hr"],
-    correctAnswer: 0,
-    explanation: "Total distance = (60×2) + (40×3) = 120 + 120 = 240 km. Total time = 5 hours. Average = 240/5 = 48 km/hr",
-  },
-  {
-    id: 6,
-    text: "What is the compound interest on ₹10,000 at 10% per annum for 2 years?",
-    options: ["₹2,000", "₹2,100", "₹2,200", "₹1,900"],
-    correctAnswer: 1,
-    explanation: "CI = P(1 + r/100)^n - P = 10000(1.1)^2 - 10000 = 12100 - 10000 = ₹2,100",
-  },
-  {
-    id: 7,
-    text: "If A can complete a work in 12 days and B can complete it in 18 days, in how many days can they complete it together?",
-    options: ["6.5 days", "7.2 days", "8 days", "9 days"],
-    correctAnswer: 1,
-    explanation: "Combined rate = 1/12 + 1/18 = 5/36. Time = 36/5 = 7.2 days",
-  },
-  {
-    id: 8,
-    text: "A mixture contains milk and water in the ratio 5:3. If 16 liters of the mixture is replaced by water, the ratio becomes 3:5. Find the initial quantity of milk.",
-    options: ["35 liters", "40 liters", "45 liters", "50 liters"],
-    correctAnswer: 1,
-    explanation: "Let total = 8x. Initial milk = 5x. After replacement: (5x - 10)/(3x + 10) = 3/5. Solving: x = 8. Milk = 40 liters",
-  },
-  {
-    id: 9,
-    text: "The average of 5 numbers is 42. If one number is excluded, the average becomes 40. What is the excluded number?",
-    options: ["48", "50", "52", "54"],
-    correctAnswer: 1,
-    explanation: "Sum of 5 numbers = 5 × 42 = 210. Sum of 4 numbers = 4 × 40 = 160. Excluded number = 210 - 160 = 50",
-  },
-  {
-    id: 10,
-    text: "A boat can travel 20 km upstream in 4 hours and 20 km downstream in 2 hours. What is the speed of the current?",
-    options: ["2.5 km/hr", "3 km/hr", "3.5 km/hr", "4 km/hr"],
-    correctAnswer: 0,
-    explanation: "Upstream speed = 20/4 = 5 km/hr. Downstream speed = 20/2 = 10 km/hr. Current speed = (10-5)/2 = 2.5 km/hr",
-  },
-];
-
 type Mode = "select" | "rapid" | "standard" | "standard-setup" | "rapid-result";
 
 const AptitudeQuiz = () => {
-  const [mode, setMode] = useState<Mode>("select");
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [answers, setAnswers] = useState<(number | null)[]>([]);
-  const [timeRemaining, setTimeRemaining] = useState(180); // 3 minutes for rapid fire
-  const [isTimerActive, setIsTimerActive] = useState(false);
-  const [questionCount, setQuestionCount] = useState(5);
-  const [activeQuestions, setActiveQuestions] = useState<Question[]>(questions);
+  const {
+    questions,
+    currentIndex,
+    answers,
+    lastResult,
+    accuracy,
+    start,
+    submitAnswer,
+    next,
+    complete,
+    reset,
+  } = useAptitude()
 
-  // Standard mode state
-  const [showResult, setShowResult] = useState(false);
+  const [mode, setMode] = useState<Mode>("select")
+  const [selectedOption, setSelectedOption] = useState<number | null>(null)
+  const [timeRemaining, setTimeRemaining] = useState(180)
+  const [isTimerActive, setIsTimerActive] = useState(false)
+  const [questionCount, setQuestionCount] = useState(5)
+  const [showResult, setShowResult] = useState(false)
 
-  const currentQuestion = activeQuestions[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === activeQuestions.length - 1;
-  const isCorrect = selectedOption === currentQuestion?.correctAnswer;
+  const currentQuestion = questions[currentIndex]
+  const isLastQuestion = currentIndex === questions.length - 1
 
-  // Timer for rapid fire mode
+  // ---------------- TIMER (RAPID) ----------------
   useEffect(() => {
     if (mode === "rapid" && isTimerActive && timeRemaining > 0) {
       const timer = setInterval(() => {
-        setTimeRemaining((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    } else if (mode === "rapid" && timeRemaining === 0) {
-      // Time's up - save current answer if selected
-      if (selectedOption !== null) {
-        const newAnswers = [...answers];
-        newAnswers[currentQuestionIndex] = selectedOption;
-        setAnswers(newAnswers);
-      }
-      setMode("rapid-result");
-      setIsTimerActive(false);
+        setTimeRemaining((t) => t - 1)
+      }, 1000)
+      return () => clearInterval(timer)
     }
-  }, [mode, isTimerActive, timeRemaining, selectedOption, answers, currentQuestionIndex]);
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
+    if (mode === "rapid" && timeRemaining === 0) {
+      finishRapid()
+    }
+  }, [mode, isTimerActive, timeRemaining])
 
-  const handleModeSelect = (selectedMode: "rapid" | "standard-setup") => {
-    if (selectedMode === "rapid") {
-      setActiveQuestions(questions.slice(0, 5)); // 5 questions for rapid fire
-      setAnswers(Array(5).fill(null));
-      setMode("rapid");
-      setIsTimerActive(true);
+  // ---------------- MODE SELECT ----------------
+  const handleModeSelect = async (m: "rapid" | "standard-setup") => {
+    if (m === "rapid") {
+      await start("RAPID")
+      setMode("rapid")
+      setIsTimerActive(true)
+      setTimeRemaining(180)
     } else {
-      setMode("standard-setup");
+      await start("STANDARD")
+      setMode("standard-setup")
     }
-  };
+  }
 
   const startStandardPractice = () => {
-    const count = Math.min(Math.max(1, questionCount), questions.length);
-    setActiveQuestions(questions.slice(0, count));
-    setAnswers(Array(count).fill(null));
-    setMode("standard");
-  };
+    setMode("standard")
+  }
 
-  const handleOptionSelect = (index: number) => {
-    if (mode === "standard" && showResult) return;
-    setSelectedOption(index);
-  };
+  // ---------------- ANSWER SUBMIT ----------------
+  const submit = async () => {
+    if (selectedOption === null || !currentQuestion) return
 
-  const handleSubmitRapid = () => {
-    if (selectedOption === null) return;
+    await submitAnswer(currentQuestion.id, selectedOption)
+    setShowResult(true)
+  }
 
-    const newAnswers = [...answers];
-    newAnswers[currentQuestionIndex] = selectedOption;
-    setAnswers(newAnswers);
+  const nextStandard = () => {
+    setSelectedOption(null)
+    setShowResult(false)
+    next()
+  }
 
-    if (!isLastQuestion) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedOption(null);
+  const nextRapid = async () => {
+    if (selectedOption !== null && currentQuestion) {
+      await submitAnswer(currentQuestion.id, selectedOption)
+    }
+
+    setSelectedOption(null)
+
+    if (isLastQuestion) {
+      finishRapid()
     } else {
-      // All questions answered in rapid fire
-      setMode("rapid-result");
-      setIsTimerActive(false);
+      next()
     }
-  };
+  }
 
-  const handleSubmitStandard = () => {
-    if (selectedOption === null) return;
+  const finishRapid = async () => {
+    setIsTimerActive(false)
+    await complete()
+    setMode("rapid-result")
+  }
 
-    const newAnswers = [...answers];
-    newAnswers[currentQuestionIndex] = selectedOption;
-    setAnswers(newAnswers);
-    setShowResult(true);
-  };
+  const restart = () => {
+    reset()
+    setMode("select")
+    setSelectedOption(null)
+    setShowResult(false)
+    setTimeRemaining(180)
+  }
+  const handleOptionSelect = (index: number) => {
+    if (showResult) return
+    setSelectedOption(index)
+  }
+  // ---------------- GUARDS ----------------
+  if (!currentQuestion && mode !== "select" && mode !== "standard-setup") {
+    return null
+  }
 
-  const handleNextStandard = () => {
-    if (!isLastQuestion) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedOption(null);
-      setShowResult(false);
-    }
-  };
-
-  const handleRestart = () => {
-    setMode("select");
-    setCurrentQuestionIndex(0);
-    setSelectedOption(null);
-    setAnswers([]);
-    setTimeRemaining(180);
-    setIsTimerActive(false);
-    setShowResult(false);
-    setActiveQuestions(questions);
-    setQuestionCount(5);
-  };
-
-  const getScore = () => {
-    return answers.reduce((score:number, answer, index) => {
-      if (answer === activeQuestions[index]?.correctAnswer) {
-        return score + 1;
-      }
-      return score;
-    }, 0);
-  };
+  // const getScore = () => {
+  //   return answers.reduce((score: number, answer, index) => {
+  //     if (answer === questions[index]?.correctAnswer) {
+  //       return score + 1;
+  //     }
+  //     return score;
+  //   }, 0);
+  // };
 
   // Mode selection screen
   if (mode === "select") {
@@ -313,19 +312,19 @@ const AptitudeQuiz = () => {
 
   // Rapid fire result screen
   if (mode === "rapid-result") {
-    const score = getScore();
-    const percentage = Math.round((score / activeQuestions.length) * 100);
+    const score = accuracy || 0;
+    const percentage = accuracy ?? 0
 
     return (
       <>
         <div className="max-w-3xl mx-auto space-y-6">
-          
+
           {/* Results Header */}
           <div className="bg-card rounded-2xl border border-border/50 p-8 text-center relative">
-          <Button onClick={handleRestart} className="absolute bottom-4 right-4" variant="outline">
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Try Again
-          </Button>
+            <Button onClick={restart} className="absolute bottom-4 right-4" variant="outline">
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Try Again
+            </Button>
             <div className="inline-flex p-4 rounded-2xl bg-aptitude/10 mb-4">
               {percentage >= 60 ? (
                 <CheckCircle2 className="w-12 h-12 text-success" />
@@ -338,7 +337,7 @@ const AptitudeQuiz = () => {
             </h1>
             <div className="flex items-center justify-center gap-4 mt-4">
               <div className="text-center">
-                <p className="text-4xl font-bold text-aptitude">{score}/{activeQuestions.length}</p>
+                <p className="text-4xl font-bold text-aptitude">{score}/{questions.length}</p>
                 <p className="text-sm text-muted-foreground">Correct</p>
               </div>
               <div className="w-px h-12 bg-border" />
@@ -352,9 +351,9 @@ const AptitudeQuiz = () => {
           {/* Question Review */}
           <div className="space-y-4">
             <h2 className="font-semibold text-foreground">Review Your Answers</h2>
-            {activeQuestions.map((question, index) => {
+            {questions.map((question, index) => {
               const userAnswer = answers[index];
-              const isCorrect = userAnswer === question.correctAnswer;
+              const isCorrect = lastResult?.correct
               const wasAnswered = userAnswer !== null;
 
               return (
@@ -385,13 +384,13 @@ const AptitudeQuiz = () => {
                             {wasAnswered ? question.options[userAnswer] : "Not answered"}
                           </span>
                         </p>
-                        {!isCorrect && (
+                        {lastResult?.correctAnswer !== undefined && (
                           <p className="text-success">
-                            Correct: {question.options[question.correctAnswer]}
+                            Correct: {currentQuestion.options[lastResult.correctAnswer]}
                           </p>
                         )}
                         <p className="text-muted-foreground mt-2 text-xs">
-                          {question.explanation}
+                          {lastResult?.explanation}
                         </p>
                       </div>
                     </div>
@@ -401,7 +400,7 @@ const AptitudeQuiz = () => {
             })}
           </div>
 
-          <Button onClick={handleRestart} className="w-full rounded-xl" variant="outline">
+          <Button onClick={restart} className="w-full rounded-xl" variant="outline">
             <RotateCcw className="w-4 h-4 mr-2" />
             Try Again
           </Button>
@@ -424,7 +423,7 @@ const AptitudeQuiz = () => {
               <div>
                 <h1 className="text-lg font-semibold text-foreground">Rapid Fire</h1>
                 <p className="text-sm text-muted-foreground">
-                  Question {currentQuestionIndex + 1} of {activeQuestions.length}
+                  Question {currentIndex + 1} of {questions.length}
                 </p>
               </div>
             </div>
@@ -442,7 +441,7 @@ const AptitudeQuiz = () => {
                   timeRemaining <= 30 ? "text-destructive" : "text-foreground"
                 )}
               >
-                {formatTime(timeRemaining)}
+                {formatTime(timeRemaining || 0)}
               </span>
             </div>
           </div>
@@ -451,7 +450,7 @@ const AptitudeQuiz = () => {
           <div className="h-1 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-aptitude transition-all duration-300"
-              style={{ width: `${((currentQuestionIndex) / activeQuestions.length) * 100}%` }}
+              style={{ width: `${((currentIndex) / questions.length) * 100}%` }}
             />
           </div>
 
@@ -495,7 +494,7 @@ const AptitudeQuiz = () => {
 
             <div className="px-6 pb-6 flex justify-end">
               <Button
-                onClick={handleSubmitRapid}
+                onClick={nextRapid}
                 disabled={selectedOption === null}
                 className="bg-aptitude hover:bg-aptitude/90 text-white rounded-xl px-6"
               >
@@ -522,13 +521,13 @@ const AptitudeQuiz = () => {
             <div>
               <h1 className="text-lg font-semibold text-foreground">Standard Practice</h1>
               <p className="text-sm text-muted-foreground">
-                Question {currentQuestionIndex + 1} of {activeQuestions.length}
+                Question {currentIndex + 1} of {questions.length}
               </p>
             </div>
           </div>
 
           <div className="text-sm text-muted-foreground">
-            Score: <span className="font-semibold text-foreground">{getScore()}/{currentQuestionIndex + (showResult ? 1 : 0)}</span>
+            Score: <span className="font-semibold text-foreground">{accuracy}/{currentIndex + (showResult ? 1 : 0)}</span>
           </div>
         </div>
 
@@ -536,7 +535,7 @@ const AptitudeQuiz = () => {
         <div className="h-1 bg-muted rounded-full overflow-hidden">
           <div
             className="h-full bg-primary transition-all duration-300"
-            style={{ width: `${((currentQuestionIndex + (showResult ? 1 : 0)) / activeQuestions.length) * 100}%` }}
+            style={{ width: `${((currentIndex + (showResult ? 1 : 0)) / questions.length) * 100}%` }}
           />
         </div>
 
@@ -552,7 +551,10 @@ const AptitudeQuiz = () => {
           <div className="p-6 space-y-3">
             {currentQuestion.options.map((option, index) => {
               const isSelected = selectedOption === index;
-              const isCorrectOption = index === currentQuestion.correctAnswer;
+              const isCorrectOption =
+                showResult &&
+                lastResult?.correctAnswer === index
+
 
               return (
                 <button
@@ -604,9 +606,9 @@ const AptitudeQuiz = () => {
           {showResult && (
             <div className="mx-6 mb-6 p-4 rounded-xl bg-muted/30 border border-border/50 animate-fade-in">
               <p className="text-sm font-medium text-foreground mb-1">
-                {isCorrect ? "✓ Correct!" : "✗ Incorrect"}
+                {lastResult?.correct ? "✓ Correct!" : "✗ Incorrect"}
               </p>
-              <p className="text-sm text-muted-foreground">{currentQuestion.explanation}</p>
+              <p className="text-sm text-muted-foreground">{lastResult?.explanation}</p>
             </div>
           )}
 
@@ -614,7 +616,7 @@ const AptitudeQuiz = () => {
           <div className="px-6 pb-6 flex justify-end gap-3">
             {!showResult ? (
               <Button
-                onClick={handleSubmitStandard}
+                onClick={submit}
                 disabled={selectedOption === null}
                 className="bg-primary hover:bg-primary/90 text-white rounded-xl px-6"
               >
@@ -623,16 +625,16 @@ const AptitudeQuiz = () => {
             ) : isLastQuestion ? (
               <div className="flex items-center gap-4">
                 <div className="text-foreground">
-                  Final Score: <span className="font-bold text-primary">{getScore()}/{activeQuestions.length}</span>
+                  Final Score: <span className="font-bold text-primary">{accuracy}/{questions.length}</span>
                 </div>
-                <Button onClick={handleRestart} variant="outline" className="rounded-xl">
+                <Button onClick={restart} variant="outline" className="rounded-xl">
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Try Again
                 </Button>
               </div>
             ) : (
               <Button
-                onClick={handleNextStandard}
+                onClick={submit}
                 className="bg-primary hover:bg-primary/90 text-white rounded-xl px-6"
               >
                 Next Question

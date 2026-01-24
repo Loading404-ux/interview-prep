@@ -7,19 +7,19 @@ import { useUserStore } from "@/store/user.store"
 import { useRouter } from "next/navigation"
 
 export function useBootstrapAuth() {
-  const {  getToken } = useAuth()
-  
+  const { getToken } = useAuth()
+
   const router = useRouter()
-    
+
   const { user, setUser, bootstrapped, markBootstrapped } = useUserStore()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const bootstrap = async () => {
-    //   if (!isSignedIn) {
-    //     setLoading(false)
-    //     return
-    //   }
+      //   if (!isSignedIn) {
+      //     setLoading(false)
+      //     return
+      //   }
 
       if (bootstrapped) {
         setLoading(false)
@@ -28,10 +28,9 @@ export function useBootstrapAuth() {
 
       try {
         const token = await getToken()
-
         const profile = await api<any>("/user/profile", {
           token,
-          method:"POST"
+          method: "POST"
         })
 
         setUser(profile)

@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Code2, Mic, Brain, Calendar, Clock, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useActivityLog } from "@/hooks/useActivityLog";
 // import { useNavigate } from "react-router-dom";
 
 type ActivityType = "coding" | "hr" | "aptitude";
@@ -32,94 +33,95 @@ const activityColors: Record<ActivityType, string> = {
   aptitude: "bg-aptitude/20 text-aptitude border-aptitude/30",
 };
 
-const mockActivities: Activity[] = [
-  {
-    id: "1",
-    type: "coding",
-    title: "Two Sum",
-    description: "Solved using hash table approach",
-    date: new Date(),
-    result: "Accepted",
-  },
-  {
-    id: "2",
-    type: "hr",
-    title: "Tell me about yourself",
-    description: "Completed mock interview session",
-    date: new Date(),
-    result: "78% confidence",
-  },
-  {
-    id: "3",
-    type: "aptitude",
-    title: "Quantitative Quiz #12",
-    description: "Percentage and profit/loss problems",
-    date: new Date(),
-    result: "8/10 correct",
-  },
-  {
-    id: "4",
-    type: "coding",
-    title: "Valid Parentheses",
-    description: "Stack-based solution",
-    date: new Date(Date.now() - 86400000),
-    result: "Accepted",
-  },
-  {
-    id: "5",
-    type: "hr",
-    title: "Why this company?",
-    description: "Practice session with AI feedback",
-    date: new Date(Date.now() - 86400000),
-    result: "72% confidence",
-  },
-  {
-    id: "6",
-    type: "aptitude",
-    title: "Logical Reasoning Quiz #8",
-    description: "Syllogisms and blood relations",
-    date: new Date(Date.now() - 2 * 86400000),
-    result: "7/10 correct",
-  },
-  {
-    id: "7",
-    type: "coding",
-    title: "Merge Two Sorted Lists",
-    description: "Recursive approach attempted",
-    date: new Date(Date.now() - 3 * 86400000),
-    result: "Accepted",
-  },
-  {
-    id: "8",
-    type: "coding",
-    title: "Longest Common Prefix",
-    description: "Horizontal scanning method",
-    date: new Date(Date.now() - 5 * 86400000),
-    result: "Accepted",
-  },
-];
+// const mockActivities: Activity[] = [
+//   {
+//     id: "1",
+//     type: "coding",
+//     title: "Two Sum",
+//     description: "Solved using hash table approach",
+//     date: new Date(),
+//     result: "Accepted",
+//   },
+//   {
+//     id: "2",
+//     type: "hr",
+//     title: "Tell me about yourself",
+//     description: "Completed mock interview session",
+//     date: new Date(),
+//     result: "78% confidence",
+//   },
+//   {
+//     id: "3",
+//     type: "aptitude",
+//     title: "Quantitative Quiz #12",
+//     description: "Percentage and profit/loss problems",
+//     date: new Date(),
+//     result: "8/10 correct",
+//   },
+//   {
+//     id: "4",
+//     type: "coding",
+//     title: "Valid Parentheses",
+//     description: "Stack-based solution",
+//     date: new Date(Date.now() - 86400000),
+//     result: "Accepted",
+//   },
+//   {
+//     id: "5",
+//     type: "hr",
+//     title: "Why this company?",
+//     description: "Practice session with AI feedback",
+//     date: new Date(Date.now() - 86400000),
+//     result: "72% confidence",
+//   },
+//   {
+//     id: "6",
+//     type: "aptitude",
+//     title: "Logical Reasoning Quiz #8",
+//     description: "Syllogisms and blood relations",
+//     date: new Date(Date.now() - 2 * 86400000),
+//     result: "7/10 correct",
+//   },
+//   {
+//     id: "7",
+//     type: "coding",
+//     title: "Merge Two Sorted Lists",
+//     description: "Recursive approach attempted",
+//     date: new Date(Date.now() - 3 * 86400000),
+//     result: "Accepted",
+//   },
+//   {
+//     id: "8",
+//     type: "coding",
+//     title: "Longest Common Prefix",
+//     description: "Horizontal scanning method",
+//     date: new Date(Date.now() - 5 * 86400000),
+//     result: "Accepted",
+//   },
+// ];
 
 const History = () => {
+  const { activities, isLoading } = useActivityLog();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<ActivityType | "all">("all");
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => setIsLoading(false), 800);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
-  const groupActivitiesByDate = (activities: Activity[]) => {
+  const groupActivitiesByDate = (activities: ActivityDTO[]) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     const lastWeek = new Date(today);
     lastWeek.setDate(lastWeek.getDate() - 7);
 
-    const groups: Record<string, Activity[]> = {
+    const groups: Record<string, ActivityDTO[]> = {
       Today: [],
       Yesterday: [],
       "Last 7 days": [],
@@ -127,7 +129,7 @@ const History = () => {
     };
 
     activities.forEach((activity) => {
-      const activityDate = new Date(activity.date);
+      const activityDate = new Date(activity.createdAt);
       activityDate.setHours(0, 0, 0, 0);
 
       if (activityDate.getTime() === today.getTime()) {
@@ -146,12 +148,12 @@ const History = () => {
 
   const filteredActivities =
     filter === "all"
-      ? mockActivities
-      : mockActivities.filter((a) => a.type === filter);
+      ? activities
+      : activities.filter((a) => a.type === filter);
 
   const groupedActivities = groupActivitiesByDate(filteredActivities);
 
-  const handleActivityClick = (activity: Activity) => {
+  const handleActivityClick = (activity: ActivityDTO) => {
     switch (activity.type) {
       case "coding":
         router.push("/coding");
@@ -220,7 +222,7 @@ const History = () => {
                         {group}
                       </h3>
                       <div className="space-y-2">
-                        {activities.map((activity) => (
+                        {activities.map((activity: ActivityDTO) => (
                           <button
                             key={activity.id}
                             onClick={() => handleActivityClick(activity)}
@@ -256,7 +258,7 @@ const History = () => {
                                 <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                                   <span className="flex items-center gap-1">
                                     <Clock className="w-3 h-3" />
-                                    {activity.date.toLocaleTimeString([], {
+                                    {new Date(activity.createdAt)?.toLocaleTimeString([], {
                                       hour: "2-digit",
                                       minute: "2-digit",
                                     })}

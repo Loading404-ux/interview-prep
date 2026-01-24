@@ -1,17 +1,17 @@
 import { create } from "zustand"
 
-type User = {
+type AuthUser = {
   id: string
   email: string
   name: string
   avatar?: string
-  clearkUserId: string
 }
 
 type UserState = {
-  user: User | null
+  user: AuthUser | null
   bootstrapped: boolean
-  setUser: (user: User) => void
+
+  setUser: (user: AuthUser) => void
   clearUser: () => void
   markBootstrapped: () => void
 }

@@ -3,7 +3,7 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/comp
 import { useMemo } from "react";
 
 interface ContributionCalendarProps {
-  data: { date: string; verified: boolean }[];
+  data: { date: string; count: number }[];
   className?: string;
 }
 
@@ -43,7 +43,7 @@ export const ContributionCalendar = ({ data, className }: ContributionCalendarPr
     return { weeks: weekColumns, monthLabels: months };
   }, []);
 
-  const hasContribution = (date: string) => data.some((d) => d.date === date && d.verified);
+  const hasContribution = (date: string) => data.some((d) => d.date === date && d.count>0);
 
   const dayLabels = [
     { label: "Mon", index: 1 },
@@ -61,7 +61,7 @@ export const ContributionCalendar = ({ data, className }: ContributionCalendarPr
           <h3 className="text-lg font-semibold tracking-tight">Last 3 months</h3>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-blue-500">
-              {data.filter(d => d.verified).length}
+              {data.filter(d => d.count > 0).length}
             </span>
             <span className="text-xs text-muted-foreground uppercase font-medium">Contributions</span>
           </div>

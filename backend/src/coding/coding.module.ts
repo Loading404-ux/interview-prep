@@ -6,6 +6,9 @@ import { DatabaseModule } from 'src/database/database.module';
 import { ClerkProvider } from 'src/common/providers/clerk.provider';
 import { Schemas } from 'src/schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AiModule } from 'src/ai/ai.module';
+import { ActivityModule } from 'src/activity/activity.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -17,6 +20,9 @@ import { MongooseModule } from '@nestjs/mongoose';
       { name: Schemas.SubmissionVote.name, schema: Schemas.SubmissionVoteSchema },
       { name: Schemas.DiscussionVote.name, schema: Schemas.DiscussionVoteSchema },
     ]),
+    AiModule,
+    UserModule,
+    ActivityModule
   ],
   controllers: [CodingController],
   providers: [CodingService, CodingRepository]

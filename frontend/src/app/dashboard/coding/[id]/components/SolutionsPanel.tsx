@@ -6,15 +6,25 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThumbsUp, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSolutions } from "../../hooks/useSolutions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@clerk/nextjs"
+import { api } from "@/lib/api-client"
+import { toast } from "sonner"
 
-export default function SolutionsPanel({ problemId }: { problemId: number }) {
+export default function SolutionsPanel({ problemId }: { problemId: string }) {
+  console.log(problemId)
   const {
     solutions,
     isLoading,
     toggleLike,
     addSolution,
   } = useSolutions(problemId);
-
+  const [newSolution, setNewSolution] = useState({
+    solutionText: "",
+    explanation: "",
+  })
+  const { getToken } = useAuth()
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
 
   if (isLoading) {
@@ -24,18 +34,111 @@ export default function SolutionsPanel({ problemId }: { problemId: number }) {
       </div>
     );
   }
+  const handleSubmitSolution = async () => {
+    if (!newSolution.solutionText.trim()) return
 
+    try {
+      const token = await getToken()
+
+      const res = await api<{
+        id: string
+        questionId: string
+        solution: string
+        explanation?: string
+        verdict: "accepted" | "rejected" | "needs_improvement"
+        upvotes: number
+        createdAt: string
+      }>("/coding/submissions", {
+        method: "POST",
+        token,
+        body: {
+          questionId: problemId,
+          solutionText: newSolution.solutionText,
+          explanation: newSolution.explanation,
+        },
+      })
+      if (res.verdict === "accepted") {
+        addSolution({
+          id: res.id,
+          solution: res.solution,
+          explanation: res.explanation,
+          upvotes: res.upvotes,
+          createdAt: res.createdAt,
+        })
+
+        toast.success("Solution accepted 🎉")
+      } else {
+        toast.message("Solution submitted for review")
+      }
+      setNewSolution({ solutionText: "", explanation: "" })
+      setIsSubmitOpen(false)
+
+    } catch (err: any) {
+      toast.error(err.message ?? "Failed to submit solution")
+    }
+  }
   return (
+
+
     <ScrollArea className="h-[calc(100vh-20rem)]">
       <div className="p-6 space-y-4">
         {/* Submit Solution */}
-        <Button
-          className="w-full bg-coding hover:bg-coding/90"
-          onClick={() => setIsSubmitOpen(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Submit Solution
-        </Button>
+        <Dialog open={isSubmitOpen} onOpenChange={setIsSubmitOpen}>
+          <DialogTrigger asChild>
+            <Button className="w-full bg-coding hover:bg-coding/90 text-white rounded-md">
+              <Plus className="w-4 h-4 mr-2" />
+              Submit Solution
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Submit Your Solution</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Solution Code
+                </label>
+                <Textarea
+                  placeholder="Paste your solution code here..."
+                  value={newSolution.solutionText}
+                  onChange={(e) =>
+                    setNewSolution((prev) => ({ ...prev, solutionText: e.target.value }))
+                  }
+                  className="min-h-[200px] text-sm bg-muted/30 border-border/50 font-mono!"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Explanation
+                </label>
+                <Textarea
+                  placeholder="Explain your approach, time/space complexity, and key insights..."
+                  value={newSolution.explanation}
+                  onChange={(e) =>
+                    setNewSolution((prev) => ({ ...prev, explanation: e.target.value }))
+                  }
+                  className="min-h-[100px] bg-muted/30 border-border/50"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsSubmitOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSubmitSolution}
+                  disabled={!newSolution.solutionText.trim() || !newSolution.explanation.trim()}
+                  className="bg-coding hover:bg-coding/90"
+                >
+                  Submit
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Empty State */}
         {solutions.length === 0 && (
@@ -92,5 +195,6 @@ export default function SolutionsPanel({ problemId }: { problemId: number }) {
         ))}
       </div>
     </ScrollArea>
+
   );
 }

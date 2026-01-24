@@ -28,7 +28,20 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
+import { useProfile } from "@/hooks/useProfile";
+import { useAchievements } from "@/hooks/useAchievements";
+import { useProfileStore } from "@/store/useProfileStore";
+import { api } from "@/lib/api-client";
+import { toast } from "sonner";
+import { useAuth } from "@clerk/nextjs";
+const ACHIEVEMENT_DEFINITIONS = [
+  { key: "first_problem", title: "First Problem Solved", icon: "🎯" },
+  { key: "7_day_streak", title: "7 Day Streak", icon: "🔥" },
+  { key: "hr_master", title: "HR Master", icon: "🎤" },
+  { key: "quant_pro", title: "Quant Pro", icon: "🧮" },
+  { key: "100_problems", title: "100 Problems", icon: "💯" },
+  { key: "interview_ready", title: "Interview Ready", icon: "🚀" },
+]
 const allCompanies = [
   "Google",
   "Microsoft",
@@ -51,43 +64,67 @@ const allCompanies = [
   "Coinbase",
   "Shopify",
 ];
-const achievements = [
-  { title: "First Problem Solved", icon: "🎯", earned: true },
-  { title: "7 Day Streak", icon: "🔥", earned: true },
-  { title: "HR Master", icon: "🎤", earned: false },
-  { title: "Quant Pro", icon: "🧮", earned: true },
-  { title: "100 Problems", icon: "💯", earned: false },
-  { title: "Interview Ready", icon: "🚀", earned: false },
-];
+// const achievements = [
+//   { title: "First Problem Solved", icon: "🎯", earned: true },
+//   { title: "7 Day Streak", icon: "🔥", earned: true },
+//   { title: "HR Master", icon: "🎤", earned: false },
+//   { title: "Quant Pro", icon: "🧮", earned: true },
+//   { title: "100 Problems", icon: "💯", earned: false },
+//   { title: "Interview Ready", icon: "🚀", earned: false },
+// ];
 
-const stats = [
-  { label: "Coding Problems", value: 45, total: 150, color: "bg-coding", icon: Code2 },
-  { label: "HR Sessions", value: 12, total: 20, color: "bg-hr", icon: Mic },
-  { label: "Aptitude Quizzes", value: 28, total: 50, color: "bg-aptitude", icon: Brain },
-];
+// const stats = [
+//   { label: "Coding Problems", value: 45, total: 150, color: "bg-coding", icon: Code2 },
+//   { label: "HR Sessions", value: 12, total: 20, color: "bg-hr", icon: Mic },
+//   { label: "Aptitude Quizzes", value: 28, total: 50, color: "bg-aptitude", icon: Brain },
+// ];
 const Profile = () => {
-  const [user, setUser] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    college: "IIT Delhi",
-    targetCompanies: ["Google", "Microsoft", "Amazon"],
-    joinedDate: "January 2024",
-  });
-
+  // const [user, setUser] = useState({
+  //   name: "John Doe",
+  //   email: "john.doe@example.com",
+  //   college: "IIT Delhi",
+  //   targetCompanies: ["Google", "Microsoft", "Amazon"],
+  //   joinedDate: "January 2024",
+  // });
+  const { profile, metrics, contributions, isLoading } = useProfile()
+  // const { user } = useUserStore()
   const [isEditingCompanies, setIsEditingCompanies] = useState(false);
-  const [selectedCompanies, setSelectedCompanies] = useState<string[]>(user.targetCompanies);
-
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>(profile?.targetCompanies || []);
+  const { unlocked, isLoading: achievementsLoading } = useAchievements()
+  const stats = [
+    {
+      label: "Coding Problems",
+      value: metrics?.coding.solved,
+      total: metrics?.coding.total,
+      color: "bg-coding",
+      icon: Code2,
+    },
+    {
+      label: "HR Sessions",
+      value: metrics?.hr.completed,
+      total: metrics?.hr.total,
+      color: "bg-hr",
+      icon: Mic,
+    },
+    {
+      label: "Aptitude Quizzes",
+      value: metrics?.aptitude.completed,
+      total: metrics?.aptitude.total,
+      color: "bg-aptitude",
+      icon: Brain,
+    },
+  ]
 
 
   // Mock contribution data (last 90 days)
-  const contributionData = Array.from({ length: 90 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (89 - i));
-    return {
-      date: date.toISOString().split("T")[0],
-      verified: Math.random() > 0.6,
-    };
-  });
+  // const contributionData = Array.from({ length: 90 }, (_, i) => {
+  //   const date = new Date();
+  //   date.setDate(date.getDate() - (89 - i));
+  //   return {
+  //     date: date.toISOString().split("T")[0],
+  //     verified: Math.random() > 0.6,
+  //   };
+  // });
 
   const toggleCompany = (company: string) => {
     setSelectedCompanies((prev) =>
@@ -96,12 +133,37 @@ const Profile = () => {
         : [...prev, company]
     );
   };
+  const updateTargetCompanies = useProfileStore(
+    (s) => s.updateTargetCompanies
+  )
+  const { getToken } = useAuth()
+  const saveCompanies = async () => {
+    try {
+      const token = await getToken()
 
-  const saveCompanies = () => {
-    setUser((prev) => ({ ...prev, targetCompanies: selectedCompanies }));
-    setIsEditingCompanies(false);
-  };
+      const res = await api<{ targetCompanies: string[] }>(
+        "/user/profile",
+        {
+          method: "PATCH",
+          token,
+          body: {
+            targetCompanies: selectedCompanies,
+          },
+        }
+      )
 
+      updateTargetCompanies(res.targetCompanies)
+      setIsEditingCompanies(false)
+
+      toast.success("Target companies updated")
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to update companies")
+    }
+  }
+  if (isLoading || !profile || !metrics) {
+    return <div className="p-6 text-muted-foreground">Loading profile…</div>
+  }
   return (
     <>
       <div className="mx-auto space-y-6">
@@ -116,8 +178,8 @@ const Profile = () => {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <h1 className="text-xl font-bold text-foreground">{user.name}</h1>
-                <p className="text-sm text-muted-foreground">Member since {user.joinedDate}</p>
+                <h1 className="text-xl font-bold text-foreground">{profile.name}</h1>
+                <p className="text-sm text-muted-foreground">Member since {profile.joinedAt}</p>
               </div>
               <Dialog open={isEditingCompanies} onOpenChange={setIsEditingCompanies}>
                 <DialogTrigger asChild>
@@ -159,7 +221,7 @@ const Profile = () => {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        setSelectedCompanies(user.targetCompanies);
+                        setSelectedCompanies(profile.targetCompanies);
                         setIsEditingCompanies(false);
                       }}
                     >
@@ -182,15 +244,15 @@ const Profile = () => {
               <div className="space-y-3">
                 <div className="flex items-center gap-3 text-sm">
                   <User className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-foreground">{user.name}</span>
+                  <span className="text-foreground">{profile.name}</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <Mail className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-foreground">{user.email}</span>
+                  <span className="text-foreground">{profile.email}</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <GraduationCap className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-foreground">{user.college}</span>
+                  <span className="text-foreground">{profile.college}</span>
                 </div>
               </div>
 
@@ -200,7 +262,7 @@ const Profile = () => {
                   <span className="text-sm font-medium text-foreground">Target Companies</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {user.targetCompanies.map((company) => (
+                  {profile.targetCompanies.map((company) => (
                     <Badge
                       key={company}
                       variant="secondary"
@@ -220,22 +282,24 @@ const Profile = () => {
                 <h3 className="font-semibold text-foreground text-sm">Achievements</h3>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                {achievements.map((achievement) => (
-                  <div
-                    key={achievement.title}
-                    className={cn(
-                      "p-3 rounded-xl border text-center transition-all duration-200",
-                      achievement.earned
-                        ? "bg-primary/5 border-primary/30"
-                        : "bg-muted/30 border-border/50 opacity-40"
-                    )}
-                  >
-                    <span className="text-xl">{achievement.icon}</span>
-                    <p className="text-[10px] font-medium text-foreground mt-1 leading-tight">
-                      {achievement.title}
-                    </p>
-                  </div>
-                ))}
+                {ACHIEVEMENT_DEFINITIONS.map((a) => {
+                  const earned = Boolean(unlocked[a.key])
+
+                  return (
+                    <div
+                      key={a.key}
+                      className={cn(
+                        "p-3 rounded-xl border text-center transition-all",
+                        earned
+                          ? "bg-primary/5 border-primary/30"
+                          : "bg-muted/30 border-border/50 opacity-40"
+                      )}
+                    >
+                      <span className="text-xl">{a.icon}</span>
+                      <p className="text-[10px] font-medium mt-1">{a.title}</p>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -260,7 +324,7 @@ const Profile = () => {
                     <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
                         className={cn("h-full rounded-full transition-all duration-500", stat.color)}
-                        style={{ width: `${(stat.value / stat.total) * 100}%` }}
+                        style={{ width: `${((stat.value ?? 0) / (stat.total ?? 1)) * 100}%`, }}
                       />
                     </div>
                   </div>
@@ -274,7 +338,7 @@ const Profile = () => {
                 <Code2 className="w-4 h-4 text-success" />
                 <h3 className="font-semibold text-foreground text-sm">Contributions</h3>
               </div>
-              <ContributionCalendar data={contributionData} />
+              <ContributionCalendar data={contributions} />
             </div>
           </div>
         </div>

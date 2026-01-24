@@ -1,26 +1,24 @@
-import { create } from "zustand";
-
-
-
-
+import { create } from "zustand"
 
 interface DiscussionsState {
-  discussions: Discussion[];
-  isLoading: boolean;
+  discussions: Discussion[]
+  replies: Record<string, Reply[]> // discussionId -> replies
+  isLoading: boolean
 
-  setDiscussions: (d: Discussion[]) => void;
-  toggleLike: (id: number) => void;
-  addDiscussion: (d: Discussion) => void;
-  addReply: (discussionId: number, reply: Reply) => void;
-  setLoading: (v: boolean) => void;
+  setLoading: (v: boolean) => void
+  setDiscussions: (d: Discussion[]) => void
+  setReplies: (discussionId: string, replies: Reply[]) => void
 
-  toggleReplies: (id: number) => void;
-  toggleReplyLike: (discussionId: number, replyId: number) => void;
+  addDiscussion: (d: Discussion) => void
+  addReply: (discussionId: string, reply: Reply) => void
 
+  incrementVote: (discussionId: string) => void
+  decrementVote: (discussionId: string) => void
 }
 
 export const useDiscussionsStore = create<DiscussionsState>((set) => ({
   discussions: [],
+  replies: {},
   isLoading: true,
 
   setLoading: (v) => set({ isLoading: v }),
@@ -28,17 +26,12 @@ export const useDiscussionsStore = create<DiscussionsState>((set) => ({
   setDiscussions: (discussions) =>
     set({ discussions, isLoading: false }),
 
-  toggleLike: (id) =>
+  setReplies: (discussionId, replies) =>
     set((state) => ({
-      discussions: state.discussions.map((d) =>
-        d.id === id
-          ? {
-            ...d,
-            isLiked: !d.isLiked,
-            likes: d.isLiked ? d.likes - 1 : d.likes + 1,
-          }
-          : d
-      ),
+      replies: {
+        ...state.replies,
+        [discussionId]: replies,
+      },
     })),
 
   addDiscussion: (discussion) =>
@@ -48,37 +41,30 @@ export const useDiscussionsStore = create<DiscussionsState>((set) => ({
 
   addReply: (discussionId, reply) =>
     set((state) => ({
-      discussions: state.discussions.map((d) =>
-        d.id === discussionId
-          ? { ...d, replies: [...d.replies, reply] }
-          : d
-      ),
-    })),
-  toggleReplies: (id) =>
-    set((state) => ({
-      discussions: state.discussions.map((d) =>
-        d.id === id ? { ...d, showReplies: !d.showReplies } : d
-      ),
+      replies: {
+        ...state.replies,
+        [discussionId]: [
+          ...(state.replies[discussionId] ?? []),
+          reply,
+        ],
+      },
     })),
 
-  toggleReplyLike: (discussionId, replyId) =>
+  incrementVote: (discussionId) =>
     set((state) => ({
       discussions: state.discussions.map((d) =>
         d.id === discussionId
-          ? {
-            ...d,
-            replies: d.replies.map((r) =>
-              r.id === replyId
-                ? {
-                  ...r,
-                  isLiked: !r.isLiked,
-                  likes: r.isLiked ? r.likes - 1 : r.likes + 1,
-                }
-                : r
-            ),
-          }
+          ? { ...d, upvotes: d.upvotes + 1 }
           : d
       ),
     })),
 
-}));
+  decrementVote: (discussionId) =>
+    set((state) => ({
+      discussions: state.discussions.map((d) =>
+        d.id === discussionId
+          ? { ...d, upvotes: Math.max(0, d.upvotes - 1) }
+          : d
+      ),
+    })),
+}))

@@ -57,7 +57,7 @@ export class ActivityService {
 
     return daily.map(d => ({
       date: d.date,
-      verified: d.contributionCount > 0,
+      contributionCount: d.contributionCount,
     }));
   }
 

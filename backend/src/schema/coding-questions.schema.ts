@@ -5,7 +5,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 export class Editorial {
 
   @Prop({ required: true })
-  approach: string;
+  approach?: string;
 
   @Prop({ required: true })
   timeComplexity: string;

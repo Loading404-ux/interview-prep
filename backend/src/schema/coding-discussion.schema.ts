@@ -13,7 +13,8 @@ export class CodingDiscussion extends Document {
 
   @Prop({ required: true, index: true, type: String })
   clerkUserId: string
-  @Prop({ type: Types.ObjectId, ref: CodingDiscussion.name, default: null })
+
+  @Prop({ type: Types.ObjectId, ref: "codingdiscussions", default: null })
   parentId: Types.ObjectId | null;
 
   @Prop({ required: true })
