@@ -30,7 +30,6 @@ export function useBootstrapAuth() {
         const token = await getToken()
         const profile = await api<any>("/user/profile", {
           token,
-          method: "POST"
         })
 
         setUser(profile)

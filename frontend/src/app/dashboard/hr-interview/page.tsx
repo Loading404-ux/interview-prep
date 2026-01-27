@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -8,46 +8,9 @@ import { Microphone } from "@/utils/Microphone";
 import { useHrInterview } from "@/hooks/useHrInterview";
 import ShinyText from "@/components/ShinyText";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type InterviewState = "idle" | "recording" | "completed" | "waiting";
-
-// interface Question {
-//   id: number;
-//   text: string;
-//   preferredAnswer: string;
-// }
-// const suggestions = [
-//   "Try to use the STAR method when answering behavioral questions",
-//   "Practice pausing before answering to gather your thoughts",
-//   "Include more specific examples from your experience",
-//   "Maintain a consistent pace throughout your response",
-// ];
-// const questions: Question[] = [
-//   {
-//     id: 1,
-//     text: "Tell me about yourself and your background. What motivated you to pursue a career in software development?",
-//     preferredAnswer:
-//       "Start with your current role and recent accomplishments. Briefly mention your educational background and how you got into software development. Focus on your passion for problem-solving and building impactful products. Keep it under 2 minutes and end with why you're excited about this opportunity.",
-//   },
-//   {
-//     id: 2,
-//     text: "Describe a challenging project you worked on. How did you overcome the obstacles?",
-//     preferredAnswer:
-//       "Use the STAR method: Situation, Task, Action, Result. Choose a project that demonstrates technical skills and soft skills like collaboration. Be specific about your contributions and quantify the impact if possible. End with what you learned.",
-//   },
-//   {
-//     id: 3,
-//     text: "Where do you see yourself in 5 years?",
-//     preferredAnswer:
-//       "Show ambition while being realistic. Mention growth in technical expertise and potential leadership roles. Connect your goals to the company's mission. Demonstrate that you're looking for a long-term opportunity to grow.",
-//   },
-// ];
-
-interface FeedbackScore {
-  label: string;
-  score: number;
-  color: string;
-}
 
 const HRInterview = () => {
   const {
@@ -57,43 +20,62 @@ const HRInterview = () => {
     start,
     submitAnswer,
     nextQuestion,
-    isLoading
-
+    complete,
+    reset,
+    isLoading,
   } = useHrInterview()
+
+  const currentQuestion = questions[currentIndex]
+  const isLastQuestion = currentIndex === questions.length - 1
   const [state, setState] = useState<InterviewState>("idle");
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  // const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [waveformBars] = useState(Array.from({ length: 40 }, () => Math.random()));
   const [showFeedback, setShowFeedback] = useState(false);
   const [cardKey, setCardKey] = useState(0);
-  const currentQuestion = questions[currentIndex]
-
-  const isLastQuestion = currentQuestionIndex === questions.length - 1;
-
+  const [disabled, setDisabled] = useState(true)
   const mic = useRef<Microphone>(null)
   if (!mic.current) {
     mic.current = new Microphone()
   }
-  // const feedbackScores: FeedbackScore[] = [
-  //   { label: "Clarity", score: 78, color: "bg-coding" },
-  //   { label: "Structure", score: 65, color: "bg-hr" },
-  //   { label: "Confidence", score: 72, color: "bg-aptitude" },
-  // ];
-
+  useEffect(() => {
+    const isSupported = mic.current?.isMicrophoneSupported()
+    if (!isSupported) {
+      setDisabled(true)
+      toast("Microphone access denied.");
+    } else {
+      setDisabled(false)
+    }
+  }, [])
+  const [pending, startTransition] = useTransition()
   const handleStartRecording = async () => {
-    // setState("waiting");
-    await Promise.resolve(() => setTimeout(() => { }, 1000))
-    setState("recording");
-    setCardKey(prev => prev + 1);
-    mic.current?.startRecording();
+    try {
+      await mic.current?.startRecording();
+      await Promise.resolve(() => setTimeout(() => { }, 1000))
+      setState("recording");
+      setCardKey(prev => prev + 1);
+    } catch (error: any) {
+      toast(error.message || "Something went wrong")
+    }
   };
 
   const handleStopRecording = async () => {
-    setState("completed")
-    const blob = await mic.current?.stopRecording()
-
-    if (blob) {
-      await submitAnswer(blob, currentQuestion.id)
-      setShowFeedback(true)
+    try {
+      const blob = await mic.current?.stopRecording()
+      console.log(blob)
+      if (blob) {
+        await submitAnswer(blob, currentQuestion.id)
+        setShowFeedback(true)
+      }
+      setState("completed")
+      if (isLastQuestion) {
+        console.log("last question")
+        await complete() // ✅ only here
+      }
+    } catch (error) {
+      console.log(error)
+      toast("Recording failed")
+    } finally {
+      //reset()
     }
   }
 
@@ -103,7 +85,10 @@ const HRInterview = () => {
   };
 
   const handleRestart = () => {
-    setCurrentQuestionIndex(0);
+    // setCurrentQuestionIndex(0);
+    // complete()
+    //reset()
+    start()
     setState("idle");
     setShowFeedback(false);
     setCardKey(prev => prev + 1);
@@ -112,9 +97,11 @@ const HRInterview = () => {
     start()
   }, [])
   if (isLoading) {
-    <div className="text-center text-sm text-muted-foreground">
-      Please Wait
-    </div>
+    return (
+      <div className="text-center text-sm text-muted-foreground">
+        Please wait…
+      </div>
+    )
   }
   const router = useRouter()
   if (questions?.length === 0) {
@@ -156,7 +143,7 @@ const HRInterview = () => {
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">
-            Question {currentQuestionIndex + 1} of {questions.length}
+            Question {currentIndex + 1} of {questions.length}
           </span>
           <div className="flex gap-1.5">
             {questions.map((_, i) => (
@@ -164,7 +151,7 @@ const HRInterview = () => {
                 key={i}
                 className={cn(
                   "w-8 h-1 rounded-full transition-colors duration-200",
-                  i <= currentQuestionIndex ? "bg-hr" : "bg-muted"
+                  i <= currentIndex ? "bg-hr" : "bg-muted"
                 )}
               />
             ))}
@@ -206,12 +193,13 @@ const HRInterview = () => {
                   </p>
                 </div>
                 <Button
-                  onClick={handleStartRecording}
+                  onClick={() => startTransition(async () => await handleStartRecording())}
                   size="lg"
                   className="bg-hr hover:bg-hr/90 text-white rounded-xl px-8"
+                  disabled={disabled || pending}
                 >
                   <Mic className="w-5 h-5 mr-2" />
-                  Start Recording
+                  {pending ? "Generating..." : "Start Recording"}
                 </Button>
               </div>
             )}
@@ -238,13 +226,14 @@ const HRInterview = () => {
                 </div>
 
                 <Button
-                  onClick={handleStopRecording}
+                  onClick={() => startTransition(async () => await handleStopRecording())}
                   size="lg"
                   variant="destructive"
                   className="rounded-xl px-8"
+                  disabled={disabled || pending}
                 >
                   <Square className="w-4 h-4 mr-2" />
-                  Stop Recording
+                  {pending ? "Wait..." : "Stop Recording"}
                 </Button>
               </div>
             )}
@@ -372,6 +361,7 @@ const HRInterview = () => {
                     <Button
                       onClick={handleNextQuestion}
                       className="bg-hr hover:bg-hr/90 text-white rounded-xl px-6"
+                      disabled={pending}
                     >
                       Next Question
                       <ArrowRight className="w-4 h-4 ml-2" />

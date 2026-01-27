@@ -9,21 +9,21 @@ const quickActions = [
     description: "Solve problems from top companies",
     icon: Code2,
     color: "coding",
-    route: "/coding",
+    route: "/dashboard/coding",
   },
   {
     title: "Start HR Interview",
     description: "Practice behavioral questions",
     icon: Mic,
     color: "hr",
-    route: "/hr-interview",
+    route: "/dashboard/hr-interview",
   },
   {
     title: "Practice Aptitude",
     description: "Sharpen your quantitative skills",
     icon: Brain,
     color: "aptitude",
-    route: "/aptitude",
+    route: "/dashboard/aptitude",
   },
 ];
 function QuickStart() {

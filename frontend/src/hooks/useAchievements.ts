@@ -15,7 +15,7 @@ export function useAchievements() {
       const token = await getToken()
       const data = await api<
         { key: string; unlockedAt: string | null }[]
-      >("/user/achievements", { token })
+      >("/user/me/achievements", { token })
 
       if (mounted) {
         store.setAchievements(data)

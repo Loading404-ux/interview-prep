@@ -186,5 +186,11 @@ export class UserProgressService {
             streak: metrics.streak,
         };
     }
-
+    async findOrCreate(userId: Types.ObjectId): Promise<UserMetrics> {
+        return this.metricsModel.findOneAndUpdate(
+            { userId },
+            { $setOnInsert: { userId } },
+            { upsert: true, new: true },
+        );
+    }
 }

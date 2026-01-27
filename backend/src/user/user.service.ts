@@ -8,6 +8,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schema/user.schema';
 import { UpdateProfileDto } from './user.dto';
+import { UserMetrics } from 'src/schema/user_metrics.schema';
 
 
 @Injectable()
@@ -16,7 +17,9 @@ export class UserService {
         private readonly userRepo: UserRepository,
         private readonly progressService: UserProgressService,
         private readonly activityService: ActivityService,
-
+        
+        @InjectModel(UserMetrics.name)
+        private readonly model: Model<UserMetrics>,
         @InjectModel(UserAchievement.name)
         private readonly achievementModel: Model<UserAchievement>,
     ) { }
@@ -31,6 +34,7 @@ export class UserService {
         }
         return UserMapper.UserResponse(res);
     }
+
     async getDashboard(user: User) {
         const [progress, contributions, achievements] = await Promise.all([
             this.progressService.getProgressOverview(user._id),

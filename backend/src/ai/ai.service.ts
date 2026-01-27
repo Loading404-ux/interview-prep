@@ -70,9 +70,9 @@ export class AiService {
         });
         const prompt = this.bbuildCodeReviewPrompt(data);
         const response = await llm.invoke(prompt);
-       const preprocess=this.preprocess(response.content as string);
-
-        return this.validateAiReviewShape(this.safeJsonParse(preprocess));
+        const preprocess = this.preprocess(response.content as string);
+        const jsonData = this.safeJsonParse(preprocess)
+        return this.validateAiReviewShape(jsonData);
 
     }
 
@@ -86,6 +86,7 @@ export class AiService {
         solution: string;
         explanation?: string;
     }) {
+        console.log(data)
         return `
 You are a strict senior software engineer reviewing a coding interview solution.
 Your task is to evaluate the submission objectively and return a structured JSON response.
@@ -112,9 +113,6 @@ ${data.constraints}
 USER SOLUTION:
 ${data.solution ?? 'N/A'}
 
---------------------
-EXPLANATION (if any):
-${data.explanation ?? 'N/A'}
 
 --------------------
 EVALUATION CRITERIA:

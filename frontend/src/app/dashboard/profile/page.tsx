@@ -142,7 +142,7 @@ const Profile = () => {
       const token = await getToken()
 
       const res = await api<{ targetCompanies: string[] }>(
-        "/user/profile",
+        "/user/me/profile",
         {
           method: "PATCH",
           token,

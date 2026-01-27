@@ -75,9 +75,8 @@ export class CodingRepository {
         submissionId: string,
     ): Promise<CodingSubmissionPopulated | null> {
         return this.submissionModel
-            .findOne({ submissionId })
-            .populate<{ questionId: CodingQuestion }>('questionId')
-            .exec() as Promise<CodingSubmissionPopulated | null>;
+            .findOne({ submissionId: new Types.ObjectId(submissionId) })
+            .populate<{ questionId: CodingQuestion }>('questionId') as Promise<CodingSubmissionPopulated | null>;
     }
 
     updateAiReview(

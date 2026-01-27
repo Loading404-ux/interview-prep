@@ -44,7 +44,7 @@ export async function api<T>(
 
     if (!res.ok) {
       // toast("Request failed", data?.message || "Something went wrong")
-      console.log(res,data)
+      console.log(res, data)
       throw new Error(data?.message)
     }
 

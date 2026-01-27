@@ -4,6 +4,15 @@ import { api } from '@/lib/api-client';
 import { toast } from "sonner";
 import { useAuth } from '@clerk/nextjs';
 import { Loader2, Mic, Square, FileText, CheckCircle2, ChevronRight } from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 type Step = 'UPLOAD' | 'INTERVIEWING' | 'REPORT';
 
@@ -20,7 +29,7 @@ const InterviewRoom = () => {
     const mediaRecorder = useRef<MediaRecorder | null>(null);
     const audioChunks = useRef<Blob[]>([]);
     const { getToken } = useAuth();
-
+    const [role, setRole] = useState('fullstack_engineer');
     /**
      * STEP 1: Process Resume PDF
      */
@@ -32,7 +41,7 @@ const InterviewRoom = () => {
         const token = await getToken();
         const formData = new FormData();
         formData.append('resume', file);
-        formData.append('role', 'Fullstack Developer');
+        formData.append('role', role);
         console.log(file)
         try {
             const data: any = await api('/interview/context/resume', {
@@ -63,7 +72,7 @@ const InterviewRoom = () => {
             audioChunks.current = [];
 
             mediaRecorder.current.ondataavailable = (e) => audioChunks.current.push(e.data);
-            
+
             mediaRecorder.current.onstop = async () => {
                 await handleSendAudio();
             };
@@ -124,7 +133,7 @@ const InterviewRoom = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 mt-10">
+        <div className="max-w-4xl mx-auto p-10 mt-10">
             {/* PROGRESS INDICATOR */}
             <div className="flex justify-between mb-8 px-10">
                 {['Resume', 'Interview', 'Verdict'].map((label, i) => (
@@ -137,8 +146,104 @@ const InterviewRoom = () => {
                 ))}
             </div>
 
-            <div className="min-h-[400px] border rounded-2xl shadow-xl bg-card p-8 flex flex-col justify-center transition-all duration-300">
-                
+            <div className="min-h-[400px] border rounded-2xl shadow-xl bg-card p-8 flex flex-col justify-center transition-all duration-300 relative">
+                <div className="absolute right-2 top-2">
+
+                    <Select value={role} onValueChange={setRole}>
+                        <SelectTrigger className="w-full max-w-72">
+                            <SelectValue placeholder="Select your career role" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+
+                            {/* ---------- Engineering ---------- */}
+                            <SelectGroup>
+                                <SelectLabel>Engineering</SelectLabel>
+                                <SelectItem value="frontend_engineer">Frontend Engineer</SelectItem>
+                                <SelectItem value="backend_engineer">Backend Engineer</SelectItem>
+                                <SelectItem value="fullstack_engineer">Full Stack Engineer</SelectItem>
+                                <SelectItem value="mobile_developer">Mobile App Developer</SelectItem>
+                                <SelectItem value="devops_engineer">DevOps Engineer</SelectItem>
+                                <SelectItem value="cloud_engineer">Cloud Engineer</SelectItem>
+                                <SelectItem value="qa_automation_engineer">QA / Automation Engineer</SelectItem>
+                            </SelectGroup>
+
+                            {/* ---------- Data & AI ---------- */}
+                            <SelectGroup>
+                                <SelectLabel>Data & AI</SelectLabel>
+                                <SelectItem value="data_analyst">Data Analyst</SelectItem>
+                                <SelectItem value="data_engineer">Data Engineer</SelectItem>
+                                <SelectItem value="machine_learning_engineer">ML Engineer</SelectItem>
+                                <SelectItem value="ai_engineer">AI Engineer</SelectItem>
+                                <SelectItem value="research_scientist">Research Scientist</SelectItem>
+                            </SelectGroup>
+
+                            {/* ---------- Product & Design ---------- */}
+                            <SelectGroup>
+                                <SelectLabel>Product & Design</SelectLabel>
+                                <SelectItem value="product_manager">Product Manager</SelectItem>
+                                <SelectItem value="technical_product_manager">Technical Product Manager</SelectItem>
+                                <SelectItem value="ui_ux_designer">UI / UX Designer</SelectItem>
+                                <SelectItem value="product_designer">Product Designer</SelectItem>
+                            </SelectGroup>
+
+                            {/* ---------- Business & Management ---------- */}
+                            <SelectGroup>
+                                <SelectLabel>Business & Management</SelectLabel>
+                                <SelectItem value="business_analyst">Business Analyst</SelectItem>
+                                <SelectItem value="project_manager">Project Manager</SelectItem>
+                                <SelectItem value="program_manager">Program Manager</SelectItem>
+                                <SelectItem value="operations_manager">Operations Manager</SelectItem>
+                                <SelectItem value="founder">Founder / Entrepreneur</SelectItem>
+                            </SelectGroup>
+
+                            {/* ---------- Sales & Marketing ---------- */}
+                            <SelectGroup>
+                                <SelectLabel>Sales & Marketing</SelectLabel>
+                                <SelectItem value="digital_marketer">Digital Marketer</SelectItem>
+                                <SelectItem value="growth_marketer">Growth Marketer</SelectItem>
+                                <SelectItem value="sales_executive">Sales Executive</SelectItem>
+                                <SelectItem value="account_manager">Account Manager</SelectItem>
+                                <SelectItem value="customer_success_manager">
+                                    Customer Success Manager
+                                </SelectItem>
+                            </SelectGroup>
+
+                            {/* ---------- Security & IT ---------- */}
+                            <SelectGroup>
+                                <SelectLabel>Security & IT</SelectLabel>
+                                <SelectItem value="cybersecurity_engineer">
+                                    Cybersecurity Engineer
+                                </SelectItem>
+                                <SelectItem value="soc_analyst">SOC Analyst</SelectItem>
+                                <SelectItem value="it_support_engineer">IT Support Engineer</SelectItem>
+                                <SelectItem value="solutions_architect">
+                                    Solutions Architect
+                                </SelectItem>
+                            </SelectGroup>
+
+                            {/* ---------- Finance & Operations ---------- */}
+                            <SelectGroup>
+                                <SelectLabel>Finance & Operations</SelectLabel>
+                                <SelectItem value="financial_analyst">Financial Analyst</SelectItem>
+                                <SelectItem value="operations_analyst">Operations Analyst</SelectItem>
+                                <SelectItem value="supply_chain_manager">
+                                    Supply Chain Manager
+                                </SelectItem>
+                            </SelectGroup>
+
+                            {/* ---------- Students / Early Career ---------- */}
+                            <SelectGroup>
+                                <SelectLabel>Early Career</SelectLabel>
+                                <SelectItem value="student">Student</SelectItem>
+                                <SelectItem value="intern">Intern</SelectItem>
+                                <SelectItem value="graduate_trainee">Graduate Trainee</SelectItem>
+                            </SelectGroup>
+
+                        </SelectContent>
+                    </Select>
+                </div>
+
                 {/* STATE 1: UPLOAD */}
                 {step === 'UPLOAD' && (
                     <div className="text-center space-y-8 animate-in fade-in zoom-in duration-300">
@@ -149,7 +254,7 @@ const InterviewRoom = () => {
                             <h1 className="text-4xl font-extrabold tracking-tight">Gemini AI Interviewer</h1>
                             <p className="text-muted-foreground mt-2 text-lg">Upload your resume to begin a tailored HR technical round.</p>
                         </div>
-                        
+
                         <div className="relative group max-w-sm mx-auto">
                             <input
                                 type="file"

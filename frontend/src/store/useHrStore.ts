@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist } from "zustand/middleware"
 
 type HrState = {
   sessionId: string | null
@@ -13,34 +14,43 @@ type HrState = {
   reset: () => void
 }
 
-export const useHrStore = create<HrState>((set) => ({
-  sessionId: null,
-  questions: [],
-  currentIndex: 0,
-  feedback: null,
-  isLoading: false,
 
-  startSession: (sessionId, questions) =>
-    set({
-      sessionId,
-      questions,
-      currentIndex: 0,
-      feedback: null,
-    }),
-
-  setFeedback: (feedback) => set({ feedback }),
-
-  nextQuestion: () =>
-    set((s) => ({
-      currentIndex: s.currentIndex + 1,
-      feedback: null,
-    })),
-
-  reset: () =>
-    set({
+export const useHrStore = create<HrState>()(
+  persist(
+    (set) => ({
       sessionId: null,
       questions: [],
       currentIndex: 0,
       feedback: null,
+      isLoading: false,
+
+      startSession: (sessionId, questions) =>
+        set({
+          sessionId,
+          questions,
+          currentIndex: 0,
+          feedback: null,
+          isLoading: false,
+        }),
+
+      setFeedback: (feedback) => set({ feedback }),
+
+      nextQuestion: () =>
+        set((s) => ({
+          currentIndex: s.currentIndex + 1,
+          feedback: null,
+        })),
+
+      reset: () =>
+        set({
+          sessionId: null,
+          questions: [],
+          currentIndex: 0,
+          feedback: null,
+        }),
     }),
-}))
+    {
+      name: "hr-session-store", // ✅ survives refresh
+    }
+  )
+)

@@ -49,8 +49,9 @@ export class CodingService {
             eventType: 'CODING_SUBMIT',
             referenceId: submission._id,
         });
-
-        void this.triggerAiReview(submission._id.toString(), user);
+        console.log("ai review")
+        await this.triggerAiReview(submission._id.toString(), user);
+        console.log("ai review done")
 
         return CodingSubmissionMapper.toResponse(submission);
     }
@@ -149,8 +150,11 @@ export class CodingService {
     }
 
     private async triggerAiReview(submissionId: string, user: any) {
+        console.log(submissionId)
         const submission = await this.repo.findSubmissionWithQuestion(submissionId);
+        console.log(submission)
         if (!submission) return;
+        console.log(submission)
 
         const review = await this.aiService.aiCodeReview({
             title: submission.questionId.title,

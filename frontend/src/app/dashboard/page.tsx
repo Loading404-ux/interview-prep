@@ -48,6 +48,7 @@ export default function Page() {
             title="Coding Practice"
             subtitle={`${progress.coding.acceptedSubmissions}/${progress.coding.totalSubmissions} problems`}
             icon={<Code2 className="w-5 h-5 text-white" />}
+            
           >
             <div className="space-y-3">
               <div className="flex justify-between text-sm">

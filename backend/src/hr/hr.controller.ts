@@ -6,6 +6,8 @@ import {
 } from './hr.dto';
 import { FileInterceptor } from "@nestjs/platform-express"
 import { ClerkAuthGuard } from 'src/common/guard/clerk-auth.guard';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('hr')
 @UseGuards(ClerkAuthGuard)
@@ -14,12 +16,21 @@ export class HrController {
 
   @Post('session/start')
   startSession(@Req() req) {
-
     return this.hrService.startSession({ userId: req.user._id, clerkUserId: req.user.clerkUserId });
   }
 
   @Post('answer/submit')
-  @UseInterceptors(FileInterceptor('audio'))
+  @UseInterceptors(FileInterceptor('audio', {
+    storage: diskStorage({
+      destination: "./uploads/audios",
+      filename: (_, file, cb) => {
+        console.log(file);
+        const unique =
+          Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(null, `${unique}${extname(file.originalname)}.webm`);
+      },
+    }),
+  }))
   submitAnswer(
     @UploadedFile() audio: Express.Multer.File,
     @Body() dto: SubmitHrAnswerDto,
@@ -31,6 +42,8 @@ export class HrController {
       transcript: dto.transcript, // optional fallback
     });
   }
+
+
   @Post('session/complete')
   completeSession(@Body() dto: CompleteSessionDto) {
     return this.hrService.completeSession(dto);

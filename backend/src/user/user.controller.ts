@@ -4,6 +4,7 @@ import { ClerkAuthGuard } from 'src/common/guard/clerk-auth.guard';
 import { UserService } from './user.service';
 import { UserProgressService } from './user-progress.service';
 import { UpdateProfileDto, UpdateTargetsDto } from './user.dto';
+import { UserMetricsMapper } from './user.mapper';
 
 @Controller('user')
 @UseGuards(ClerkAuthGuard)
@@ -11,9 +12,15 @@ import { UpdateProfileDto, UpdateTargetsDto } from './user.dto';
 export class UserController {
 
     constructor(private readonly service: UserService, private readonly progressService: UserProgressService) { }
-    @Post('profile')
+
+    @Get('profile')
     async getUserProfile(@Req() req: any) {
         return this.service.getUser(req.user._id);
+    }
+    @Get("me/metrics")
+    async getMyMetrics(@Req() req) {
+        const metrics = await this.progressService.findOrCreate(req.user._id)
+        return UserMetricsMapper.toDashboard(metrics)
     }
     @Get('me/progress')
     getMyProgress(@Req() req: any) {

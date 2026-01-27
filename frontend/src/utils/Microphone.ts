@@ -48,7 +48,7 @@ export class Microphone {
         }
 
         const duration = Date.now() - this.startTime;
-        if (duration < 800) {
+        if (duration < 200) {
             throw new Error('Recording too short');
         }
 
@@ -67,5 +67,13 @@ export class Microphone {
 
             this.mediaRecorder!.stop();
         });
+    }
+
+    isMicrophoneSupported() {
+        return (
+            typeof navigator !== "undefined" &&
+            !!navigator.mediaDevices &&
+            typeof navigator.mediaDevices.getUserMedia === "function"
+        );
     }
 }

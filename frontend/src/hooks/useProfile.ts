@@ -21,9 +21,9 @@ export function useProfile() {
         store.setLoading(true)
         const token = await getToken()
 
-        const [profile, metrics, contributions] = await Promise.all([
+        const [profile, metrics,contributions] = await Promise.all([
           api<UserProfile>("/user/profile", { token }),
-          api<UserMetrics>("/user/metrics", { token }),
+          api<UserMetrics>("/user/me/metrics", { token }),
           api<ContributionDay[]>("/activity/contributions", { token }),
         ])
 

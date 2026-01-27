@@ -23,10 +23,10 @@ export default function SsoCallback() {
             try {
                 const token = await getToken()
                 const profile = await api<any>("/user/profile", {
-                    token,
-                    method: "POST",
+                    token
                 })
                 setUser(profile)
+                console.log(profile)
                 router.replace("/dashboard")
             } catch (err) {
                 console.log(err)

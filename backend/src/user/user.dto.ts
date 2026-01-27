@@ -39,3 +39,8 @@ export class UpdateTargetsDto {
   targetCompanies: string[];
 }
 
+export interface DashboardMetrics {
+  coding: { solved: number; total: number }
+  hr: { completed: number; total: number }
+  aptitude: { completed: number; total: number }
+}

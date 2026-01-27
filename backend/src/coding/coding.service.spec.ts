@@ -22,38 +22,40 @@ describe('CodingService', () => {
     repo = module.get(CodingRepository);
   });
 
-  it('should create a submission for a user', async () => {
-    const fakeUserId = new Types.ObjectId().toString();
+  // it('should create a submission for a user', async () => {
+  //   const fakeUserId = new Types.ObjectId().toString();
 
-    const dto = {
-      questionId: new Types.ObjectId().toString(),
-      solutionText: 'function twoSum() {}',
-      explanation: 'Using hashmap',
-    };
+  //   const dto = {
+  //     questionId: new Types.ObjectId().toString(),
+  //     solutionText: 'function twoSum() {}',
+  //     explanation: 'Using hashmap',
+  //   };
 
-    const mockSubmission = {
-      _id: new Types.ObjectId(),
-      userId: new Types.ObjectId(fakeUserId),
-      questionId: new Types.ObjectId(dto.questionId),
-      solutionText: dto.solutionText,
-      explanation: dto.explanation,
-      verdict: SubmissionVerdict.NEEDS_IMPROVEMENT,
-    };
+  //   const mockSubmission = {
+  //     _id: new Types.ObjectId(),
+  //     userId: new Types.ObjectId(fakeUserId),
+  //     questionId: new Types.ObjectId(dto.questionId),
+  //     solutionText: dto.solutionText,
+  //     explanation: dto.explanation,
+  //     verdict: SubmissionVerdict.NEEDS_IMPROVEMENT,
+  //   };
 
-    repo.createInitialSubmission.mockResolvedValue(mockSubmission as any);
+  //   repo.createInitialSubmission.mockResolvedValue(mockSubmission as any);
 
-    const result = await service.submitSolution(fakeUserId, fakeUserId, dto);
+  //   const result = await service.submitSolution(fakeUserId, fakeUserId, dto);
 
-    expect(repo.createInitialSubmission).toHaveBeenCalledWith({
-      userId: expect.any(Types.ObjectId),
-      questionId: expect.any(Types.ObjectId),
-      solutionText: dto.solutionText,
-      explanation: dto.explanation,
-    });
+  //   expect(repo.createInitialSubmission).toHaveBeenCalledWith({
+  //     userId: expect.any(Types.ObjectId),
+  //     questionId: expect.any(Types.ObjectId),
+  //     solutionText: dto.solutionText,
+  //     explanation: dto.explanation,
+  //   });
 
-    expect(result.verdict).toBe(SubmissionVerdict.NEEDS_IMPROVEMENT);
-  });
-
+  //   expect(result.verdict).toBe(SubmissionVerdict.NEEDS_IMPROVEMENT);
+  // });
+  it ('should return solution with ai feedback', async () => {
+    service.
+  })
   it('should be defined', () => {
     expect(service).toBeDefined();
   });

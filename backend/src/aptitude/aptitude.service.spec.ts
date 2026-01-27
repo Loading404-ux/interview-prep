@@ -6,12 +6,12 @@ describe('AptitudeService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AptitudeService],
+      providers: [AptitudeService,],
     }).compile();
 
     service = module.get<AptitudeService>(AptitudeService);
   });
-
+it('should return solution with question')
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
