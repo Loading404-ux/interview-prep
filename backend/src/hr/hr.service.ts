@@ -14,12 +14,15 @@ import { Types } from 'mongoose';
 import { ActivityService } from 'src/activity/activity.service';
 import { UserProgressService } from 'src/user/user-progress.service';
 import { AssemblyAiService } from 'src/ai/assemblyai.service';
+import { ActivityLogType } from 'src/schema/activity-log.schema';
+import { HrAiEvaluation, HrSessionStatus } from 'src/schema/hr-session.schema';
 
 @Injectable()
 export class HrService {
   constructor(
     private readonly sessionRepo: HrSessionRepository,
     private readonly questionRepo: HrQuestionRepository,
+
     private readonly aiService: AiService,
     private readonly activityService: ActivityService,
     private readonly progressService: UserProgressService,
@@ -27,8 +30,8 @@ export class HrService {
   ) { }
 
   /* ---------- START SESSION ---------- */
-  async startSession(dto: StartHrSessionDto) {
-    const questions = await this.questionRepo.findRandom(3);
+  async startSession(dto: StartHrSessionDto, numberOfQuestions = 3) {
+    const questions = await this.questionRepo.findRandom(numberOfQuestions);
 
     const session = await this.sessionRepo.createSession({
       userId: new Types.ObjectId(dto.userId),
@@ -47,7 +50,7 @@ export class HrService {
   async submitAnswer(input: {
     sessionId: string;
     questionId: string;
-    audioFile?: Express.Multer.File;
+    audioFile: Express.Multer.File;
     transcript?: string;
   }) {
     const session = await this.sessionRepo.findById(input.sessionId);
@@ -86,6 +89,7 @@ export class HrService {
       question: question.question,
       preferredAnswer: question.preferred_answer,
       userAnswer: transcript,
+      durationSeconds,
     });
 
     await this.sessionRepo.addQuestionResponse(input.sessionId, {
@@ -99,32 +103,31 @@ export class HrService {
   }
 
 
-  async completeSession(dto: CompleteSessionDto) {
-    const session = await this.sessionRepo.markCompleted(
-      dto.sessionId,
-      dto.userId,
-    );
-
+  async completeSession(dto: CompleteSessionDto): Promise<HrAiEvaluation> {
+    const session = await this.sessionRepo.findById(dto.sessionId)
     if (!session) {
       throw new BadRequestException('Session not found or already completed');
     }
 
+    const finalReport = await this.aiService.hrFinalReport(session.questions);
+
+    //TODO:RUN both THIS PARALLELY
+    await this.sessionRepo.updateStatus(dto.sessionId, HrSessionStatus.COMPLETED);
+    await this.sessionRepo.updateSession(dto.sessionId, { aiEvaluation: finalReport });
+
+    // HrAiEvaluation
     // ✅ Activity
+
+    //TODO:RUN both THIS PARALLELY
     await this.activityService.record({
       userId: session.userId,
       clerkUserId: session.clerkUserId,
-      eventType: 'HR_SESSION_COMPLETE',
+      eventType: ActivityLogType.HR_SESSION,
       referenceId: session._id,
     });
-
-    // ✅ Metrics + achievements
     await this.progressService.onHrSessionCompleted(session);
-
-    return {
-      sessionId: session._id,
-      status: session.status,
-      completedAt: session.completedAt,
-    };
+    
+    return finalReport;
   }
 
 }

@@ -3,6 +3,7 @@ import { HrAiResultDto } from 'src/hr/hr.dto';
 import { LlmFactory } from './llm.factory';
 import { AiFeedback, CodingSubmission, SubmissionVerdict } from 'src/schema/coding-submission.schema';
 import { CodingQuestion, Constraints, Example } from 'src/schema/coding-questions.schema';
+import { HrAiEvaluation, HrQuestionResponse } from 'src/schema/hr-session.schema';
 
 function isValidScore(value: any): value is number {
     return (
@@ -36,10 +37,12 @@ export class AiService {
         question,
         preferredAnswer,
         userAnswer,
+        durationSeconds
     }: {
         question: string;
         preferredAnswer: string;
         userAnswer: string;
+        durationSeconds?: number;
     }): Promise<HrAiResultDto> {
         const llm = this.llmFactory.getLLM({
             temperature: 0.2,
@@ -63,7 +66,7 @@ export class AiService {
         topics: string[];
         solution: string;
         explanation?: string;
-        difficulty:string
+        difficulty: string
     }): Promise<AiReviewResponse> {
         const llm = this.llmFactory.getLLM({
             model: "meta/llama-3.3-70b-instruct",
@@ -71,13 +74,27 @@ export class AiService {
         });
         const prompt = this.bbuildCodeReviewPrompt(data);
         const response = await llm.invoke(prompt);
-       const preprocess=this.preprocess(response.content as string);
+        const preprocess = this.preprocess(response.content as string);
 
         return this.validateAiReviewShape(this.safeJsonParse(preprocess));
 
     }
+    async hrFinalReport(data: HrQuestionResponse[]): Promise<HrAiEvaluation> {
+        const llm = this.llmFactory.getLLM({
+            temperature: 0.2,
+        });
+        const prompt = this.buildHrAiEvaluationPrompt(data);
+        const response = await llm.invoke(prompt);
+        const json = this.safeJsonParse(response.content as string);
+        return this.validateHrAiEvaluationShape(json);
+    }
+    //TODO: WRITE THE PROMPT
+    private buildHrAiEvaluationPrompt(data: HrQuestionResponse[]): string {
+        return ``;
+    }
 
 
+    //FIXME:RE-WRITE THE PROMPTS
     private bbuildCodeReviewPrompt(data: {
         title: string;
         problem: string;
@@ -221,6 +238,8 @@ Return the JSON now.
 `;
     }
 
+
+
     private safeJsonParse(raw: string): HrAiResultDto {
         try {
             const cleaned = this.preprocess(raw);
@@ -319,5 +338,42 @@ Return the JSON now.
             },
         };
     }
+    
+    //FIXME
+    private validateHrAiEvaluationShape(raw: any): HrAiEvaluation {
+        if (!raw || typeof raw !== 'object') {
+            throw new Error('AI response is not an object');
+        }
 
+        const { clarity, structure, confidence, improvementTips, generatedPreferredAnswer } = raw;
+
+        if (!isValidScore(clarity)) {
+            throw new Error('Invalid clarity');
+        }
+
+        if (!isValidScore(structure)) {
+            throw new Error('Invalid structure');
+        }
+
+        if (!isValidScore(confidence)) {
+            throw new Error('Invalid confidence');
+        }
+
+        if (!Array.isArray(improvementTips) || improvementTips.length < 3 || improvementTips.length > 5) {
+            throw new Error('Invalid improvementTips');
+        }
+
+        if (typeof generatedPreferredAnswer !== 'string' || generatedPreferredAnswer.trim().length === 0) {
+            throw new Error('Invalid generatedPreferredAnswer');
+        }
+
+        return {
+            avgClarity: clarity,
+            avgStructure: structure,
+            avgConfidence: confidence,
+            overallFeedback: improvementTips.join(', '),
+            evaluationVersion: generatedPreferredAnswer.trim(),
+        }
+    }
 }
+

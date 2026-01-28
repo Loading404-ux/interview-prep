@@ -5,7 +5,6 @@ import {
   Param,
   Patch,
   Post,
-  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -35,7 +34,7 @@ export class CodingController {
 
   @Post('submit-solution')
   submitSolution(@Req() req: any, @Body() dto: CodingSubmissionDto) {
-    return this.service.addSubmission(req.user.id, dto);
+    return this.service.addSubmission(req.user.id,req.user.clerkUserId, dto);
   }
   @Get('submission/:id')
   getSubmission(@Param('id') id: string) {

@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { HrAiEvaluation, HrSession } from '../schema/hr-session.schema';
+import { HrAiEvaluation, HrSession, HrSessionStatus } from '../schema/hr-session.schema';
 import { HrQuestion } from '../schema/hr-questions.schema';
 import { Injectable } from '@nestjs/common';
 
@@ -19,7 +19,7 @@ export class HrSessionRepository {
     return this.sessionModel.findById(sessionId);
   }
 
-  async addQuestionResponse(
+  addQuestionResponse(
     sessionId: string,
     response: {
       questionId: string;
@@ -46,53 +46,59 @@ export class HrSessionRepository {
     );
   }
 
-  updateStatus(sessionId: string, status: string) {
+  updateSession(sessionId: string, data: Partial<HrSession>) {
+    return this.sessionModel.updateOne({ _id: sessionId }, data);
+  }
+
+  updateStatus(sessionId: string, status: HrSessionStatus) {
     return this.sessionModel.updateOne(
       { _id: sessionId },
       { status },
+      {}
     );
   }
-  markCompleted(sessionId: string, userId: string) {
-    return this.sessionModel.findOneAndUpdate(
-      {
-        _id: sessionId,
-        userId: new Types.ObjectId(userId),
-        status: 'STARTED',
-      },
-      {
-        $set: {
-          status: 'COMPLETED',
-          completedAt: new Date(),
-        },
-      },
-      { new: true },
-    );
-  }
+
+  // markCompleted(sessionId: string, userId: string) {
+  //   return this.sessionModel.findOneAndUpdate(
+  //     {
+  //       _id: sessionId,
+  //       userId: new Types.ObjectId(userId),
+  //       status: 'STARTED',
+  //     },
+  //     {
+  //       $set: {
+  //         status: 'COMPLETED',
+  //         completedAt: new Date(),
+  //       },
+  //     },
+  //     { new: true },
+  //   );
+  // }
 
   //TODO: Later on
-  markAiPending(sessionId: string) {
-    return this.sessionModel.updateOne(
-      { _id: sessionId, status: 'COMPLETED' },
-      { status: 'AI_PENDING' },
-    );
-  }
+  // markAiPending(sessionId: string) {
+  //   return this.sessionModel.updateOne(
+  //     { _id: sessionId, status: 'COMPLETED' },
+  //     { status: 'AI_PENDING' },
+  //   );
+  // }
 
-  markAiDone(sessionId: string, evaluation: HrAiEvaluation) {
-    return this.sessionModel.updateOne(
-      { _id: sessionId, status: 'AI_PENDING' },
-      {
-        status: 'AI_DONE',
-        aiEvaluation: evaluation,
-      },
-    );
-  }
+  // markAiDone(sessionId: string, evaluation: HrAiEvaluation) {
+  //   return this.sessionModel.updateOne(
+  //     { _id: sessionId, status: 'AI_PENDING' },
+  //     {
+  //       status: 'AI_DONE',
+  //       aiEvaluation: evaluation,
+  //     },
+  //   );
+  // }
 
-  markAiFailed(sessionId: string) {
-    return this.sessionModel.updateOne(
-      { _id: sessionId, status: 'AI_PENDING' },
-      { status: 'AI_FAILED' },
-    );
-  }
+  // markAiFailed(sessionId: string) {
+  //   return this.sessionModel.updateOne(
+  //     { _id: sessionId, status: 'AI_PENDING' },
+  //     { status: 'AI_FAILED' },
+  //   );
+  // }
 
 }
 

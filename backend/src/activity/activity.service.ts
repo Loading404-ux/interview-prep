@@ -10,8 +10,8 @@ import { ActivityHistoryDto, ContributionDayDto } from './activity.dto';
 export class ActivityService {
   constructor(
     private readonly repo: ActivityRepository,
-    @InjectModel(UserMetrics.name)
-    private readonly metricsModel: Model<UserMetrics>,
+    //@InjectModel(UserMetrics.name)
+    //private readonly metricsModel: Model<UserMetrics>,
   ) {}
 
   /* ---------- WRITE ---------- */
@@ -61,12 +61,6 @@ export class ActivityService {
     }));
   }
 
-  /* ---------- READ: STREAK ---------- */
-
-  async getStreak(clerkUserId: string) {
-    const metrics = await this.metricsModel.findOne({ clerkUserId });
-    return metrics?.streak ?? { current: 0, longest: 0 };
-  }
 
   /* ---------- HELPERS ---------- */
 

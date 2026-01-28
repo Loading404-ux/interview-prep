@@ -184,11 +184,15 @@ import { ActivityLogType } from 'src/schema/activity-log.schema';
 //     }
 // }
 
+
+//NOTE: questions: questions.map(HrMapper.toQuestionView), MAP LIKE THIS 
+
 export class CodingService {
     constructor(
         private readonly questionRepo: CodingQuestionRepository,
         private readonly submissionRepo: CodingSubmissionRepository,
         private readonly discussionRepo: CodingDiscussionRepository,
+
         private readonly aiService: AiService,
 
         private readonly activityService: ActivityService,
@@ -215,7 +219,7 @@ export class CodingService {
             eventType: ActivityLogType.CODING_SUBMIT,
             referenceId: submission._id,
         });
-        
+
         await this.triggerAiReview(submission._id.toString());
         return true;
     }
@@ -290,8 +294,13 @@ export class CodingService {
         }
 
         await this.submissionRepo.updateValue(new Types.ObjectId(submissionId), { aiFeedback, verdict });
-        this.progressService.onCodingAccepted({ userId: new Types.ObjectId(userId), clerkUserId: clerkUserId, accuracy: (
-            (aiFeedback.clarityScore ?? 0) + (aiFeedback.correctnessScore ?? 0)) / 2 });
+        if (verdict === SubmissionVerdict.ACCEPTED) {
+
+        }
+        this.progressService.onCodingAccepted({
+            userId: new Types.ObjectId(userId), clerkUserId: clerkUserId, accuracy: (
+                (aiFeedback.clarityScore ?? 0) + (aiFeedback.correctnessScore ?? 0)) / 2
+        });
 
     }
 }

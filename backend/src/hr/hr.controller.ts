@@ -13,7 +13,7 @@ export class HrController {
   constructor(private readonly hrService: HrService) { }
 
   @Post('session/start')
-  startSession(@Req() req) {
+  startSession(@Req() req: any) {
 
     return this.hrService.startSession({ userId: req.user._id, clerkUserId: req.user.clerkUserId });
   }
@@ -31,8 +31,10 @@ export class HrController {
       transcript: dto.transcript, // optional fallback
     });
   }
+  
   @Post('session/complete')
   completeSession(@Body() dto: CompleteSessionDto) {
+    //HrAiEvaluation
     return this.hrService.completeSession(dto);
   }
 }

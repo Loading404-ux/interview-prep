@@ -45,7 +45,7 @@ export class UserProgressService {
         //             100,
         //         )
         //         : 0;
-       const newAccuracy=(metrics.coding.accuracy+input.accuracy)/2
+        const newAccuracy = (metrics.coding.accuracy + input.accuracy) / 2
         await this.metricsModel.updateOne(
             { userId: input.userId },
             { 'coding.accuracy': newAccuracy },
@@ -70,20 +70,21 @@ export class UserProgressService {
             },
             { new: true, upsert: true },
         );
-
+        const newAvgConfidence = session.aiEvaluation?.avgConfidence || 0
         // running average
-        const prevTotal = metrics.hr.totalSessions - 1;
-        const newAvg =
-            prevTotal === 0
-                ? avgConfidence
-                : Math.round(
-                    (metrics.hr.avgConfidence * prevTotal + avgConfidence) /
-                    metrics.hr.totalSessions,
-                );
+        const prevTotal = (newAvgConfidence + metrics.hr.avgConfidence) / 2
+
+        // const newAvg =
+        //     prevTotal === 0
+        //         ? avgConfidence
+        //         : Math.round(
+        //             (metrics.hr.avgConfidence * prevTotal + avgConfidence) /
+        //             metrics.hr.totalSessions,
+        //         );
 
         await this.metricsModel.updateOne(
             { userId: session.userId },
-            { 'hr.avgConfidence': newAvg },
+            { 'hr.avgConfidence': prevTotal, 'hr.totalSessions': metrics.hr.totalSessions + 1 },
         );
 
         // achievements
@@ -147,7 +148,8 @@ export class UserProgressService {
         await this.unlock(input, 'STREAK_7', input.currentStreak >= 7);
     }
 
-    
+    /* ---------- READ: STREAK ---------- */
+
     async getStreak(clerkUserId: string) {
         const metrics = await this.metricsModel.findOne({ clerkUserId });
         return metrics?.streak ?? { current: 0, longest: 0 };
