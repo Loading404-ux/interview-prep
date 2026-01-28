@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HrAiResultDto } from 'src/hr/hr.dto';
 import { LlmFactory } from './llm.factory';
-import { CodingSubmission } from 'src/schema/coding-submission.schema';
+import { AiFeedback, CodingSubmission, SubmissionVerdict } from 'src/schema/coding-submission.schema';
 import { CodingQuestion, Constraints, Example } from 'src/schema/coding-questions.schema';
 
 function isValidScore(value: any): value is number {
@@ -12,17 +12,17 @@ function isValidScore(value: any): value is number {
         value <= 100
     );
 }
-export enum SubmissionVerdict {
-    ACCEPTED = 'accepted',
-    REJECTED = 'rejected',
-    NEEDS_IMPROVEMENT = 'needs_improvement',
-}
+// export enum SubmissionVerdict {
+//     ACCEPTED = 'accepted',
+//     REJECTED = 'rejected',
+//     NEEDS_IMPROVEMENT = 'needs_improvement',
+// }
 
-export interface AiFeedback {
-    clarityScore?: number;
-    correctnessScore?: number;
-    suggestions?: string;
-}
+// export interface AiFeedback {
+//     clarityScore?: number;
+//     correctnessScore?: number;
+//     suggestions?: string;
+// }
 
 export interface AiReviewResponse {
     verdict: SubmissionVerdict;
@@ -63,6 +63,7 @@ export class AiService {
         topics: string[];
         solution: string;
         explanation?: string;
+        difficulty:string
     }): Promise<AiReviewResponse> {
         const llm = this.llmFactory.getLLM({
             model: "meta/llama-3.3-70b-instruct",

@@ -22,6 +22,7 @@ export class UserProgressService {
     async onCodingAccepted(input: {
         userId: Types.ObjectId;
         clerkUserId: string;
+        accuracy: number;
     }) {
         const metrics = await this.metricsModel.findOneAndUpdate(
             { userId: input.userId },
@@ -30,23 +31,24 @@ export class UserProgressService {
                     'coding.totalSubmissions': 1,
                     'coding.acceptedSubmissions': 1,
                 },
+
             },
             { new: true, upsert: true },
         );
 
         // accuracy
-        const accuracy =
-            metrics.coding.totalSubmissions > 0
-                ? Math.round(
-                    (metrics.coding.acceptedSubmissions /
-                        metrics.coding.totalSubmissions) *
-                    100,
-                )
-                : 0;
-
+        // const accuracy =
+        //     metrics.coding.totalSubmissions > 0
+        //         ? Math.round(
+        //             (metrics.coding.acceptedSubmissions /
+        //                 metrics.coding.totalSubmissions) *
+        //             100,
+        //         )
+        //         : 0;
+       const newAccuracy=(metrics.coding.accuracy+input.accuracy)/2
         await this.metricsModel.updateOne(
             { userId: input.userId },
-            { 'coding.accuracy': accuracy },
+            { 'coding.accuracy': newAccuracy },
         );
 
         // achievements
@@ -143,6 +145,12 @@ export class UserProgressService {
         currentStreak: number;
     }) {
         await this.unlock(input, 'STREAK_7', input.currentStreak >= 7);
+    }
+
+    
+    async getStreak(clerkUserId: string) {
+        const metrics = await this.metricsModel.findOne({ clerkUserId });
+        return metrics?.streak ?? { current: 0, longest: 0 };
     }
 
     /* =====================================================

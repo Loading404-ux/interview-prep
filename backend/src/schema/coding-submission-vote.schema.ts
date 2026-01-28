@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { User } from "./user.schema";
 import { CodingSubmission } from "./coding-submission.schema";
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true,_id:false })
 export class SubmissionVote extends Document {
 
     @Prop({ type: Types.ObjectId, ref: CodingSubmission.name, required: true, index: true })

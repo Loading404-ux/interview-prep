@@ -5,7 +5,6 @@ import { AuthService } from "./auth.service";
 import { UserModule } from "src/user/user.module";
 
 @Global()
-@Global()
 @Module({
   imports: [UserModule],
   providers: [

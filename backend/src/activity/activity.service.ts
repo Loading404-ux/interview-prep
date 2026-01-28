@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
-import { ActivityLog } from 'src/schema/activity-log.schema';
+import { ActivityLog, ActivityLogType } from 'src/schema/activity-log.schema';
 import { ActivityRepository } from './activity.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserMetrics } from 'src/schema/user_metrics.schema';
@@ -19,7 +19,7 @@ export class ActivityService {
   async record(event: {
     userId: Types.ObjectId;
     clerkUserId: string;
-    eventType: 'CODING_SUBMIT' | 'CODING_APPROVED' | 'HR_SESSION_COMPLETE' | 'APTITUDE_ATTEMPT';
+    eventType: ActivityLogType;
     referenceId?: Types.ObjectId;
     metadata?: Record<string, any>;
   }) {

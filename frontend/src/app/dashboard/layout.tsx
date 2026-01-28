@@ -23,7 +23,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <SidebarProvider className='overflow-auto max-h-dvh'>
             <AppSidebar />
-            <SidebarInset className='relative'>
+            <SidebarInset className='relative overflow-hidden'>
                 <div className="absolute size-full left-0 md:rounded-xl overflow-hidden opacity-90">
                     <Background />
                 </div>

@@ -14,6 +14,8 @@ import { AptitudeModule } from './aptitude/aptitude.module';
 import { InterviewModule } from './interview/interview.module';
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
+import { RealtimeModule } from './realtime/realtime.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -36,6 +38,7 @@ import { join } from "path";
     AiModule,
     AptitudeModule,
     InterviewModule,
+    RealtimeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

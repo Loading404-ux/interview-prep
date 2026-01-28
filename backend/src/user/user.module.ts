@@ -12,7 +12,9 @@ import { ActivityModule } from 'src/activity/activity.module';
     forwardRef(() => ActivityModule), // 🔴 REQUIRED
     MongooseModule.forFeature([
       { name: Schemas.User.name, schema: Schemas.UserSchema },
+
       { name: Schemas.UserMetrics.name, schema: Schemas.UserMetricsSchema },
+      
       { name: Schemas.UserAchievement.name, schema: Schemas.UserAchievementSchema },
     ]),
   ],

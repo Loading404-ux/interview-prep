@@ -6,8 +6,8 @@ export const bindLoadingBar = (ref: any) => {
   loadingRef = ref
 }
 
-export const BASE_URL = "http://localhost:8000"
-// export const BASE_URL = "http://10.5.146.66:8000"
+// export const BASE_URL = "http://localhost:8000"
+export const BASE_URL = "http://10.5.146.66:8000"
 
 export async function api<T>(
   endpoint: string,

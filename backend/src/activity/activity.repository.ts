@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { ActivityLog } from "src/schema/activity-log.schema";
+import { ActivityLog, ActivityLogType } from "src/schema/activity-log.schema";
 import { DailyActivity } from "src/schema/daily-activity.schema";
 
 @Injectable()
@@ -22,7 +22,7 @@ export class ActivityRepository {
   }: {
     clerkUserId: string;
     userId: Types.ObjectId;
-    eventType: string;
+    eventType: ActivityLogType;
     referenceId?: Types.ObjectId;
     metadata?: Record<string, any>;
   }) {

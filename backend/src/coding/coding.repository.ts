@@ -6,6 +6,7 @@ import { CodingSubmission, SubmissionVerdict } from 'src/schema/coding-submissio
 import { CodingDiscussion } from 'src/schema/coding-discussion.schema';
 import { SubmissionVote } from 'src/schema/coding-submission-vote.schema';
 import { DiscussionVote } from 'src/schema/coding-discussion-vote.schema';
+import { CodingSubmissionDto } from './coding.dto';
 type CodingSubmissionPopulated =
     Omit<CodingSubmission, 'questionId'> & {
         questionId: CodingQuestion;
@@ -184,5 +185,149 @@ export class CodingRepository {
 
     deleteDiscussionVote(id: Types.ObjectId) {
         return this.discussionVoteModel.deleteOne({ _id: id });
+    }
+}
+
+
+@Injectable()
+export class CodingQuestionRepository {
+    constructor(
+        @InjectModel(CodingQuestion.name)
+        private readonly questionModel: Model<CodingQuestion>
+
+    ) { }
+
+    createQuestion(data: Partial<CodingQuestion>) {
+        return this.questionModel.create(data);
+    }
+
+    getQuestions() {
+        return this.questionModel.aggregate([
+            { $sort: { createdAt: -1 } },
+            { $project: { id: '$_id', title: 1, description: 1, difficulty: 1, company: 1 } }
+        ])
+    }
+    getQuestionById(id: string | Types.ObjectId) {
+        return this.questionModel.findById(id);
+    }
+}
+
+@Injectable()
+export class CodingSubmissionRepository {
+    constructor(
+        @InjectModel(SubmissionVote.name)
+        private readonly submissionModel: Model<CodingSubmission>,
+
+        @InjectModel(SubmissionVote.name)
+        private readonly voteModel: Model<SubmissionVote>,
+    ) { }
+
+    submitSolution(userId: Types.ObjectId,clerkUserId: string, data: CodingSubmissionDto) {
+        return this.submissionModel.create({...data, userId,clerkUserId});
+    }
+    getSubmissionsByQuestionId(questionId: string) {
+        return this.submissionModel
+            .find({ questionId: new Types.ObjectId(questionId) })
+            .sort({ createdAt: -1 }).limit(49);
+    }
+
+    findSubmissionById(id: string) {
+        return this.submissionModel.findById(id);
+    }
+
+    updateVote(submissionId: Types.ObjectId, value: number) {
+        return this.submissionModel.updateOne(
+            { _id: submissionId },
+            { $inc: { upvotes: value } },
+        );
+    }
+    createVote(userId: Types.ObjectId, submissionId: string, clerkUserId: string) {
+        return this.voteModel.create({
+            userId,
+            submissionId,
+            clerkUserId,
+        });
+    }
+    findVote(userId: Types.ObjectId, submissionId: string, clerkUserId: string) {
+        return this.voteModel.create({
+            userId,
+            submissionId,
+            clerkUserId,
+        });
+    }
+    deleteVote(userId: Types.ObjectId, submissionId: string, clerkUserId: string) {
+        return this.voteModel.findOneAndDelete({ userId, submissionId, clerkUserId });
+    }
+    updateValue(id: Types.ObjectId, data: Partial<CodingSubmission>) {
+        return this.submissionModel.findByIdAndUpdate(
+            id,
+            { ...data },
+            { new: true }
+        );
+    }
+}
+
+@Injectable()
+export class CodingDiscussionRepository {
+    constructor(
+        @InjectModel(CodingDiscussion.name)
+        private readonly discussionModel: Model<CodingDiscussion>,
+
+        @InjectModel(DiscussionVote.name)
+        private readonly voteModel: Model<DiscussionVote>,
+    ) { }
+
+    newDiscussion(data: Partial<CodingDiscussion>) {
+        return this.discussionModel.create(data);
+    }
+
+    getDiscussionsByQuestion(questionId: string) {
+        return this.discussionModel
+            .find({ questionId: new Types.ObjectId(questionId), parentId: null, isDeleted: false })
+            .sort({ createdAt: -1 })
+            .limit(49);
+    }
+
+    findDiscussionById(id: string) {
+        return this.discussionModel.findById(id);
+    }
+
+    updateVote(id: Types.ObjectId, value: number) {
+        return this.discussionModel.updateOne(
+            { _id: id },
+            { $inc: { upvotes: value } },
+        );
+    }
+
+    createVote(userId: Types.ObjectId, discussionId: string, clerkUserId: string) {
+        return this.voteModel.create({
+            userId,
+            discussionId,
+            clerkUserId,
+        });
+    }
+    findVote(userId: Types.ObjectId, discussionId: string, clerkUserId: string) {
+        return this.voteModel.create({
+            userId,
+            discussionId,
+            clerkUserId,
+        });
+    }
+    deleteVote(userId: Types.ObjectId, discussionId: string, clerkUserId: string) {
+        return this.voteModel.findOneAndDelete({ userId, discussionId, clerkUserId });
+    }
+    increateReplyCount(id: Types.ObjectId) {
+        return this.discussionModel.updateOne(
+            { _id: id },
+            { $inc: { replyCount: 1 } },
+        );
+    }
+
+    updateValue(id: Types.ObjectId, value: number) {
+        return this.discussionModel.findByIdAndUpdate(
+            id,
+            { $inc: { value } },
+            { new: true }
+        );
     }
 }
