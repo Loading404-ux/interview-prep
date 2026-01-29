@@ -11,34 +11,46 @@ import { UpdateProfileDto, UpdateTargetsDto } from './user.dto';
 export class UserController {
 
     constructor(private readonly service: UserService, private readonly progressService: UserProgressService) { }
+
     @Post('profile')
-    async getUserProfile(@Req() req: any) {
+    async verifyUser(@Req() req: any) {
         return this.service.getUser(req.user._id);
     }
-
-    @Get('me/progress') //NOTE: GETTING THE PROGRESS CARDS IN FROFILE
-    getProgressCardsReport(@Req() req: any) {
-        return this.progressService.getProgressOverview(req.user._id);
+    @Get('dashboard/cards')
+    async dashboardCard(@Req() req: any) {
+        return this.progressService.getProgressOverview(req.user.id);
     }
 
-    @Get('me/dashboard')
-    async getDashboard(@Req() req: any) {
-        return this.service.getDashboard(req.user);
+    @Get('dashboard/streak')
+    async getStreak(@Req() req: any) {
+        return this.progressService.getStreak(req.user.id);
     }
+
+    @Get('me/profile')
+    getAchievements(@Req() req: any) {
+        return this.service.getProfile(req.user.id,req.user.clerkUserId);
+    }
+
+    // @Get('me/progress-card') //NOTE: GETTING THE PROGRESS CARDS IN FROFILE
+    // getProgressCardsReport(@Req() req: any) {
+    //     return this.progressService.getProgressOverview(req.user.id);
+    // }
+
+    // @Get('me/profile')
+    // async getDashboard(@Req() req: any) {
+    //     return this.service.getDashboard(req.user);
+    // }
 
     @Patch('me/profile')
     updateProfile(@Req() req: any, @Body() dto: UpdateProfileDto) {
-        return this.service.updateProfile(req.user._id, dto);
+        return this.service.updateProfile(req.user.id, dto);
     }
 
     @Patch('me/targets')
     updateTargets(@Req() req: any, @Body() dto: UpdateTargetsDto) {
-        return this.service.updateTargets(req.user._id, dto.targetCompanies);
+        return this.service.updateTargets(req.user.id, dto.targetCompanies);
     }
-    
-    @Get('me/achievements')
-    getAchievements(@Req() req: any) {
-        return this.service.getAchievements(req.user._id);
-    }
-    
+
+
+
 }

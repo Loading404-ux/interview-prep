@@ -36,8 +36,8 @@ export default function RootLayout({
       <body
         className={`${quicksand.variable} ${cascadiaCode.variable}  antialiased`}
       >
-        <Toaster theme="dark" position="bottom-right"/>
         <ClerkProvider>
+        <Toaster theme="dark" position="bottom-right"/>
           {children}
         </ClerkProvider>
       </body>

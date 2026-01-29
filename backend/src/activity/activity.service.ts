@@ -12,7 +12,7 @@ export class ActivityService {
     private readonly repo: ActivityRepository,
     //@InjectModel(UserMetrics.name)
     //private readonly metricsModel: Model<UserMetrics>,
-  ) {}
+  ) { }
 
   /* ---------- WRITE ---------- */
 
@@ -61,6 +61,8 @@ export class ActivityService {
     }));
   }
 
+  //NOTE: FOR GET THE DAILY HR,APTITUDE DETAILS FOR DAILY SHOWING INPROFILE PROGRESS
+  async dailyProfileProcess() { }
 
   /* ---------- HELPERS ---------- */
 

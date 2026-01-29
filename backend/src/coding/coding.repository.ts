@@ -11,182 +11,182 @@ type CodingSubmissionPopulated =
     Omit<CodingSubmission, 'questionId'> & {
         questionId: CodingQuestion;
     };
-@Injectable()
-export class CodingRepository {
-    constructor(
-        @InjectModel(CodingQuestion.name)
-        private readonly questionModel: Model<CodingQuestion>,
+// @Injectable()
+// export class CodingRepository {
+//     constructor(
+//         @InjectModel(CodingQuestion.name)
+//         private readonly questionModel: Model<CodingQuestion>,
 
-        @InjectModel(CodingSubmission.name)
-        private readonly submissionModel: Model<CodingSubmission>,
+//         @InjectModel(CodingSubmission.name)
+//         private readonly submissionModel: Model<CodingSubmission>,
 
-        @InjectModel(SubmissionVote.name)
-        private readonly submissionVoteModel: Model<SubmissionVote>,
+//         @InjectModel(SubmissionVote.name)
+//         private readonly submissionVoteModel: Model<SubmissionVote>,
 
-        @InjectModel(CodingDiscussion.name)
-        private readonly discussionModel: Model<CodingDiscussion>,
+//         @InjectModel(CodingDiscussion.name)
+//         private readonly discussionModel: Model<CodingDiscussion>,
 
-        @InjectModel(DiscussionVote.name)
-        private readonly discussionVoteModel: Model<DiscussionVote>,
-    ) { }
+//         @InjectModel(DiscussionVote.name)
+//         private readonly discussionVoteModel: Model<DiscussionVote>,
+//     ) { }
 
-    /* ---------- QUESTIONS ---------- */
+//     /* ---------- QUESTIONS ---------- */
 
-    createQuestion(data: Partial<CodingQuestion>) {
-        return this.questionModel.create(data);
-    }
+//     createQuestion(data: Partial<CodingQuestion>) {
+//         return this.questionModel.create(data);
+//     }
 
-    getQuestions() {
-        return this.questionModel.find().sort({ createdAt: -1 }).lean()
-            .then(docs =>
-                docs.map(({ _id, ...rest }) => ({
-                    id: _id.toString(),
-                    ...rest,
-                }))
-            );
-    }
+//     getQuestions() {
+//         return this.questionModel.find().sort({ createdAt: -1 }).lean()
+//             .then(docs =>
+//                 docs.map(({ _id, ...rest }) => ({
+//                     id: _id.toString(),
+//                     ...rest,
+//                 }))
+//             );
+//     }
 
-    async getQuestionById(id: string) {
-        const doc = await this.questionModel.findById(id).lean();
+//     async getQuestionById(id: string) {
+//         const doc = await this.questionModel.findById(id).lean();
 
-        if (!doc) return null;
+//         if (!doc) return null;
 
-        const { _id, ...rest } = doc;
+//         const { _id, ...rest } = doc;
 
-        return {
-            id: _id.toString(),
-            ...rest,
-        };
-    }
+//         return {
+//             id: _id.toString(),
+//             ...rest,
+//         };
+//     }
 
-    /* ---------- SUBMISSIONS ---------- */
+//     /* ---------- SUBMISSIONS ---------- */
 
-    createSubmission(data: Partial<CodingSubmission>) {
-        return this.submissionModel.create({
-            ...data,
-            verdict: SubmissionVerdict.NEEDS_IMPROVEMENT,
-        });
-    }
+//     createSubmission(data: Partial<CodingSubmission>) {
+//         return this.submissionModel.create({
+//             ...data,
+//             verdict: SubmissionVerdict.NEEDS_IMPROVEMENT,
+//         });
+//     }
 
-    findSubmissionById(id: string) {
-        return this.submissionModel.findById(id);
-    }
+//     findSubmissionById(id: string) {
+//         return this.submissionModel.findById(id);
+//     }
 
-    async findSubmissionWithQuestion(
-        submissionId: string,
-    ): Promise<CodingSubmissionPopulated | null> {
-        return this.submissionModel
-            .findOne({ submissionId })
-            .populate<{ questionId: CodingQuestion }>('questionId')
-            .exec() as Promise<CodingSubmissionPopulated | null>;
-    }
+//     async findSubmissionWithQuestion(
+//         submissionId: string,
+//     ): Promise<CodingSubmissionPopulated | null> {
+//         return this.submissionModel
+//             .findOne({ submissionId })
+//             .populate<{ questionId: CodingQuestion }>('questionId')
+//             .exec() as Promise<CodingSubmissionPopulated | null>;
+//     }
 
-    updateAiReview(
-        id: Types.ObjectId,
-        verdict: SubmissionVerdict,
-        aiFeedback: any,
-    ) {
-        return this.submissionModel.findByIdAndUpdate(
-            id,
-            { verdict, aiFeedback },
-            { new: true },
-        );
-    }
+//     updateAiReview(
+//         id: Types.ObjectId,
+//         verdict: SubmissionVerdict,
+//         aiFeedback: any,
+//     ) {
+//         return this.submissionModel.findByIdAndUpdate(
+//             id,
+//             { verdict, aiFeedback },
+//             { new: true },
+//         );
+//     }
 
-    incrementSubmissionUpvotes(id: Types.ObjectId, value: number) {
-        return this.submissionModel.updateOne(
-            { _id: id },
-            { $inc: { upvotes: value } },
-        );
-    }
+//     incrementSubmissionUpvotes(id: Types.ObjectId, value: number) {
+//         return this.submissionModel.updateOne(
+//             { _id: id },
+//             { $inc: { upvotes: value } },
+//         );
+//     }
 
-    getAcceptedSubmissions(questionId: string) {
-        return this.submissionModel
-            .find({
-                questionId,
-                verdict: SubmissionVerdict.ACCEPTED,
-            })
-            .sort({ upvotes: -1, createdAt: -1 });
-    }
+//     getAcceptedSubmissions(questionId: string) {
+//         return this.submissionModel
+//             .find({
+//                 questionId,
+//                 verdict: SubmissionVerdict.ACCEPTED,
+//             })
+//             .sort({ upvotes: -1, createdAt: -1 });
+//     }
 
-    /* ---------- SUBMISSION VOTES ---------- */
+//     /* ---------- SUBMISSION VOTES ---------- */
 
-    findSubmissionVote(userId: Types.ObjectId, submissionId: string) {
-        return this.submissionVoteModel.findOne({
-            userId,
-            submissionId,
-        });
-    }
+//     findSubmissionVote(userId: Types.ObjectId, submissionId: string) {
+//         return this.submissionVoteModel.findOne({
+//             userId,
+//             submissionId,
+//         });
+//     }
 
-    createSubmissionVote(userId: Types.ObjectId, submissionId: string, clerkUserId: string) {
-        return this.submissionVoteModel.create({
-            userId,
-            submissionId,
-            clerkUserId,
-        });
-    }
+//     createSubmissionVote(userId: Types.ObjectId, submissionId: string, clerkUserId: string) {
+//         return this.submissionVoteModel.create({
+//             userId,
+//             submissionId,
+//             clerkUserId,
+//         });
+//     }
 
-    deleteSubmissionVote(id: Types.ObjectId) {
-        return this.submissionVoteModel.deleteOne({ _id: id });
-    }
+//     deleteSubmissionVote(id: Types.ObjectId) {
+//         return this.submissionVoteModel.deleteOne({ _id: id });
+//     }
 
-    /* ---------- DISCUSSIONS ---------- */
+//     /* ---------- DISCUSSIONS ---------- */
 
-    createDiscussion(data: Partial<CodingDiscussion>) {
-        return this.discussionModel.create(data);
-    }
+//     createDiscussion(data: Partial<CodingDiscussion>) {
+//         return this.discussionModel.create(data);
+//     }
 
-    findDiscussionById(id: string) {
-        return this.discussionModel.findById(id);
-    }
+//     findDiscussionById(id: string) {
+//         return this.discussionModel.findById(id);
+//     }
 
-    incrementDiscussionUpvotes(id: Types.ObjectId, value: number) {
-        return this.discussionModel.updateOne(
-            { _id: id },
-            { $inc: { upvotes: value } },
-        );
-    }
+//     incrementDiscussionUpvotes(id: Types.ObjectId, value: number) {
+//         return this.discussionModel.updateOne(
+//             { _id: id },
+//             { $inc: { upvotes: value } },
+//         );
+//     }
 
-    incrementReplyCount(id: Types.ObjectId) {
-        return this.discussionModel.updateOne(
-            { _id: id },
-            { $inc: { replyCount: 1 } },
-        );
-    }
+//     incrementReplyCount(id: Types.ObjectId) {
+//         return this.discussionModel.updateOne(
+//             { _id: id },
+//             { $inc: { replyCount: 1 } },
+//         );
+//     }
 
-    getDiscussionsByQuestion(questionId: string) {
-        return this.discussionModel
-            .find({ questionId: new Types.ObjectId(questionId), parentId: null, isDeleted: false })
-            .sort({ createdAt: -1 });
-    }
+//     getDiscussionsByQuestion(questionId: string) {
+//         return this.discussionModel
+//             .find({ questionId: new Types.ObjectId(questionId), parentId: null, isDeleted: false })
+//             .sort({ createdAt: -1 });
+//     }
 
-    getReplies(parentId: string) {
-        return this.discussionModel
-            .find({ parentId, isDeleted: false })
-            .sort({ createdAt: 1 });
-    }
+//     getReplies(parentId: string) {
+//         return this.discussionModel
+//             .find({ parentId, isDeleted: false })
+//             .sort({ createdAt: 1 });
+//     }
 
-    /* ---------- DISCUSSION VOTES ---------- */
+//     /* ---------- DISCUSSION VOTES ---------- */
 
-    findDiscussionVote(userId: Types.ObjectId, discussionId: string) {
-        return this.discussionVoteModel.findOne({
-            userId,
-            discussionId,
-        });
-    }
+//     findDiscussionVote(userId: Types.ObjectId, discussionId: string) {
+//         return this.discussionVoteModel.findOne({
+//             userId,
+//             discussionId,
+//         });
+//     }
 
-    createDiscussionVote(userId: Types.ObjectId, discussionId: string, clerkUserId: string) {
-        return this.discussionVoteModel.create({
-            userId,
-            discussionId,
-            clerkUserId,
-        });
-    }
+//     createDiscussionVote(userId: Types.ObjectId, discussionId: string, clerkUserId: string) {
+//         return this.discussionVoteModel.create({
+//             userId,
+//             discussionId,
+//             clerkUserId,
+//         });
+//     }
 
-    deleteDiscussionVote(id: Types.ObjectId) {
-        return this.discussionVoteModel.deleteOne({ _id: id });
-    }
-}
+//     deleteDiscussionVote(id: Types.ObjectId) {
+//         return this.discussionVoteModel.deleteOne({ _id: id });
+//     }
+// }
 
 
 @Injectable()

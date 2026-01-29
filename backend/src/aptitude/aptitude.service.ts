@@ -4,6 +4,7 @@ import { StartAptitudeSessionDto, SubmitAptitudeAnswerDto } from "./aptitude.dto
 import { Types } from "mongoose";
 import { ActivityService } from "src/activity/activity.service";
 import { UserProgressService } from "src/user/user-progress.service";
+import { ActivityLogType } from "src/schema/activity-log.schema";
 
 @Injectable()
 export class AptitudeService {
@@ -13,6 +14,8 @@ export class AptitudeService {
     userId: string;
     clerkUserId: string;
     mode: 'RAPID' | 'STANDARD';
+    onOfquestions?: number;
+    topic?: string;
   }) {
     const count = input.mode === 'RAPID' ? 5 : 10;
 
@@ -76,7 +79,7 @@ export class AptitudeService {
     await this.activityService.record({
       userId: session.userId,
       clerkUserId: session.clerkUserId,
-      eventType: 'APTITUDE_ATTEMPT',
+      eventType: ActivityLogType.APTITUDE_SESSION,
       referenceId: session._id,
     });
 

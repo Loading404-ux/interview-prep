@@ -4,7 +4,7 @@ import { UserMapper } from './user.mapper';
 import { UserProgressService } from './user-progress.service';
 import { ActivityService } from 'src/activity/activity.service';
 import { UserAchievement } from 'src/schema/user_achievements.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schema/user.schema';
 import { UpdateProfileDto } from './user.dto';
@@ -19,6 +19,8 @@ export class UserService {
 
         @InjectModel(UserAchievement.name)
         private readonly achievementModel: Model<UserAchievement>,
+        @InjectModel(User.name)
+        private readonly userModel: Model<User>,
     ) { }
 
     async getUser(userId: string) {
@@ -31,20 +33,23 @@ export class UserService {
         }
         return UserMapper.UserResponse(res);
     }
-    async getDashboard(user: User) {
-        const [progress, contributions, achievements] = await Promise.all([
-            this.progressService.getProgressOverview(user._id),
-            this.activityService.getContributionCalendar(user.clerkUserId),
-            this.achievementModel.find({ userId: user._id }),
+    async getProfile(userId:string,clerkUserId:string){ 
+        const [progress, contributions, achievements,user] = await Promise.all([
+            this.progressService.getProgressOverview(new Types.ObjectId(userId)),
+            this.activityService.getContributionCalendar(clerkUserId, 90),
+            this.achievementModel.find({ userId: new Types.ObjectId(userId)}),
+            this.userModel.findById(userId),
         ]);
-
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
         return {
             profile: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                university: user.university,
                 avatar: user.profilePic,
+                university: user.university,
                 targetCompanies: user.targetCompanies,
                 memberSince: user.createdAt,
             },

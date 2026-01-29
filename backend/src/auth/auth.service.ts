@@ -2,7 +2,7 @@ import type { ClerkClient } from "@clerk/backend";
 import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { UserRepository } from "src/user/user.repository";
 import { JwtPayload } from "@clerk/backend/jwt"
-import {UserMapper} from "src/user/user.mapper"
+import { UserMapper } from "src/user/user.mapper"
 @Injectable()
 export class AuthService {
   constructor(
@@ -23,7 +23,7 @@ export class AuthService {
       });
       const email = clerk.emailAddresses[0].emailAddress.split("@")[1];
     }
-   
+
     // if (email !== "@kiit.ac.in") throw new UnauthorizedException('This is only for KIIT students!');
     return UserMapper.UserResponse(user);
   }

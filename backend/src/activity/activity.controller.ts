@@ -17,10 +17,10 @@ export class ActivityController {
     return this.service.getContributionCalendar(req.user.clerkUserId);
   }
 
-  @Get('streak')
-  getStreak(@Req() req: any) {
-    return this.service.getStreak(req.user.clerkUserId);
-  }
+  // @Get('streak')
+  // getStreak(@Req() req: any) {
+  //   return this.service.getStreak(req.user.clerkUserId);
+  // }
 }
 
 

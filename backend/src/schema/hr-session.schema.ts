@@ -23,11 +23,11 @@ class AiResult {
 
 @Schema({ _id: false })
 export class HrQuestionResponse {
-  @Prop({ type: Types.ObjectId, ref: 'HrQuestion', required: true })
+  @Prop({ type: Types.ObjectId, ref: HrQuestion.name, required: true })
   questionId: Types.ObjectId;
 
   @Prop()
-  transcript?: string;
+  transcript: string;
 
   @Prop({ default: 1 })
   attempt: number;

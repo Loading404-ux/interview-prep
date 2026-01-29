@@ -31,7 +31,7 @@ export default function LoginPage() {
   const router = useRouter();
   useEffect(() => { setMounted(true) }, []);
   if (isLoaded && isSignedIn) {
-    router.replace("/dashboard");
+    router.push("/dashboard");
   }
   const [loading, setLoading] = useState(false)
   const handleGoogleLogin = async () => {

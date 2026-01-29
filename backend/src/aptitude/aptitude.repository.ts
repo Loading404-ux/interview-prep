@@ -29,9 +29,8 @@ export class AptitudeRepository {
     return this.sessionModel.updateOne(
       { _id: sessionId },
       {
-        $inc: isCorrect
-          ? { correctCount: 1 }
-          : { wrongCount: 1 },
+        $inc: { correctCount: isCorrect ? 1 : 0 }
+        // : { wrongCount: 1 },
       },
     );
   }

@@ -16,6 +16,7 @@ export class UserProgressService {
         private readonly achievementModel: Model<UserAchievement>,
     ) { }
 
+    //FIXME WRITE A FUNCTION FOR UPDATE USER METRIX VALUE NOT on___Accepted()
     /* =====================================================
        CODING — called when AI verdict = ACCEPTED
        ===================================================== */
@@ -74,13 +75,6 @@ export class UserProgressService {
         // running average
         const prevTotal = (newAvgConfidence + metrics.hr.avgConfidence) / 2
 
-        // const newAvg =
-        //     prevTotal === 0
-        //         ? avgConfidence
-        //         : Math.round(
-        //             (metrics.hr.avgConfidence * prevTotal + avgConfidence) /
-        //             metrics.hr.totalSessions,
-        //         );
 
         await this.metricsModel.updateOne(
             { userId: session.userId },
@@ -193,8 +187,10 @@ export class UserProgressService {
             coding: metrics.coding,
             hr: metrics.hr,
             aptitude: metrics.aptitude,
-            streak: metrics.streak,
+            //streak: metrics.streak,
         };
     }
+
+    
 
 }

@@ -5,7 +5,12 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
-import { CodingDiscussionRepository, CodingQuestionRepository, CodingRepository, CodingSubmissionRepository } from './coding.repository';
+import {
+    CodingDiscussionRepository,
+    CodingQuestionRepository,
+    // CodingRepository,
+    CodingSubmissionRepository
+} from './coding.repository';
 import {
     CodingDiscussionDto,
     CodingSubmissionDto,
@@ -294,13 +299,11 @@ export class CodingService {
         }
 
         await this.submissionRepo.updateValue(new Types.ObjectId(submissionId), { aiFeedback, verdict });
-        if (verdict === SubmissionVerdict.ACCEPTED) {
-
-        }
-        this.progressService.onCodingAccepted({
-            userId: new Types.ObjectId(userId), clerkUserId: clerkUserId, accuracy: (
-                (aiFeedback.clarityScore ?? 0) + (aiFeedback.correctnessScore ?? 0)) / 2
-        });
+        if (verdict === SubmissionVerdict.ACCEPTED)
+            await this.progressService.onCodingAccepted({
+                userId: new Types.ObjectId(userId), clerkUserId: clerkUserId, accuracy: (
+                    (aiFeedback.clarityScore ?? 0) + (aiFeedback.correctnessScore ?? 0)) / 2
+            });
 
     }
 }
