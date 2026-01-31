@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useAuth, useSignIn, } from "@clerk/nextjs";
+import { ClerkProvider, useAuth, useSignIn, } from "@clerk/nextjs";
 import {
   Terminal,
   Fingerprint,
@@ -30,9 +30,13 @@ export default function LoginPage() {
   const { setUser } = useUserStore()
   const router = useRouter();
   useEffect(() => { setMounted(true) }, []);
-  if (isLoaded && isSignedIn) {
-    router.push("/dashboard");
-  }
+  useEffect(() => {
+    console.log(isSignedIn)
+    if (isLoaded && isSignedIn) {
+      router.push("/dashboard");
+    }
+  }, [isSignedIn])
+
   const [loading, setLoading] = useState(false)
   const handleGoogleLogin = async () => {
     if (!isLoaded) return;
@@ -64,6 +68,8 @@ export default function LoginPage() {
   if (!mounted) return null;
 
   return (
+
+
     <div className="min-h-screen w-full flex items-center justify-center bg-background p-4 lg:p-8 relative overflow-hidden font-sans">
 
       {/* Background Mesh Gradients - Using your theme tokens */}

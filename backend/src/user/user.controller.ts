@@ -14,8 +14,9 @@ export class UserController {
 
     @Post('profile')
     async verifyUser(@Req() req: any) {
-        return this.service.getUser(req.user._id);
+        return this.service.getUser(req.user.id);
     }
+
     @Get('dashboard/cards')
     async dashboardCard(@Req() req: any) {
         return this.progressService.getProgressOverview(req.user.id);
@@ -28,9 +29,20 @@ export class UserController {
 
     @Get('me/profile')
     getAchievements(@Req() req: any) {
-        return this.service.getProfile(req.user.id,req.user.clerkUserId);
+        return this.service.getProfile(req.user.id, req.user.clerkUserId);
     }
-
+    // @Get('me/targets')
+    // getTargets(@Req() req: any) {
+    //     return this.service.getTagets(req.user.id);
+    // }
+    @Get('me/contributions')
+    getContributions(@Req() req: any) {
+        return this.service.getContributionCalendar(req.user.clerkUserId);
+    }
+    @Get('dashboard/streak-calendar')
+    getStreakCalendar(@Req() req: any) {
+        return this.service.getStreakCalendar(req.user.clerkUserId, 90);
+    }
     // @Get('me/progress-card') //NOTE: GETTING THE PROGRESS CARDS IN FROFILE
     // getProgressCardsReport(@Req() req: any) {
     //     return this.progressService.getProgressOverview(req.user.id);
@@ -50,7 +62,6 @@ export class UserController {
     updateTargets(@Req() req: any, @Body() dto: UpdateTargetsDto) {
         return this.service.updateTargets(req.user.id, dto.targetCompanies);
     }
-
 
 
 }

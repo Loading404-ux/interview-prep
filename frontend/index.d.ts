@@ -60,15 +60,21 @@ interface Reply {
   createdAt: string
 }
 
-interface DashboardProfile {
+interface Auth {
   id: string
   name: string
   email: string
-  university?: string
   avatar?: string
+  // university?: string
+  // targetCompanies: string[]
+  // memberSince: string
+}
+interface Profile extends Auth {
+  university?: string
   targetCompanies: string[]
   memberSince: string
 }
+
 
 interface CodingProgress {
   totalSubmissions: number
@@ -91,7 +97,7 @@ interface StreakProgress {
   longest: number
 }
 
-interface DashboardProgress {
+interface DashboardProgressCards {
   coding: CodingProgress
   hr: HrProgress
   aptitude: AptitudeProgress
@@ -107,13 +113,24 @@ interface Achievement {
   key: string
   unlockedAt: string
 }
+interface UserProfileResponse {
+  profile: Profile;
+  achievements: Achievement[];
+  contributions: Contribution[];
+  progressCards: {
+    codingSolved: number;
+    hrSessions: number;
+    aptitudeAttempts: number;
+  }
+  targets: string[]
+}
 
 interface DashboardResponse {
-  profile: DashboardProfile
-  progress: DashboardProgress
-  streak: StreakProgress
-  contributions: Contribution[]
-  achievements: Achievement[]
+  //profile: DashboardProfile
+  progressCards: DashboardProgressCards
+  streak?: StreakProgress
+  streakCalender: Contribution[]
+  //achievements: Achievement[]
 }
 
 
@@ -166,7 +183,7 @@ interface ActivityDTO {
   createdAt: string; // ISO string from backend
   result?: string;
 }
- interface UserProfile {
+interface UserProfile {
   id: string
   name: string
   email: string
@@ -175,13 +192,13 @@ interface ActivityDTO {
   joinedAt: string
 }
 
- interface UserMetrics {
+interface UserMetrics {
   coding: { solved: number; total: number }
   hr: { completed: number; total: number }
   aptitude: { completed: number; total: number }
 }
 
- interface ContributionDay {
+interface ContributionDay {
   date: string
   count: number
 }

@@ -37,7 +37,7 @@ export default function RootLayout({
         className={`${quicksand.variable} ${cascadiaCode.variable}  antialiased`}
       >
         <ClerkProvider>
-        <Toaster theme="dark" position="bottom-right"/>
+          <Toaster theme="dark" position="bottom-right" />
           {children}
         </ClerkProvider>
       </body>

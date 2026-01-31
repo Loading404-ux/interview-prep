@@ -20,41 +20,31 @@ export class UserProgressService {
     /* =====================================================
        CODING — called when AI verdict = ACCEPTED
        ===================================================== */
-    async onCodingAccepted(input: {
-        userId: Types.ObjectId;
-        clerkUserId: string;
-        accuracy: number;
-    }) {
+    async onCodingAccepted(userId: Types.ObjectId, accuracy) {
         const metrics = await this.metricsModel.findOneAndUpdate(
-            { userId: input.userId },
-            {
-                $inc: {
-                    'coding.totalSubmissions': 1,
-                    'coding.acceptedSubmissions': 1,
-                },
-
-            },
-            { new: true, upsert: true },
+            { userId },
+            { $inc: { 'coding.acceptedSubmissions': 1 } },
+            { new: true },
         );
+        if (!metrics) {
+            throw new Error('Metrics not found');
+        }
+        //    (aiFeedback.clarityScore ?? 0) + (aiFeedback.correctnessScore ?? 0) / 2
+        const newAccuracy =
+            (metrics.coding.accuracy + accuracy) / 2
 
-        // accuracy
-        // const accuracy =
-        //     metrics.coding.totalSubmissions > 0
-        //         ? Math.round(
-        //             (metrics.coding.acceptedSubmissions /
-        //                 metrics.coding.totalSubmissions) *
-        //             100,
-        //         )
-        //         : 0;
-        const newAccuracy = (metrics.coding.accuracy + input.accuracy) / 2
         await this.metricsModel.updateOne(
-            { userId: input.userId },
+            { userId },
             { 'coding.accuracy': newAccuracy },
         );
+    }
 
-        // achievements
-        await this.unlock(input, 'FIRST_PROBLEM', metrics.coding.acceptedSubmissions >= 1);
-        await this.unlock(input, 'HUNDRED_PROBLEMS', metrics.coding.totalSubmissions >= 100);
+    async onCodingSubmitted(userId: Types.ObjectId) {
+        await this.metricsModel.updateOne(
+            { userId },
+            { $inc: { 'coding.totalSubmissions': 1 } },
+            { upsert: true },
+        );
     }
 
     /* =====================================================
@@ -179,7 +169,7 @@ export class UserProgressService {
                 coding: { totalSubmissions: 0, acceptedSubmissions: 0, accuracy: 0 },
                 hr: { totalSessions: 0, avgConfidence: 0 },
                 aptitude: { totalAttempts: 0, accuracy: 0 },
-                streak: { current: 0, longest: 0 },
+                //streak: { current: 0, longest: 0 },
             };
         }
 
@@ -191,6 +181,36 @@ export class UserProgressService {
         };
     }
 
-    
+    async updateStreak(userId: Types.ObjectId, clerkUserId: string) {
+        const today = new Date().toISOString().split('T')[0];
+        const yesterday = new Date(Date.now() - 86400000)
+            .toISOString()
+            .split('T')[0];
+
+        const metrics =
+            (await this.metricsModel.findOne({ userId })) ??
+            (await this.metricsModel.create({ userId }));
+
+        const last =
+            metrics.streak.lastActiveDate
+                ? metrics.streak.lastActiveDate.toISOString().split('T')[0]
+                : null;
+
+        if (last === today) return;
+
+        const newCurrent = last === yesterday ? metrics.streak.current + 1 : 1;
+
+        await this.metricsModel.updateOne(
+            { userId },
+            {
+                $set: {
+                    'streak.current': newCurrent,
+                    'streak.longest': Math.max(metrics.streak.longest, newCurrent),
+                    'streak.lastActiveDate': new Date(),
+                },
+            },
+        );
+    }
+
 
 }

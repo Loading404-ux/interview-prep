@@ -5,6 +5,7 @@ import { useAuth } from "@clerk/nextjs"
 import { api } from "@/lib/api-client"
 import { useUserStore } from "@/store/user.store"
 import { useRouter } from "next/navigation"
+import { API_ROUTES } from "@/routes"
 
 export function useBootstrapAuth() {
   const { getToken } = useAuth()
@@ -28,7 +29,7 @@ export function useBootstrapAuth() {
 
       try {
         const token = await getToken()
-        const profile = await api<any>("/user/profile", {
+        const profile = await api<any>(API_ROUTES.USER.PROFILE_FETCH, {
           token,
           method: "POST"
         })

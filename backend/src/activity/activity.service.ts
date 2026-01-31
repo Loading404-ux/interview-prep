@@ -60,6 +60,23 @@ export class ActivityService {
       contributionCount: d.contributionCount,
     }));
   }
+  async getStreakCalendar(
+    clerkUserId: string,
+    days = 90,
+  ): Promise<{ date: string; active: boolean }[]> {
+    const from = new Date();
+    from.setDate(from.getDate() - days);
+
+    const daily = await this.repo.getDailyActivities(
+      clerkUserId,
+      from.toISOString().split('T')[0],
+    );
+
+    return daily.map(d => ({
+      date: d.date,
+      active: d.didCoding || d.didHr || d.didAptitude,
+    }));
+  }
 
   //NOTE: FOR GET THE DAILY HR,APTITUDE DETAILS FOR DAILY SHOWING INPROFILE PROGRESS
   async dailyProfileProcess() { }

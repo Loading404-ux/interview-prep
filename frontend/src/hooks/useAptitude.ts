@@ -1,6 +1,7 @@
 import { useAuth } from "@clerk/nextjs"
 import { api } from "@/lib/api-client"
 import { useAptitudeStore } from "@/store/useAptitudeStore"
+import { API_ROUTES } from "@/routes"
 // import { AptitudeSession, AptitudeAnswerResult } from "@/types/aptitude"
 
 export function useAptitude() {
@@ -11,12 +12,13 @@ export function useAptitude() {
     const token = await getToken()
 
     const res = await api<AptitudeSession>(
-      "/aptitude/session/start",
+      API_ROUTES.APTITUDE.SESSION_START,
       {
         method: "POST",
         token,
         body: {
           mode,
+          noOfQuestions: 10,
         },
       }
     )

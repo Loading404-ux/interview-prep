@@ -40,6 +40,7 @@ export class CodingController {
   getSubmission(@Param('id') id: string) {
     return this.service.getSubmissionsByQuestion(id);
   }
+
   @Patch('submission/:id/vote')
   toggleSubmissionVotes(@Req() req: any, @Body() dto: SubmisstionVoteDto) {
     return this.service.toggleSubmissionVotes(req.user.id, req.user.clerkUserId, dto);
@@ -49,10 +50,12 @@ export class CodingController {
   addDiscussion(@Req() req: any, @Body() dto: CodingDiscussionDto) {
     return this.service.addDiscussion(req.user.id, dto.content, dto.parentId);
   }
+
   @Get('discussion/:id')
   getDiscussions(@Param('id') id: string) {
     return this.service.getDiscussions(id);
   }
+  
   @Patch('discussion/:id/vote')
   toggleDiscussionVotes(@Req() req: any, @Body() dto: DiscussionVoteDto) {
     return this.service.toggleDiscussionVotes(req.user.id, req.user.clerkUserId, dto);

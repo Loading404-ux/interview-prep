@@ -4,6 +4,7 @@ import { api } from "@/lib/api-client";
 import { useActivityStore } from "@/store/useActivityStore";
 // import { ActivityDTO } from "@/types/activity";
 import { useAuth } from "@clerk/nextjs";
+import { API_ROUTES } from "@/routes";
 
 export function useActivityLog() {
   const { getToken } = useAuth();
@@ -22,7 +23,7 @@ export function useActivityLog() {
         setLoading(true);
         const token = await getToken();
 
-        const data = await api<ActivityDTO[]>("/activity", {
+        const data = await api<ActivityDTO[]>(API_ROUTES.ACTIVITY.HISTORY, {
           token,
         });
 

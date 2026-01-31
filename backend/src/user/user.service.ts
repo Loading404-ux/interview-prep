@@ -33,11 +33,11 @@ export class UserService {
         }
         return UserMapper.UserResponse(res);
     }
-    async getProfile(userId:string,clerkUserId:string){ 
-        const [progress, contributions, achievements,user] = await Promise.all([
+    async getProfile(userId: string, clerkUserId: string) {
+        const [progress, contributions, achievements, user] = await Promise.all([
             this.progressService.getProgressOverview(new Types.ObjectId(userId)),
             this.activityService.getContributionCalendar(clerkUserId, 90),
-            this.achievementModel.find({ userId: new Types.ObjectId(userId)}),
+            this.achievementModel.find({ userId: new Types.ObjectId(userId) }),
             this.userModel.findById(userId),
         ]);
         if (!user) {
@@ -54,15 +54,22 @@ export class UserService {
                 memberSince: user.createdAt,
             },
             progress,
-            streak: progress.streak,
+            // streak: progress.streak,
             contributions,
             achievements: achievements.map(a => ({
                 key: a.achievementKey,
                 unlockedAt: a.unlockedAt,
             })),
+            targets: user.targetCompanies
         };
     }
-
+    // async getTagets(userId: string) {
+    //     const user = await this.userRepo.findById(userId);
+    //     if (!user) {
+    //         throw new NotFoundException('User not found');
+    //     }
+    //     return user.targetCompanies;
+    // }
     async updateProfile(userId: string, dto: UpdateProfileDto) {
         await this.userRepo.updateById(userId, dto);
         return { success: true };
@@ -78,5 +85,10 @@ export class UserService {
             unlockedAt: a.unlockedAt,
         }));
     }
-
+    async getContributionCalendar(clerkUserId: string, days = 90) {
+        return this.activityService.getContributionCalendar(clerkUserId, days);
+    }
+    getStreakCalendar( clerkUserId: string,days = 90) {
+        return this.activityService.getStreakCalendar(clerkUserId, 90);
+    }
 }

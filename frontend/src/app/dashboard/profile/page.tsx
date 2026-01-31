@@ -28,7 +28,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/useProfileHook";
 import { useAchievements } from "@/hooks/useAchievements";
 import { useProfileStore } from "@/store/useProfileStore";
 import { api } from "@/lib/api-client";

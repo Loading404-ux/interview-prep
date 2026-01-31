@@ -15,7 +15,7 @@ export class HrController {
   @Post('session/start')
   startSession(@Req() req: any) {
 
-    return this.hrService.startSession({ userId: req.user._id, clerkUserId: req.user.clerkUserId });
+    return this.hrService.startSession({ userId: req.user.id, clerkUserId: req.user.clerkUserId });
   }
 
   @Post('answer/submit')
