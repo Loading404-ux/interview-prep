@@ -8,7 +8,7 @@ interface SolutionsState {
 
   setLoading: (v: boolean) => void;
   setSolutions: (s: Solution[]) => void;
-  toggleLike: (id: number) => void;
+  toggleLike: (id: string) => void;
   addSolution: (s: Solution) => void;
   reset: () => void;
 }
@@ -30,10 +30,10 @@ export const useSolutionsStore = create<SolutionsState>((set) => ({
       solutions: state.solutions.map((s) =>
         s.id === id
           ? {
-              ...s,
-              isLiked: !s.isLiked,
-              likes: s.isLiked ? s.likes - 1 : s.likes + 1,
-            }
+            ...s,
+            isLiked: !s.upvotes,
+            likes: s.upvotes ? s.upvotes - 1 : s.upvotes + 1,
+          }
           : s
       ),
     })),

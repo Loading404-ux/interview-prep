@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfileHook";
-import { useAchievements } from "@/hooks/useAchievements";
+// import { useAchievements } from "@/hooks/useAchievements";
 import { useProfileStore } from "@/store/useProfileStore";
 import { api } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -86,30 +86,30 @@ const Profile = () => {
   //   targetCompanies: ["Google", "Microsoft", "Amazon"],
   //   joinedDate: "January 2024",
   // });
-  const { profile, metrics, contributions, isLoading } = useProfile()
+  const { profile, codingSolved, hrSessions, aptitudeAttempts, contributions, isLoading, achievements } = useProfile()
   // const { user } = useUserStore()
   const [isEditingCompanies, setIsEditingCompanies] = useState(false);
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>(profile?.targetCompanies || []);
-  const { unlocked, isLoading: achievementsLoading } = useAchievements()
+  // const { unlocked, isLoading: achievementsLoading } = useAchievements()
   const stats = [
     {
       label: "Coding Problems",
-      value: metrics?.coding.solved,
-      total: metrics?.coding.total,
+      value: codingSolved,
+      total: 69,
       color: "bg-coding",
       icon: Code2,
     },
     {
       label: "HR Sessions",
-      value: metrics?.hr.completed,
-      total: metrics?.hr.total,
+      value: hrSessions,
+      total: 12,
       color: "bg-hr",
       icon: Mic,
     },
     {
       label: "Aptitude Quizzes",
-      value: metrics?.aptitude.completed,
-      total: metrics?.aptitude.total,
+      value: aptitudeAttempts,
+      total: 30,
       color: "bg-aptitude",
       icon: Brain,
     },
@@ -134,7 +134,7 @@ const Profile = () => {
     );
   };
   const updateTargetCompanies = useProfileStore(
-    (s) => s.updateTargetCompanies
+    (s) => s.updateTargets
   )
   const { getToken } = useAuth()
   const saveCompanies = async () => {
@@ -161,7 +161,7 @@ const Profile = () => {
       toast.error("Failed to update companies")
     }
   }
-  if (isLoading || !profile || !metrics) {
+  if (isLoading || !profile) {
     return <div className="p-6 text-muted-foreground">Loading profile…</div>
   }
   return (
@@ -179,7 +179,7 @@ const Profile = () => {
               </Avatar>
               <div className="flex-1">
                 <h1 className="text-xl font-bold text-foreground">{profile.name}</h1>
-                <p className="text-sm text-muted-foreground">Member since {profile.joinedAt}</p>
+                <p className="text-sm text-muted-foreground">Member since {profile.memberSince}</p>
               </div>
               <Dialog open={isEditingCompanies} onOpenChange={setIsEditingCompanies}>
                 <DialogTrigger asChild>
@@ -252,7 +252,7 @@ const Profile = () => {
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <GraduationCap className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-foreground">{profile.college}</span>
+                  <span className="text-foreground">{profile.university}</span>
                 </div>
               </div>
 
@@ -283,7 +283,7 @@ const Profile = () => {
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {ACHIEVEMENT_DEFINITIONS.map((a) => {
-                  const earned = Boolean(unlocked[a.key])
+                  const earned = Boolean(achievements.map(a => a.key).includes(a.key));
 
                   return (
                     <div

@@ -33,7 +33,7 @@ export function useAptitude() {
     const token = await getToken()
 
     const res = await api<AptitudeAnswerResult>(
-      "/aptitude/answer/submit",
+      API_ROUTES.APTITUDE.ANSWER_SUBMIT,
       {
         method: "POST",
         token,
@@ -54,7 +54,7 @@ export function useAptitude() {
     const token = await getToken()
 
     const res = await api<{ accuracy: number }>(
-      "/aptitude/session/complete",
+      API_ROUTES.APTITUDE.SESSION_COMPLETE,
       {
         method: "POST",
         token,

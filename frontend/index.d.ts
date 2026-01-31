@@ -34,14 +34,29 @@ interface CodingProblemDetail {
   }
   topics: string[]
 }
-
-interface CodingSolution {
-  id: string
-  solution: string
-  explanation?: string
-  upvotes: number
-  createdAt: string
+interface AiFeedback {
+  clarityScore?: number;
+  correctnessScore?: number;
+  suggestions?: string;
 }
+
+interface Solution {
+  id: string;
+  questionId: string
+  solution: string;
+  explanation: string | undefined;
+  aiFeedback: AiFeedback | undefined;
+  upvotes: number;
+  createdAt: Date;
+}
+
+// interface CodingSolution {
+//   id: string
+//   solution: string
+//   explanation?: string
+//   upvotes: number
+//   createdAt: string
+// }
 
 
 interface Discussion {
@@ -113,6 +128,7 @@ interface Achievement {
   key: string
   unlockedAt: string
 }
+
 interface UserProfileResponse {
   profile: Profile;
   achievements: Achievement[];

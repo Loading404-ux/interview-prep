@@ -1,6 +1,7 @@
 import { useAuth } from "@clerk/nextjs"
 import { api } from "@/lib/api-client"
 import { useHrStore } from "@/store/useHrStore"
+import { API_ROUTES } from "@/routes"
 
 export function useHrInterview() {
   const { getToken } = useAuth()
@@ -11,7 +12,7 @@ export function useHrInterview() {
     store.isLoading = true
     const token = await getToken()
 
-    const res = await api<HrSession>("/hr/session/start", {
+    const res = await api<HrSession>(API_ROUTES.HR.SESSION_START, {
       method: "POST",
       token,
       body: {},
@@ -32,7 +33,7 @@ export function useHrInterview() {
     form.append("sessionId", store.sessionId!)
     form.append("questionId", questionId)
 
-    const res = await api<HrFeedback>("/hr/answer/submit", {
+    const res = await api<HrFeedback>(API_ROUTES.HR.ANSWER_SUBMIT, {
       method: "POST",
       token,
       body: form,
@@ -46,7 +47,7 @@ export function useHrInterview() {
   // COMPLETE SESSION
   const complete = async () => {
     const token = await getToken()
-    await api("/hr/session/complete", {
+    await api(API_ROUTES.HR.SESSION_COMPLETE, {
       method: "POST",
       token,
       body: { sessionId: store.sessionId },

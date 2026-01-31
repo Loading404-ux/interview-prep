@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { api } from "@/lib/api-client";
 import { useSolutionsStore } from "@/store/solutions.store";
+import { API_ROUTES } from "@/routes";
 // const initialSolutions: Solution[] = [
 //   {
 //     id: 1,
@@ -72,8 +73,9 @@ export function useSolutions(questionId: string) {
     async function load() {
       store.setLoading(true)
       const token = await getToken()
-      const data = await api<CodingSolution[]>(
-        `/coding/questions/${questionId}/submissions`,
+      API_ROUTES.CODING.GET_SUBMISSIONS(questionId)
+      const data = await api<Solution[]>(
+        API_ROUTES.CODING.GET_SUBMISSIONS(questionId),
         { token }
       )
       if (mounted) store.setSolutions(data)

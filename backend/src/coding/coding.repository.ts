@@ -222,8 +222,8 @@ export class CodingSubmissionRepository {
         private readonly voteModel: Model<SubmissionVote>,
     ) { }
 
-    submitSolution(userId: Types.ObjectId,clerkUserId: string, data: CodingSubmissionDto) {
-        return this.submissionModel.create({...data, userId,clerkUserId});
+    submitSolution(userId: Types.ObjectId, clerkUserId: string, data: CodingSubmissionDto) {
+        return this.submissionModel.create({ ...data, userId, clerkUserId });
     }
     getSubmissionsByQuestionId(questionId: string) {
         return this.submissionModel

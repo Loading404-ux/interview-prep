@@ -36,8 +36,9 @@ export class CodingController {
   submitSolution(@Req() req: any, @Body() dto: CodingSubmissionDto) {
     return this.service.addSubmission(req.user.id,req.user.clerkUserId, dto);
   }
+
   @Get('submission/:id')
-  getSubmission(@Param('id') id: string) {
+  getSubmissions(@Param('id') id: string) {
     return this.service.getSubmissionsByQuestion(id);
   }
 

@@ -3,9 +3,9 @@ import { create } from "zustand";
 
 
 interface ProblemDetailState {
-  problem: ProblemDetail | null;
+  problem: CodingProblemDetail | null;
   isLoading: boolean;
-  setProblem: (p?: ProblemDetail) => void;
+  setProblem: (p?: CodingProblemDetail) => void;
   setLoading: (v: boolean) => void;
 }
 

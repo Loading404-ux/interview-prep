@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { api } from "@/lib/api-client";
 import { useDiscussionsStore } from "@/store/discussions.store";
+import { API_ROUTES } from "@/routes";
 // const initialDiscussions: Discussion[] = [
 //     {
 //         id: 1,
@@ -71,8 +72,9 @@ export function useDiscussions(problemId: string) {
 
         async function load() {
             store.setLoading(true);
-            const token = await getToken();
-            const data = await api<Discussion[]>(`/coding/questions/${problemId}/discussions`, {
+            const token = await getToken(); 
+            
+            const data = await api<Discussion[]>(API_ROUTES.CODING.DISCUSSIONS(problemId), {
                 token,
             });
             console.log(data)

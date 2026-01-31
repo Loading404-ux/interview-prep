@@ -242,7 +242,7 @@ export class CodingService {
     }
 
     async getSubmissionsByQuestion(questionId: string) {
-        return await this.submissionRepo.getSubmissionsByQuestionId(questionId);
+        return (await this.submissionRepo.getSubmissionsByQuestionId(questionId)).map(CodingSubmissionMapper.toResponse);
     }
 
 
@@ -256,7 +256,7 @@ export class CodingService {
     }
 
     async getDiscussions(questionId: string) {
-        return await this.discussionRepo.getDiscussionsByQuestion(questionId);
+        return (await this.discussionRepo.getDiscussionsByQuestion(questionId)).map(CodingDiscussionMapper.toResponse);
     }
     async toggleDiscussionVotes(userId: string, clerkUserId: string, dto: DiscussionVoteDto) {
         const vote = await this.discussionRepo.findVote(new Types.ObjectId(userId), dto.discussionId, clerkUserId);
@@ -301,7 +301,7 @@ export class CodingService {
         await this.submissionRepo.updateValue(new Types.ObjectId(submissionId), { aiFeedback, verdict });
         if (verdict === SubmissionVerdict.ACCEPTED) {
             const accuracy = ((aiFeedback.clarityScore ?? 0) + (aiFeedback.correctnessScore ?? 0) / 2)
-            await this.progressService.onCodingAccepted(new Types.ObjectId(userId),accuracy);
+            await this.progressService.onCodingAccepted(new Types.ObjectId(userId), accuracy);
         }
     }
 }

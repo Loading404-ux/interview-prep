@@ -17,7 +17,7 @@ export const API_ROUTES = {
 
   CODING: {
     QUESTIONS: "/coding/questions",
-    QUESTION: (id: string) => `/coding/question/${id}`,
+    QUESTION_DETAILS: (id: string) => `/coding/question/${id}`,
     SUBMIT_SOLUTION: "/coding/submit-solution",
     GET_SUBMISSIONS: (id: string) => `/coding/submission/${id}`,
     TOGGLE_SOLUTION_VOTE: (id: string) => `/coding/submission/${id}/vote`,
