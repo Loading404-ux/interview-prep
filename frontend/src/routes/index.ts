@@ -5,8 +5,8 @@ export const API_ROUTES = {
     DASHBOARD_STREAK: "/user/dashboard/streak",
     ME_PROFILE: "/user/me/profile",
     ME_TARGETS: "/user/me/targets",
-    ME_CONTRIBUTIONS: "user/me/contributions",
-    DASHBOARD_STREAK_CALENDER: "user/me/streak-calendar",
+    ME_CONTRIBUTIONS: "/user/me/contributions",
+    DASHBOARD_STREAK_CALENDER: "/user/dashboard/streak-calendar",
     SET_TARGETS: "/user/me/targets",
     UPDATE_PROFILE: "/user/me/profile",
   },
@@ -25,6 +25,7 @@ export const API_ROUTES = {
     ADD_DISCUSSIONS: `/coding/discussion`,
     DISCUSSIONS: (id: string) => `/coding/discussion/${id}`,
     TOGGLE_DISCUSSION_VOTE: (id: string) => `/coding/discussion/${id}/vote`,
+    DISCUSSION_REPLIES:`/coding/discussion/replies`,
   },
 
   HR: {

@@ -1,11 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-export default function ProblemHeader({ problem }:{problem:CodingProblem}) {
+export default function ProblemHeader({ problem }:{problem:CodingProblemDetail}) {
   return (
     <div className="bg-card rounded-xl border p-6">
       <h1 className="text-2xl font-bold">
-        {problem.id}. {problem.title}
+        {problem.title}
       </h1>
 
       <div className="flex gap-2 mt-3">

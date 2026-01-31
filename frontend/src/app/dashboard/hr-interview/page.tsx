@@ -8,6 +8,7 @@ import { Microphone } from "@/utils/Microphone";
 import { useHrInterview } from "@/hooks/useHrInterview";
 import ShinyText from "@/components/ShinyText";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type InterviewState = "idle" | "recording" | "completed" | "waiting";
 
@@ -66,7 +67,7 @@ const HRInterview = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [cardKey, setCardKey] = useState(0);
   const currentQuestion = questions[currentIndex]
-
+  const [disabled, setDisabled] = useState(true)
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
   const mic = useRef<Microphone>(null)
@@ -81,19 +82,32 @@ const HRInterview = () => {
 
   const handleStartRecording = async () => {
     // setState("waiting");
-    await Promise.resolve(() => setTimeout(() => { }, 1000))
-    setState("recording");
-    setCardKey(prev => prev + 1);
-    mic.current?.startRecording();
+    try {
+      await Promise.resolve(() => setTimeout(() => { }, 1000))
+      await mic.current?.startRecording();
+      setState("recording");
+      setCardKey(prev => prev + 1);
+    } catch (error: any) {
+      console.log(error.message)
+      toast('No microphone found')
+      setDisabled(true)
+    }
   };
 
   const handleStopRecording = async () => {
-    setState("completed")
-    const blob = await mic.current?.stopRecording()
+    try {
+      setState("completed")
+      const blob = await mic.current?.stopRecording()
 
-    if (blob) {
-      await submitAnswer(blob, currentQuestion.id)
-      setShowFeedback(true)
+      if (blob) {
+        await submitAnswer(blob, currentQuestion.id)
+        setShowFeedback(true)
+      } else {
+        toast("No recording found")
+      }
+    } catch (error) {
+      toast("No microphone found")
+      setDisabled(true)
     }
   }
 
@@ -109,6 +123,17 @@ const HRInterview = () => {
     setCardKey(prev => prev + 1);
   };
   useEffect(() => {
+    async function checkMic() {
+      try {
+        const res = await navigator.mediaDevices.getUserMedia({ audio: true })
+        console.log(res)
+        setDisabled(false)
+      } catch (error) {
+        console.log(error)
+        setDisabled(true)
+      }
+    }
+    checkMic()
     start()
   }, [])
   if (isLoading) {
@@ -207,6 +232,7 @@ const HRInterview = () => {
                 </div>
                 <Button
                   onClick={handleStartRecording}
+                  disabled={disabled}
                   size="lg"
                   className="bg-hr hover:bg-hr/90 text-white rounded-xl px-8"
                 >

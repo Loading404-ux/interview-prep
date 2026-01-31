@@ -20,12 +20,13 @@ import {
 import { ActivityService } from 'src/activity/activity.service';
 import { AiService } from 'src/ai/ai.service';
 import { SubmissionVerdict } from 'src/schema/coding-submission.schema';
-import { CodingDiscussionMapper, CodingSubmissionMapper } from './coding.mapper';
+import { CodingDiscussionMapper, CodingQuestionMapper, CodingSubmissionMapper, DiscussionWithUser } from './coding.mapper';
 import { CodingDiscussion } from 'src/schema/coding-discussion.schema';
 import { UserProgressService } from 'src/user/user-progress.service';
 import { ActivityLogType } from 'src/schema/activity-log.schema';
+import { User } from 'src/schema/user.schema';
 
-@Injectable()
+//@Injectable()
 // export class CodingService {
 //     constructor(
 //         private readonly repo: CodingRepository,
@@ -192,6 +193,9 @@ import { ActivityLogType } from 'src/schema/activity-log.schema';
 
 //NOTE: questions: questions.map(HrMapper.toQuestionView), MAP LIKE THIS 
 
+
+
+@Injectable()
 export class CodingService {
     constructor(
         private readonly questionRepo: CodingQuestionRepository,
@@ -207,11 +211,18 @@ export class CodingService {
     //------------Question-------------
     async getQuestions() {
         return await this.questionRepo.getQuestions();
+        // console.log("Question data",data)
+        // return data;
     }
 
     async questionById(id: string) {
-        return await this.questionRepo.getQuestionById(id);
+        const question = await this.questionRepo.getQuestionById(id);
+
+        if (!question) return null;
+
+        return CodingQuestionMapper.toResponse(question.toObject());
     }
+
 
     // -----------Submission------------
     async addSubmission(userId: string, clerkUserId: string, dto: CodingSubmissionDto) {
@@ -230,15 +241,17 @@ export class CodingService {
     }
 
     async toggleSubmissionVotes(userId: string, clerkUserId: string, dto: SubmisstionVoteDto) {
-        const vote = await this.submissionRepo.findVote(new Types.ObjectId(userId), dto.submissionId, clerkUserId);
+        const vote = await this.submissionRepo.findVote(new Types.ObjectId(userId), new Types.ObjectId(dto.submissionId), clerkUserId);
+        let count = 1
         if (!vote) {
-            await this.submissionRepo.createVote(new Types.ObjectId(userId), dto.submissionId, clerkUserId);
-            await this.submissionRepo.updateVote(new Types.ObjectId(userId), 1);
+            await this.submissionRepo.createVote(new Types.ObjectId(userId), new Types.ObjectId(dto.submissionId), clerkUserId);
+            await this.submissionRepo.updateVote(new Types.ObjectId(dto.submissionId), 1);
         } else {
-            await this.submissionRepo.deleteVote(new Types.ObjectId(userId), dto.submissionId, clerkUserId);
-            await this.submissionRepo.updateVote(new Types.ObjectId(userId), -1);
+            await this.submissionRepo.deleteVote(new Types.ObjectId(userId), new Types.ObjectId(dto.submissionId), clerkUserId);
+            await this.submissionRepo.updateVote(new Types.ObjectId(dto.submissionId), -1);
+            count = -1
         }
-        return true;
+        return { value: count };
     }
 
     async getSubmissionsByQuestion(questionId: string) {
@@ -247,29 +260,45 @@ export class CodingService {
 
 
     // -----------Discussion------------
-    async addDiscussion(userId: string, text: string, parentId?: string) {
-        const discussion = await this.discussionRepo.newDiscussion({ userId: new Types.ObjectId(userId), content: text, parentId: parentId ? new Types.ObjectId(parentId) : null });
+    async addDiscussion({ userId, text, questionId, parentId, clerkUserId }: { userId: string, text: string, parentId?: string, clerkUserId: string, questionId: string }) {
+        const discussion = await this.discussionRepo.newDiscussion({
+            userId: new Types.ObjectId(userId),
+            clerkUserId,
+            content: text,
+            parentId: parentId ? new Types.ObjectId(parentId) : null,
+            questionId: new Types.ObjectId(questionId)
+        });
         if (parentId) {
             await this.discussionRepo.increateReplyCount(new Types.ObjectId(parentId));
         }
-        return discussion;
+
+        return CodingDiscussionMapper.toCreateResponse(discussion.toObject());
     }
 
     async getDiscussions(questionId: string) {
-        return (await this.discussionRepo.getDiscussionsByQuestion(questionId)).map(CodingDiscussionMapper.toResponse);
-    }
-    async toggleDiscussionVotes(userId: string, clerkUserId: string, dto: DiscussionVoteDto) {
-        const vote = await this.discussionRepo.findVote(new Types.ObjectId(userId), dto.discussionId, clerkUserId);
-        if (!vote) {
-            await this.discussionRepo.createVote(new Types.ObjectId(userId), dto.discussionId, clerkUserId);
-            await this.discussionRepo.updateVote(new Types.ObjectId(userId), 1);
-        } else {
-            await this.discussionRepo.deleteVote(new Types.ObjectId(userId), dto.discussionId, clerkUserId);
-            await this.discussionRepo.updateVote(new Types.ObjectId(userId), -1);
-        }
-        return true;
+        const data = await this.discussionRepo.getDiscussionsByQuestion(questionId).populate('userId')
+
+        return data.map(CodingDiscussionMapper.toResponse);
     }
 
+    async toggleDiscussionVotes(userId: string, clerkUserId: string, dto: DiscussionVoteDto) {
+        console.log(userId, clerkUserId, dto)
+        const vote = await this.discussionRepo.findVote(new Types.ObjectId(userId), new Types.ObjectId(dto.discussionId), clerkUserId);
+        let count = 1
+        if (!vote) {
+            await this.discussionRepo.createVote(new Types.ObjectId(userId), new Types.ObjectId(dto.discussionId), clerkUserId);
+            await this.discussionRepo.updateVote(new Types.ObjectId(dto.discussionId), 1);
+        } else {
+            await this.discussionRepo.deleteVote(new Types.ObjectId(userId), new Types.ObjectId(dto.discussionId), clerkUserId);
+            await this.discussionRepo.updateVote(new Types.ObjectId(dto.discussionId), -1);
+            count = -1
+        }
+        return { value: count };
+    }
+
+    async getReplies(parentId: string, questionId: string) {
+        return (await this.discussionRepo.getReplies(new Types.ObjectId(parentId), new Types.ObjectId(questionId))).map(CodingDiscussionMapper.toResponse);
+    }
     // -------------Ai------------
     private async triggerAiReview(submissionId: string) {
         const submission = await this.submissionRepo.findSubmissionById(submissionId).populate('questionId');

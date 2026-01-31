@@ -79,7 +79,7 @@ export class AptitudeService {
     await this.activityService.record({
       userId: session.userId,
       clerkUserId: session.clerkUserId,
-      eventType: ActivityLogType.APTITUDE_SESSION,
+      eventType: ActivityLogType.APTITUDE_SESSION_COMPLETE,
       referenceId: session._id,
     });
 

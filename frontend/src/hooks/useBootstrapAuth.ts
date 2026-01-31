@@ -8,35 +8,33 @@ import { useRouter } from "next/navigation"
 import { API_ROUTES } from "@/routes"
 
 export function useBootstrapAuth() {
-  const { getToken } = useAuth()
-
+  const { isSignedIn, getToken, isLoaded } = useAuth()
   const router = useRouter()
-
   const { user, setUser, bootstrapped, markBootstrapped } = useUserStore()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!isLoaded) return
+
+    if (!isSignedIn) {
+      setLoading(false)
+      return
+    }
+
+    if (bootstrapped) {
+      setLoading(false)
+      return
+    }
+
     const bootstrap = async () => {
-      //   if (!isSignedIn) {
-      //     setLoading(false)
-      //     return
-      //   }
-
-      if (bootstrapped) {
-        setLoading(false)
-        return
-      }
-
       try {
         const token = await getToken()
-        const profile = await api<any>(API_ROUTES.USER.PROFILE_FETCH, {
+        const profile = await api<Auth>(API_ROUTES.USER.PROFILE_FETCH, {
           token,
-          method: "POST"
+          method: "POST",
         })
-
         setUser(profile)
-      } catch (err) {
-        // backend rejected user → force logout or redirect
+      } catch {
         router.replace("/")
       } finally {
         markBootstrapped()
@@ -45,10 +43,7 @@ export function useBootstrapAuth() {
     }
 
     bootstrap()
-  }, [])
+  }, [isLoaded, isSignedIn])
 
-  return {
-    loading,
-    user,
-  }
+  return { loading, user }
 }

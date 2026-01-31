@@ -7,6 +7,7 @@ import { CodingDiscussion } from 'src/schema/coding-discussion.schema';
 import { SubmissionVote } from 'src/schema/coding-submission-vote.schema';
 import { DiscussionVote } from 'src/schema/coding-discussion-vote.schema';
 import { CodingSubmissionDto } from './coding.dto';
+import { DiscussionWithUser } from './coding.mapper';
 type CodingSubmissionPopulated =
     Omit<CodingSubmission, 'questionId'> & {
         questionId: CodingQuestion;
@@ -215,7 +216,7 @@ export class CodingQuestionRepository {
 @Injectable()
 export class CodingSubmissionRepository {
     constructor(
-        @InjectModel(SubmissionVote.name)
+        @InjectModel(CodingSubmission.name)
         private readonly submissionModel: Model<CodingSubmission>,
 
         @InjectModel(SubmissionVote.name)
@@ -241,21 +242,21 @@ export class CodingSubmissionRepository {
             { $inc: { upvotes: value } },
         );
     }
-    createVote(userId: Types.ObjectId, submissionId: string, clerkUserId: string) {
+    createVote(userId: Types.ObjectId, submissionId: Types.ObjectId, clerkUserId: string) {
         return this.voteModel.create({
             userId,
             submissionId,
             clerkUserId,
         });
     }
-    findVote(userId: Types.ObjectId, submissionId: string, clerkUserId: string) {
-        return this.voteModel.create({
+    findVote(userId: Types.ObjectId, submissionId: Types.ObjectId, clerkUserId: string) {
+        return this.voteModel.findOne({
             userId,
             submissionId,
             clerkUserId,
         });
     }
-    deleteVote(userId: Types.ObjectId, submissionId: string, clerkUserId: string) {
+    deleteVote(userId: Types.ObjectId, submissionId: Types.ObjectId, clerkUserId: string) {
         return this.voteModel.findOneAndDelete({ userId, submissionId, clerkUserId });
     }
     updateValue(id: Types.ObjectId, data: Partial<CodingSubmission>) {
@@ -283,9 +284,9 @@ export class CodingDiscussionRepository {
 
     getDiscussionsByQuestion(questionId: string) {
         return this.discussionModel
-            .find({ questionId: new Types.ObjectId(questionId), parentId: null, isDeleted: false })
+            .find({ questionId: new Types.ObjectId(questionId), parentId: null, isDeleted: false }).populate({ path: 'userId', select: 'name' })
             .sort({ createdAt: -1 })
-            .limit(49);
+            .limit(49).lean<DiscussionWithUser[]>();
     }
 
     findDiscussionById(id: string) {
@@ -299,21 +300,22 @@ export class CodingDiscussionRepository {
         );
     }
 
-    createVote(userId: Types.ObjectId, discussionId: string, clerkUserId: string) {
+    createVote(userId: Types.ObjectId, discussionId: Types.ObjectId, clerkUserId: string) {
         return this.voteModel.create({
             userId,
             discussionId,
             clerkUserId,
         });
     }
-    findVote(userId: Types.ObjectId, discussionId: string, clerkUserId: string) {
-        return this.voteModel.create({
+
+    findVote(userId: Types.ObjectId, discussionId: Types.ObjectId, clerkUserId: string) {
+        return this.voteModel.findOne({
             userId,
             discussionId,
             clerkUserId,
         });
     }
-    deleteVote(userId: Types.ObjectId, discussionId: string, clerkUserId: string) {
+    deleteVote(userId: Types.ObjectId, discussionId: Types.ObjectId, clerkUserId: string) {
         return this.voteModel.findOneAndDelete({ userId, discussionId, clerkUserId });
     }
     increateReplyCount(id: Types.ObjectId) {
@@ -329,5 +331,13 @@ export class CodingDiscussionRepository {
             { $inc: { value } },
             { new: true }
         );
+    }
+
+    getReplies(parentId: Types.ObjectId, questionId: Types.ObjectId) {
+        return this.discussionModel
+            .find({ parentId, questionId, isDeleted: false })
+            .sort({ createdAt: 1 }).populate({ path: 'userId', select: 'name' })
+            .sort({ createdAt: -1 })
+            .limit(49).lean<DiscussionWithUser[]>();
     }
 }

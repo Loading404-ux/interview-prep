@@ -25,6 +25,9 @@ interface CodingProblem {
 interface CodingProblemDetail {
   id: string
   title: string
+  difficulty:string;
+  topics: string[];
+  company?: string
   problem: string
   hint: string
   examples: { input: any; output: any }[]
@@ -32,7 +35,7 @@ interface CodingProblemDetail {
     time_complexity: string
     space_complexity: string
   }
-  topics: string[]
+  isPremium?: boolean;
 }
 interface AiFeedback {
   clarityScore?: number;
@@ -66,6 +69,7 @@ interface Discussion {
   upvotes: number
   replyCount: number
   createdAt: string
+  author: string
 }
 
 interface Reply {

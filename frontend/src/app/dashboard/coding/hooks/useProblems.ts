@@ -34,7 +34,7 @@ export function useProblems() {
             const token = await getToken()
             const data = await api<CodingProblem[]>(API_ROUTES.CODING.QUESTIONS, { token })
 
-            if (mounted) store.setProblems(data?.length > 0 ? data : problems)
+            if (mounted) store.setProblems(data)
         }
 
         if (store.problems.length === 0) load()

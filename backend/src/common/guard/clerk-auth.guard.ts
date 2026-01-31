@@ -21,11 +21,11 @@ export class ClerkAuthGuard implements CanActivate {
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const req = ctx.switchToHttp().getRequest();
 
-    const authHeader = req.headers.authorization;
-    console.log(authHeader);
+    const authHeader = req.headers.authorization as string | undefined;
     if (!authHeader) {
       throw new UnauthorizedException('Missing Authorization header');
     }
+    console.log("Token is here. NO PROBLEM");
 
     const token = authHeader.replace('Bearer ', '');
 

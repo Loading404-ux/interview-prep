@@ -122,7 +122,7 @@ export class HrService {
     await this.activityService.record({
       userId: session.userId,
       clerkUserId: session.clerkUserId,
-      eventType: ActivityLogType.HR_SESSION,
+      eventType: ActivityLogType.HR_SESSION_COMPLETE,
       referenceId: session._id,
     });
     await this.progressService.onHrSessionCompleted(session);

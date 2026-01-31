@@ -7,11 +7,13 @@ import { useBootstrapAuth } from "@/hooks/useBootstrapAuth"
 import { useAuth } from "@clerk/nextjs"
 import { useSocketStore } from '@/store/socket.store';
 import { toast } from "sonner"
+import { redirect } from "next/navigation"
 export default function Main({ children }: { children: React.ReactNode }) {
   // 🔑 ALL hooks at the top — no conditions
   const ref = useRef<any>(null)
   const { isLoaded, isSignedIn, getToken } = useAuth()
   const { loading, user } = useBootstrapAuth()
+
   const initializeSocket = useSocketStore((state) => state.initializeSocket);
   const disconnectSocket = useSocketStore((state) => state.disconnectSocket);
   useEffect(() => {
@@ -29,16 +31,15 @@ export default function Main({ children }: { children: React.ReactNode }) {
         disconnectSocket(); // Auto-disconnect on logout
       }
     };
-
     setup();
-  }, [isSignedIn]);
+  }, [isSignedIn, user]);
   // 🧠 Now branch AFTER hooks
   if (!isLoaded) {
     return null
   }
 
   if (!isSignedIn) {
-    return null
+    redirect("/")
   }
 
   if (loading) {

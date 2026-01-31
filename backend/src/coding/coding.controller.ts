@@ -13,6 +13,7 @@ import { CodingService } from './coding.service';
 import {
   CodingDiscussionDto,
   CodingSubmissionDto,
+  DiscussionReplyDto,
   DiscussionVoteDto,
   SubmisstionVoteDto,
 } from './coding.dto';
@@ -34,7 +35,7 @@ export class CodingController {
 
   @Post('submit-solution')
   submitSolution(@Req() req: any, @Body() dto: CodingSubmissionDto) {
-    return this.service.addSubmission(req.user.id,req.user.clerkUserId, dto);
+    return this.service.addSubmission(req.user.id, req.user.clerkUserId, dto);
   }
 
   @Get('submission/:id')
@@ -49,16 +50,27 @@ export class CodingController {
 
   @Post('discussion')
   addDiscussion(@Req() req: any, @Body() dto: CodingDiscussionDto) {
-    return this.service.addDiscussion(req.user.id, dto.content, dto.parentId);
+    return this.service.addDiscussion({
+      userId: req.user.id,
+      clerkUserId: req.user.clerkUserId,
+      questionId: dto.questionId,
+      text: dto.content,
+      parentId: dto.parentId
+    });
   }
 
   @Get('discussion/:id')
   getDiscussions(@Param('id') id: string) {
     return this.service.getDiscussions(id);
   }
-  
+
   @Patch('discussion/:id/vote')
   toggleDiscussionVotes(@Req() req: any, @Body() dto: DiscussionVoteDto) {
     return this.service.toggleDiscussionVotes(req.user.id, req.user.clerkUserId, dto);
+  }
+
+  @Get('discussion/replies')
+  getReplys(@Body() data: DiscussionReplyDto) {
+    return this.service.getReplies(data.parentId, data.questionId);
   }
 }

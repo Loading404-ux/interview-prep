@@ -9,13 +9,17 @@ export class Microphone {
             throw new Error('Recording already in progress');
         }
 
-        this.stream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                sampleRate: 44100,
-            },
-        });
+        try {
+            this.stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    sampleRate: 44100,
+                },
+            });
+        } catch (error: any) {
+            throw new Error(error.message)
+        }
 
         const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
             ? 'audio/webm;codecs=opus'

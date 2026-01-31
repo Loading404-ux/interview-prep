@@ -938,7 +938,7 @@ export default async function Page({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  // console.log(id)
+  console.log("question Id",id)
   // return <div className="bg-blue-600">hii</div>
   return <CodingDetailClient slug={id} />;
 }

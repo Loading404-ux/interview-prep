@@ -94,6 +94,7 @@ const difficulties: ("All" | Difficulty)[] = ["All", "Easy", "Medium", "Hard"];
 
 export default function CodingPractice() {
     const { problems, isLoading, filters, setFilters } = useProblems();
+    console.log(problems)
     // const [searchQuery, setSearchQuery] = useState("");
     // const [companyFilter, setCompanyFilter] = useState("All");
     // const [topicFilter, setTopicFilter] = useState("All");

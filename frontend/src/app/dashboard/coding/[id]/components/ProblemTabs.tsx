@@ -35,7 +35,7 @@ export default function ProblemTabs({ problem }: { problem: CodingProblemDetail 
       <TabsContent value="solutions">
         <SolutionsPanel problemId={problem.id} />
       </TabsContent>
-
+              
       <TabsContent value="discussions">
         <DiscussionsPanel problemId={problem.id} />
       </TabsContent>

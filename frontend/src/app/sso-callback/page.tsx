@@ -12,35 +12,13 @@ import 'ldrs/react/Quantum.css'
 // Default values shown
 
 export default function SsoCallback() {
-    const [error, setError] = useState("")
-    const { isLoaded, isSignedIn, getToken, signOut } = useAuth()
+    const { isLoaded, isSignedIn, } = useAuth()
     const router = useRouter()
-    const { setUser } = useUserStore()
 
     useEffect(() => {
-        if (!isLoaded || !isSignedIn) {
-            router.push("/")
-        }
-
-        const bootstrap = async () => {
-            try {
-                const token = await getToken()
-                const profile = await api<any>("/user/profile", {
-                    token,
-                    method: "POST",
-                })
-                setUser(profile)
-                router.push("/dashboard")
-            } catch (err: any) {
-                console.log(err)
-                if (isSignedIn) {
-                    await signOut();
-                }
-                setError(err.message)
-            }
-        }
-
-        bootstrap()
+        if (!isLoaded) return
+        if (isSignedIn) router.replace("/dashboard")
+        //else router.replace("/")
     }, [isLoaded, isSignedIn])
 
     return (
@@ -48,18 +26,19 @@ export default function SsoCallback() {
             <div className="fixed size-full left-0 top-0">
                 <Background />
             </div >
-            {!error ? <div className="relative z-10 grid place-items-center">
+            <div className="relative z-10 grid place-items-center">
                 <Quantum
                     size="75"
                     speed="1.75"
                     color="#193be699"
                 />
                 <h4 className="text-3xl">Please Wait...</h4>
-            </div> :
+            </div>
+            {/* {!error ? :
                 <div className="relative z-10 grid place-items-center p-4 text-rose-600">
                     <h3 className="">Authtication failed</h3>
                     <h4 className="text-xl">{error}</h4>
-                </div>}
+                </div>} */}
         </div>
     )
 }
