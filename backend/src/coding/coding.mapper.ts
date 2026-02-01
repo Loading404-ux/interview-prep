@@ -35,7 +35,7 @@ export class CodingQuestionMapper {
 
 
 export class CodingDiscussionMapper {
-  static toResponse(d: DiscussionWithUser) {
+  static toResponse(d: any) {
     return {
       id: d._id,
       questionId: d.questionId,
@@ -44,7 +44,8 @@ export class CodingDiscussionMapper {
       upvotes: d.upvotes,
       replyCount: d.replyCount,
       createdAt: d.createAt,
-      author: d.userId?.name,
+      author: d.user?.name,
+      isLiked: d.isLiked,
       _id: undefined,
     };
   }

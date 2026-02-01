@@ -75,7 +75,9 @@ export class DiscussionVoteDto {
 
 export class DiscussionReplyDto {
   @IsMongoId()
+  @IsOptional()
   parentId: string;
+  
   @IsMongoId()
   questionId: string;
 }

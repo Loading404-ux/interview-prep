@@ -23,7 +23,7 @@ export const API_ROUTES = {
     TOGGLE_SOLUTION_VOTE: (id: string) => `/coding/submission/${id}/vote`,
     DISCUSSION_CREATE: "/coding/discussion",
     ADD_DISCUSSIONS: `/coding/discussion`,
-    DISCUSSIONS: (id: string) => `/coding/discussion/${id}`,
+    DISCUSSIONS:(query:string)=>`/coding/discussion?${query}`,
     TOGGLE_DISCUSSION_VOTE: (id: string) => `/coding/discussion/${id}/vote`,
     DISCUSSION_REPLIES:`/coding/discussion/replies`,
   },

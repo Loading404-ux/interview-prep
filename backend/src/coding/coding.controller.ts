@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -59,9 +60,17 @@ export class CodingController {
     });
   }
 
-  @Get('discussion/:id')
-  getDiscussions(@Param('id') id: string) {
-    return this.service.getDiscussions(id);
+  @Get('discussion')
+  getDiscussions(
+    @Req() req: any,
+    @Query('problemId') problemId: string,
+    @Query('parentId') parentId?: string,
+  ) {
+    return this.service.getDiscussions({
+      questionId: problemId,
+      parentId: parentId || null,
+      userId: req.user.id
+    });
   }
 
   @Patch('discussion/:id/vote')
@@ -69,8 +78,8 @@ export class CodingController {
     return this.service.toggleDiscussionVotes(req.user.id, req.user.clerkUserId, dto);
   }
 
-  @Get('discussion/replies')
-  getReplys(@Body() data: DiscussionReplyDto) {
-    return this.service.getReplies(data.parentId, data.questionId);
-  }
+  // @Get('discussion/replies')
+  // getReplys(@Body() data: DiscussionReplyDto) {
+  //   return this.service.getReplies(data.parentId, data.questionId);
+  // }
 }

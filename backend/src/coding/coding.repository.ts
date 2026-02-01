@@ -282,12 +282,65 @@ export class CodingDiscussionRepository {
         return this.discussionModel.create(data);
     }
 
-    getDiscussionsByQuestion(questionId: string) {
-        return this.discussionModel
-            .find({ questionId: new Types.ObjectId(questionId), parentId: null, isDeleted: false }).populate({ path: 'userId', select: 'name' })
-            .sort({ createdAt: -1 })
-            .limit(49).lean<DiscussionWithUser[]>();
-    }
+   getDiscussionsByQuestion(
+  questionId: string,
+  parentId: string | null,
+  userId: string,
+) {
+  return this.discussionModel.aggregate([
+    {
+      $match: {
+        questionId: new Types.ObjectId(questionId),
+        parentId: parentId ? new Types.ObjectId(parentId) : null,
+        isDeleted: false,
+      },
+    },
+    {
+      $lookup: {
+        from: "discussionvotes",
+        let: { discussionId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$discussionId', '$$discussionId'] },
+                  { $eq: ['$userId', new Types.ObjectId(userId)] },
+                ],
+              },
+            },
+          },
+        ],
+        as: 'userVotes',
+      },
+    },
+    {
+      $addFields: {
+        isLiked: { $gt: [{ $size: '$userVotes' }, 0] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    { $unwind: '$user' },
+    {
+      $project: {
+        userVotes: 0,
+        'user._id': 0,
+        'user.email': 0,
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    { $limit: 49 },
+  ]);
+}
+
+
 
     findDiscussionById(id: string) {
         return this.discussionModel.findById(id);
@@ -333,11 +386,11 @@ export class CodingDiscussionRepository {
         );
     }
 
-    getReplies(parentId: Types.ObjectId, questionId: Types.ObjectId) {
-        return this.discussionModel
-            .find({ parentId, questionId, isDeleted: false })
-            .sort({ createdAt: 1 }).populate({ path: 'userId', select: 'name' })
-            .sort({ createdAt: -1 })
-            .limit(49).lean<DiscussionWithUser[]>();
-    }
+    // getReplies(parentId: Types.ObjectId, questionId: Types.ObjectId) {
+    //     return this.discussionModel
+    //         .find({ parentId, questionId, isDeleted: false })
+    //         .sort({ createdAt: 1 }).populate({ path: 'userId', select: 'name' })
+    //         .sort({ createdAt: -1 })
+    //         .limit(49).lean<DiscussionWithUser[]>();
+    // }
 }

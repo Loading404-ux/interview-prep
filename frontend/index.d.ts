@@ -25,7 +25,7 @@ interface CodingProblem {
 interface CodingProblemDetail {
   id: string
   title: string
-  difficulty:string;
+  difficulty: string;
   topics: string[];
   company?: string
   problem: string
@@ -70,6 +70,11 @@ interface Discussion {
   replyCount: number
   createdAt: string
   author: string
+
+  parentId?: string | null
+  isLiked: boolean
+  replies?: Reply[] | null
+  showReplies: boolean // default false
 }
 
 interface Reply {
@@ -77,6 +82,7 @@ interface Reply {
   content: string
   upvotes: number
   createdAt: string
+  author: string
 }
 
 interface Auth {

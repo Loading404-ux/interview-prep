@@ -275,9 +275,12 @@ export class CodingService {
         return CodingDiscussionMapper.toCreateResponse(discussion.toObject());
     }
 
-    async getDiscussions(questionId: string) {
-        const data = await this.discussionRepo.getDiscussionsByQuestion(questionId).populate('userId')
+    async getDiscussions(
+        { questionId, parentId, userId }:
+            { questionId: string, parentId: string | null, userId: string }) {
+        const data = await this.discussionRepo.getDiscussionsByQuestion(questionId, parentId, userId)
 
+        console.log(data.map(CodingDiscussionMapper.toResponse))
         return data.map(CodingDiscussionMapper.toResponse);
     }
 
@@ -296,9 +299,9 @@ export class CodingService {
         return { value: count };
     }
 
-    async getReplies(parentId: string, questionId: string) {
-        return (await this.discussionRepo.getReplies(new Types.ObjectId(parentId), new Types.ObjectId(questionId))).map(CodingDiscussionMapper.toResponse);
-    }
+    // async getReplies(parentId: string, questionId: string) {
+    //     return (await this.discussionRepo.getReplies(new Types.ObjectId(parentId), new Types.ObjectId(questionId))).map(CodingDiscussionMapper.toResponse);
+    // }
     // -------------Ai------------
     private async triggerAiReview(submissionId: string) {
         const submission = await this.submissionRepo.findSubmissionById(submissionId).populate('questionId');
