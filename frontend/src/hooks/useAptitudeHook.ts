@@ -5,10 +5,13 @@ import { API_ROUTES } from "@/routes"
 // import { AptitudeSession, AptitudeAnswerResult } from "@/types/aptitude"
 
 export function useAptitude() {
-  const { getToken, userId } = useAuth()
+  const { getToken } = useAuth()
   const store = useAptitudeStore()
 
   const start = async (mode: "RAPID" | "STANDARD") => {
+    // 🔒 Prevent restarting an active session
+    if (store.sessionId) return
+
     const token = await getToken()
 
     const res = await api<AptitudeSession>(
@@ -23,13 +26,18 @@ export function useAptitude() {
       }
     )
 
-    store.start(res.sessionId, res.questions)
+    store.start(res.sessionId, res.questions,mode)
   }
 
   const submitAnswer = async (
     questionId: string,
     selectedOption: number
   ): Promise<AptitudeAnswerResult> => {
+    if (!store.sessionId) {
+      throw new Error("No active aptitude session")
+    }
+
+    const index = store.currentIndex // 🔒 SNAPSHOT INDEX
     const token = await getToken()
 
     const res = await api<AptitudeAnswerResult>(
@@ -45,12 +53,16 @@ export function useAptitude() {
       }
     )
 
-    store.answer(store.currentIndex, selectedOption)
-    store.setResult(store.currentIndex, res)
+    // ✅ Deterministic state update
+    store.answer(index, selectedOption)
+    store.setResult(index, res)
+
     return res
   }
 
   const complete = async () => {
+    if (!store.sessionId) return
+
     const token = await getToken()
 
     const res = await api<{ accuracy: number }>(

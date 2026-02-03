@@ -12,43 +12,7 @@ import { toast } from "sonner";
 
 type InterviewState = "idle" | "recording" | "completed" | "waiting";
 
-// interface Question {
-//   id: number;
-//   text: string;
-//   preferredAnswer: string;
-// }
-// const suggestions = [
-//   "Try to use the STAR method when answering behavioral questions",
-//   "Practice pausing before answering to gather your thoughts",
-//   "Include more specific examples from your experience",
-//   "Maintain a consistent pace throughout your response",
-// ];
-// const questions: Question[] = [
-//   {
-//     id: 1,
-//     text: "Tell me about yourself and your background. What motivated you to pursue a career in software development?",
-//     preferredAnswer:
-//       "Start with your current role and recent accomplishments. Briefly mention your educational background and how you got into software development. Focus on your passion for problem-solving and building impactful products. Keep it under 2 minutes and end with why you're excited about this opportunity.",
-//   },
-//   {
-//     id: 2,
-//     text: "Describe a challenging project you worked on. How did you overcome the obstacles?",
-//     preferredAnswer:
-//       "Use the STAR method: Situation, Task, Action, Result. Choose a project that demonstrates technical skills and soft skills like collaboration. Be specific about your contributions and quantify the impact if possible. End with what you learned.",
-//   },
-//   {
-//     id: 3,
-//     text: "Where do you see yourself in 5 years?",
-//     preferredAnswer:
-//       "Show ambition while being realistic. Mention growth in technical expertise and potential leadership roles. Connect your goals to the company's mission. Demonstrate that you're looking for a long-term opportunity to grow.",
-//   },
-// ];
 
-interface FeedbackScore {
-  label: string;
-  score: number;
-  color: string;
-}
 
 const HRInterview = () => {
   const {
@@ -56,9 +20,13 @@ const HRInterview = () => {
     currentIndex,
     feedback,
     start,
+    reset,
     submitAnswer,
+    sessionStatus,
     nextQuestion,
-    isLoading
+    micSupported,
+    micError,
+    finalReport
 
   } = useHrInterview()
   const [state, setState] = useState<InterviewState>("idle");
@@ -69,16 +37,120 @@ const HRInterview = () => {
   const currentQuestion = questions[currentIndex]
   const [disabled, setDisabled] = useState(true)
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
-
+  const [micStatus, setMicStatus] = useState(true)
   const mic = useRef<Microphone>(null)
   if (!mic.current) {
     mic.current = new Microphone()
+  }
+  async function requestMicPermission() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      stream.getTracks().forEach(t => t.stop())
+      setMicStatus(true)
+    } catch (err) {
+      setMicStatus(false)
+      toast("Microphone permission denied")
+    }
   }
   // const feedbackScores: FeedbackScore[] = [
   //   { label: "Clarity", score: 78, color: "bg-coding" },
   //   { label: "Structure", score: 65, color: "bg-hr" },
   //   { label: "Confidence", score: 72, color: "bg-aptitude" },
   // ];
+  if (!micSupported) {
+    return (
+      <div className="text-center space-y-4">
+        <p className="text-sm text-muted-foreground">
+          This interview requires microphone access.
+        </p>
+
+        <Button
+          onClick={requestMicPermission}
+          className="bg-hr hover:bg-hr/60"
+        >
+          Enable Microphone
+        </Button>
+
+        {micError && (
+          <p className="text-xs text-destructive">
+            {micError}
+          </p>
+        )}
+      </div>
+    )
+  }
+
+  if (sessionStatus === "COMPLETED" && finalReport) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6">
+        <h2 className="text-xl font-semibold">Interview Summary</h2>
+
+        <div className="grid grid-cols-3 gap-4">
+          {/* {feedbackScores.map((item) => ( */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-sm">
+              <span className="text-foreground">Clarity</span>
+              <span className="font-semibold text-foreground">
+                {finalReport.avgClarity}%
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all duration-500",
+                  "bg-coding"
+                )}
+                style={{ width: `${finalReport.avgClarity}%` }}
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-sm">
+              <span className="text-foreground">Structure</span>
+              <span className="font-semibold text-foreground">
+                {finalReport.avgStructure}%
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all duration-500",
+                  "bg-coding"
+                )}
+                style={{ width: `${finalReport.avgStructure}%` }}
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-sm">
+              <span className="text-foreground">Confidence</span>
+              <span className="font-semibold text-foreground">
+                {finalReport.avgConfidence}%
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all duration-500",
+                  "bg-coding"
+                )}
+                style={{ width: `${finalReport.avgConfidence}%` }}
+              />
+            </div>
+          </div>
+          {/* ))} */}
+        </div>
+
+        <div className="p-6 rounded-xl bg-muted/30 border">
+          <p className="text-sm text-muted-foreground">
+            {finalReport.overallFeedback}
+          </p>
+        </div>
+
+        <Button onClick={reset}>Back to Dashboard</Button>
+      </div>
+    )
+  }
 
   const handleStartRecording = async () => {
     // setState("waiting");
@@ -123,20 +195,9 @@ const HRInterview = () => {
     setCardKey(prev => prev + 1);
   };
   useEffect(() => {
-    async function checkMic() {
-      try {
-        const res = await navigator.mediaDevices.getUserMedia({ audio: true })
-        console.log(res)
-        setDisabled(false)
-      } catch (error) {
-        console.log(error)
-        setDisabled(true)
-      }
-    }
-    checkMic()
     start()
   }, [])
-  if (isLoading) {
+  if (sessionStatus === "RUNNING") {
     <div className="text-center text-sm text-muted-foreground">
       Please Wait
     </div>

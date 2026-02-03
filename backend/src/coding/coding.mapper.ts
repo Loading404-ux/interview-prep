@@ -9,7 +9,7 @@ export type DiscussionWithUser = Omit<CodingDiscussion, 'userId'> & {
   };
 };
 export class CodingSubmissionMapper {
-  static toResponse(submission: CodingSubmission) {
+  static toResponse(submission: any) {
     return {
       id: submission._id,
       questionId: submission.questionId,
@@ -19,6 +19,9 @@ export class CodingSubmissionMapper {
       aiFeedback: submission.aiFeedback,
       upvotes: submission.upvotes ?? 0,
       createdAt: submission.createdAt,
+      _id: undefined,
+      isLiked: submission.isLiked,
+      author: submission.author.name,
     };
   }
 }

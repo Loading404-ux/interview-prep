@@ -40,8 +40,8 @@ export class CodingController {
   }
 
   @Get('submission/:id')
-  getSubmissions(@Param('id') id: string) {
-    return this.service.getSubmissionsByQuestion(id);
+  getSubmissions(@Param('id') id: string, @Req() req: any) {
+    return this.service.getSubmissionsByQuestion(id, req.user.id);
   }
 
   @Patch('submission/:id/vote')

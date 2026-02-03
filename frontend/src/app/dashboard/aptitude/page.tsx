@@ -5,88 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Clock, CheckCircle2, XCircle, ArrowRight, Brain, RotateCcw, Zap, BookOpen, AlertCircle, ArrowLeft } from "lucide-react";
-import { useAptitude } from "@/hooks/useAptitude"
+import { useAptitude } from "@/hooks/useAptitudeHook"
 
-// interface Question {
-//   id: number;
-//   text: string;
-//   options: string[];
-//   correctAnswer: number;
-//   explanation: string;
-// }
-
-// const questions: Question[] = [
-//   {
-//     id: 1,
-//     text: "A train travels 360 km in 4 hours. What is its speed in km/hr?",
-//     options: ["80 km/hr", "90 km/hr", "100 km/hr", "85 km/hr"],
-//     correctAnswer: 1,
-//     explanation: "Speed = Distance / Time = 360 km / 4 hr = 90 km/hr",
-//   },
-//   {
-//     id: 2,
-//     text: "If 15% of a number is 45, what is the number?",
-//     options: ["300", "450", "200", "350"],
-//     correctAnswer: 0,
-//     explanation: "Let the number be x. 15% of x = 45 → 0.15x = 45 → x = 45/0.15 = 300",
-//   },
-//   {
-//     id: 3,
-//     text: "A shopkeeper sells an article at 20% profit. If the cost price is ₹500, what is the selling price?",
-//     options: ["₹550", "₹600", "₹650", "₹580"],
-//     correctAnswer: 1,
-//     explanation: "Selling Price = Cost Price × (1 + Profit%) = 500 × 1.20 = ₹600",
-//   },
-//   {
-//     id: 4,
-//     text: "The ratio of ages of A and B is 3:5. If B is 25 years old, how old is A?",
-//     options: ["12 years", "15 years", "18 years", "20 years"],
-//     correctAnswer: 1,
-//     explanation: "If B = 25 years and ratio is 3:5, then A = (3/5) × 25 = 15 years",
-//   },
-//   {
-//     id: 5,
-//     text: "A car travels at 60 km/hr for 2 hours and 40 km/hr for 3 hours. What is the average speed?",
-//     options: ["48 km/hr", "50 km/hr", "52 km/hr", "45 km/hr"],
-//     correctAnswer: 0,
-//     explanation: "Total distance = (60×2) + (40×3) = 120 + 120 = 240 km. Total time = 5 hours. Average = 240/5 = 48 km/hr",
-//   },
-//   {
-//     id: 6,
-//     text: "What is the compound interest on ₹10,000 at 10% per annum for 2 years?",
-//     options: ["₹2,000", "₹2,100", "₹2,200", "₹1,900"],
-//     correctAnswer: 1,
-//     explanation: "CI = P(1 + r/100)^n - P = 10000(1.1)^2 - 10000 = 12100 - 10000 = ₹2,100",
-//   },
-//   {
-//     id: 7,
-//     text: "If A can complete a work in 12 days and B can complete it in 18 days, in how many days can they complete it together?",
-//     options: ["6.5 days", "7.2 days", "8 days", "9 days"],
-//     correctAnswer: 1,
-//     explanation: "Combined rate = 1/12 + 1/18 = 5/36. Time = 36/5 = 7.2 days",
-//   },
-//   {
-//     id: 8,
-//     text: "A mixture contains milk and water in the ratio 5:3. If 16 liters of the mixture is replaced by water, the ratio becomes 3:5. Find the initial quantity of milk.",
-//     options: ["35 liters", "40 liters", "45 liters", "50 liters"],
-//     correctAnswer: 1,
-//     explanation: "Let total = 8x. Initial milk = 5x. After replacement: (5x - 10)/(3x + 10) = 3/5. Solving: x = 8. Milk = 40 liters",
-//   },
-//   {
-//     id: 9,
-//     text: "The average of 5 numbers is 42. If one number is excluded, the average becomes 40. What is the excluded number?",
-//     options: ["48", "50", "52", "54"],
-//     correctAnswer: 1,
-//     explanation: "Sum of 5 numbers = 5 × 42 = 210. Sum of 4 numbers = 4 × 40 = 160. Excluded number = 210 - 160 = 50",
-//   },
-//   {
-//     id: 10,
-//     text: "A boat can travel 20 km upstream in 4 hours and 20 km downstream in 2 hours. What is the speed of the current?",
-//     options: ["2.5 km/hr", "3 km/hr", "3.5 km/hr", "4 km/hr"],
-//     correctAnswer: 0,
-//     explanation: "Upstream speed = 20/4 = 5 km/hr. Downstream speed = 20/2 = 10 km/hr. Current speed = (10-5)/2 = 2.5 km/hr",
-//   },
-// ];
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
@@ -105,7 +25,8 @@ const AptitudeQuiz = () => {
     next,
     complete,
     reset,
-    results
+    results,
+    sessionStatus,
   } = useAptitude()
   console.log(questions)
   const [mode, setMode] = useState<Mode>("select")
@@ -195,8 +116,12 @@ const AptitudeQuiz = () => {
     setSelectedOption(index)
   }
   // ---------------- GUARDS ----------------
-  if (!currentQuestion && mode !== "select" && mode !== "standard-setup") {
-    return null
+  if (!currentQuestion && sessionStatus === "RUNNING") {
+    return (
+      <div className="text-center text-sm text-muted-foreground">
+        Loading question…
+      </div>
+    )
   }
 
   // const getScore = () => {
@@ -639,12 +564,13 @@ const AptitudeQuiz = () => {
               </div>
             ) : (
               <Button
-                onClick={submit}
+                onClick={nextStandard}
                 className="bg-primary hover:bg-primary/90 text-white rounded-xl px-6"
               >
                 Next Question
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
+
             )}
           </div>
         </div>

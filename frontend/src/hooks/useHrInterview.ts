@@ -2,6 +2,7 @@ import { useAuth } from "@clerk/nextjs"
 import { api } from "@/lib/api-client"
 import { useHrStore } from "@/store/useHrStore"
 import { API_ROUTES } from "@/routes"
+import { Microphone } from "@/utils/Microphone"
 
 export function useHrInterview() {
   const { getToken } = useAuth()
@@ -9,17 +10,26 @@ export function useHrInterview() {
 
   // START SESSION
   const start = async () => {
-    store.isLoading = true
-    const token = await getToken()
+    if (store.sessionId) return
 
+    const mic = await Microphone.isSupported()
+    if (!mic.supported) {
+      store.setMicStatus(false, mic.reason)
+      return
+    }
+
+    store.setMicStatus(true)
+
+    const token = await getToken()
     const res = await api<HrSession>(API_ROUTES.HR.SESSION_START, {
       method: "POST",
       token,
       body: {},
     })
-    console.log(res)
+
     store.startSession(res.sessionId, res.questions)
   }
+
 
   // SUBMIT ANSWER
   const submitAnswer = async (
@@ -47,12 +57,18 @@ export function useHrInterview() {
   // COMPLETE SESSION
   const complete = async () => {
     const token = await getToken()
-    await api(API_ROUTES.HR.SESSION_COMPLETE, {
-      method: "POST",
-      token,
-      body: { sessionId: store.sessionId },
-    })
+    const report = await api<HrAiEvaluation>(
+      API_ROUTES.HR.SESSION_COMPLETE,
+      {
+        method: "POST",
+        token,
+        body: { sessionId: store.sessionId },
+      }
+    )
+
+    store.setFinalReport(report)
   }
+
 
   return {
     ...store,

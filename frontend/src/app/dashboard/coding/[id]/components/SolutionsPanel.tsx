@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@clerk/nextjs"
 import { api } from "@/lib/api-client"
 import { toast } from "sonner"
+import { API_ROUTES } from "@/routes";
 
 export default function SolutionsPanel({ problemId }: { problemId: string }) {
   console.log(problemId)
@@ -40,15 +41,7 @@ export default function SolutionsPanel({ problemId }: { problemId: string }) {
     try {
       const token = await getToken()
 
-      const res = await api<{
-        id: string
-        questionId: string
-        solution: string
-        explanation?: string
-        verdict: "accepted" | "rejected" | "needs_improvement"
-        upvotes: number
-        createdAt: string
-      }>("/coding/submissions", {
+      const res = await api(API_ROUTES.CODING.SUBMIT_SOLUTION, {
         method: "POST",
         token,
         body: {
@@ -57,19 +50,19 @@ export default function SolutionsPanel({ problemId }: { problemId: string }) {
           explanation: newSolution.explanation,
         },
       })
-      if (res.verdict === "accepted") {
-        addSolution({
-          id: res.id,
-          solution: res.solution,
-          explanation: res.explanation,
-          upvotes: res.upvotes,
-          createdAt: res.createdAt,
-        })
+      // if (res.verdict === "accepted") {
+      //   addSolution({
+      //     id: res.id,
+      //     solution: res.solution,
+      //     explanation: res.explanation,
+      //     upvotes: res.upvotes,
+      //     createdAt: res.createdAt,
+      //   })
 
-        toast.success("Solution accepted 🎉")
-      } else {
-        toast.message("Solution submitted for review")
-      }
+      toast.success("Solution submited.. Waiting for review..! 🎉")
+      // } else {
+      //   toast.message("Solution submitted for review")
+      // }
       setNewSolution({ solutionText: "", explanation: "" })
       setIsSubmitOpen(false)
 
@@ -156,10 +149,11 @@ export default function SolutionsPanel({ problemId }: { problemId: string }) {
             <div className="flex justify-between mb-2">
               <div>
                 <h4 className="font-semibold text-foreground">
-                  {solution.title}
+                  {solution.title || "Untitled"}
                 </h4>
                 <p className="text-xs text-muted-foreground">
-                  by {solution.author} • {solution.createdAt}
+                  by {solution.author} • {Intl.DateTimeFormat('en-US',
+                    { year: 'numeric', month: "2-digit", day: 'numeric' }).format(new Date(solution.createdAt))}
                 </p>
               </div>
 
@@ -178,12 +172,12 @@ export default function SolutionsPanel({ problemId }: { problemId: string }) {
                     solution.isLiked && "fill-current"
                   )}
                 />
-                {solution.likes}
+                {solution.upvotes}
               </button>
             </div>
 
             <pre className="bg-background/50 p-3 rounded-lg text-sm overflow-x-auto">
-              <code>{solution.code}</code>
+              <code>{solution.solution}</code>
             </pre>
 
             {solution.explanation && (

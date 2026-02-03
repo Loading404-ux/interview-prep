@@ -48,9 +48,12 @@ interface Solution {
   questionId: string
   solution: string;
   explanation: string | undefined;
-  aiFeedback: AiFeedback | undefined;
+  //aiFeedback: AiFeedback | undefined;
   upvotes: number;
   createdAt: Date;
+  title: string
+  isLiked: boolean
+  author: string
 }
 
 // interface CodingSolution {
@@ -179,7 +182,13 @@ interface HrFeedback {
   generatedPreferredAnswer: string
 }
 
-
+interface HrAiEvaluation {
+  avgClarity?: number;
+  avgStructure?: number;
+  avgConfidence?: number;
+  overallFeedback?: string;
+  evaluationVersion: string;
+}
 interface AptitudeQuestion {
   id: string
   text: string
@@ -197,6 +206,8 @@ interface AptitudeAnswerResult {
   correctAnswer: number
   explanation: string
 }
+type AptitudeSessionStatus = "IDLE" | "RUNNING" | "COMPLETED"
+type AptitudeMode = "RAPID" | "STANDARD"
 
 // types/activity.ts
 type ActivityType = "coding" | "hr" | "aptitude";

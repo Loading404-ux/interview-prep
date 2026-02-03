@@ -1,8 +1,14 @@
 import type { ClerkClient } from "@clerk/backend";
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { UserRepository } from "src/user/user.repository";
-import { JwtPayload } from "@clerk/backend/jwt"
+// import { JwtPayload } from "@clerk/backend/jwt"
 import { UserMapper } from "src/user/user.mapper"
+import type { JwtPayload } from "@clerk/types";
+
+// function handleJwt(payload: JwtPayload) {
+//   const userId = payload.sub;
+// }
+
 @Injectable()
 export class AuthService {
   constructor(

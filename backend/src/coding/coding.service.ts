@@ -254,8 +254,8 @@ export class CodingService {
         return { value: count };
     }
 
-    async getSubmissionsByQuestion(questionId: string) {
-        return (await this.submissionRepo.getSubmissionsByQuestionId(questionId)).map(CodingSubmissionMapper.toResponse);
+    async getSubmissionsByQuestion(questionId: string,userId: string) {
+        return (await this.submissionRepo.getSubmissionsByQuestionId(questionId,userId)).map(CodingSubmissionMapper.toResponse);
     }
 
 
@@ -280,7 +280,7 @@ export class CodingService {
             { questionId: string, parentId: string | null, userId: string }) {
         const data = await this.discussionRepo.getDiscussionsByQuestion(questionId, parentId, userId)
 
-        console.log(data.map(CodingDiscussionMapper.toResponse))
+        // console.log(data.map(CodingDiscussionMapper.toResponse))
         return data.map(CodingDiscussionMapper.toResponse);
     }
 

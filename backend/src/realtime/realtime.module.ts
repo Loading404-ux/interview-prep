@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { RealtimeGateway } from './realtime.gateway';
 import { RealtimeService } from './realtime.service';
 
+@Global()
 @Module({
   providers: [RealtimeGateway, RealtimeService]
 })
-export class RealtimeModule {}
+export class RealtimeModule { }

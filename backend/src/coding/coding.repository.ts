@@ -226,10 +226,60 @@ export class CodingSubmissionRepository {
     submitSolution(userId: Types.ObjectId, clerkUserId: string, data: CodingSubmissionDto) {
         return this.submissionModel.create({ ...data, userId, clerkUserId });
     }
-    getSubmissionsByQuestionId(questionId: string) {
-        return this.submissionModel
-            .find({ questionId: new Types.ObjectId(questionId) })
-            .sort({ createdAt: -1 }).limit(49);
+    getSubmissionsByQuestionId(questionId: string, userId) {
+        // return this.submissionModel
+        //     .find({ questionId: new Types.ObjectId(questionId) })
+        //     .sort({ createdAt: -1 }).limit(49);
+
+        return this.submissionModel.aggregate([
+            {
+                $match: {
+                    questionId: new Types.ObjectId(questionId)
+                },
+            },
+            {
+                $lookup: {
+                    from: "submissionvotes",
+                    let: { discussionId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$submissionId', '$$submissionId'] },
+                                        { $eq: ['$userId', new Types.ObjectId(userId)] },
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                    as: 'userVotes',
+                },
+            },
+            {
+                $addFields: {
+                    isLiked: { $gt: [{ $size: '$userVotes' }, 0] },
+                },
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'userId',
+                    foreignField: '_id',
+                    as: 'user',
+                },
+            },
+            { $unwind: '$user' },
+            {
+                $project: {
+                    userVotes: 0,
+                    'user._id': 0,
+                    'user.email': 0,
+                },
+            },
+            { $sort: { createdAt: -1 } },
+            { $limit: 49 },
+        ])
     }
 
     findSubmissionById(id: string) {
@@ -282,63 +332,63 @@ export class CodingDiscussionRepository {
         return this.discussionModel.create(data);
     }
 
-   getDiscussionsByQuestion(
-  questionId: string,
-  parentId: string | null,
-  userId: string,
-) {
-  return this.discussionModel.aggregate([
-    {
-      $match: {
-        questionId: new Types.ObjectId(questionId),
-        parentId: parentId ? new Types.ObjectId(parentId) : null,
-        isDeleted: false,
-      },
-    },
-    {
-      $lookup: {
-        from: "discussionvotes",
-        let: { discussionId: '$_id' },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ['$discussionId', '$$discussionId'] },
-                  { $eq: ['$userId', new Types.ObjectId(userId)] },
-                ],
-              },
+    getDiscussionsByQuestion(
+        questionId: string,
+        parentId: string | null,
+        userId: string,
+    ) {
+        return this.discussionModel.aggregate([
+            {
+                $match: {
+                    questionId: new Types.ObjectId(questionId),
+                    parentId: parentId ? new Types.ObjectId(parentId) : null,
+                    isDeleted: false,
+                },
             },
-          },
-        ],
-        as: 'userVotes',
-      },
-    },
-    {
-      $addFields: {
-        isLiked: { $gt: [{ $size: '$userVotes' }, 0] },
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'userId',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
-    { $unwind: '$user' },
-    {
-      $project: {
-        userVotes: 0,
-        'user._id': 0,
-        'user.email': 0,
-      },
-    },
-    { $sort: { createdAt: -1 } },
-    { $limit: 49 },
-  ]);
-}
+            {
+                $lookup: {
+                    from: "discussionvotes",
+                    let: { discussionId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$discussionId', '$$discussionId'] },
+                                        { $eq: ['$userId', new Types.ObjectId(userId)] },
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                    as: 'userVotes',
+                },
+            },
+            {
+                $addFields: {
+                    isLiked: { $gt: [{ $size: '$userVotes' }, 0] },
+                },
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'userId',
+                    foreignField: '_id',
+                    as: 'user',
+                },
+            },
+            { $unwind: '$user' },
+            {
+                $project: {
+                    userVotes: 0,
+                    'user._id': 0,
+                    'user.email': 0,
+                },
+            },
+            { $sort: { createdAt: -1 } },
+            { $limit: 49 },
+        ]);
+    }
 
 
 
