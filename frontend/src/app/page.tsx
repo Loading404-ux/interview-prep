@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ClerkProvider, useAuth, useSignIn, } from "@clerk/nextjs";
+import { ClerkProvider, SignInButton, useAuth, useSignIn, } from "@clerk/nextjs";
 import {
   Terminal,
   Fingerprint,
@@ -26,8 +26,8 @@ const REASONING_STEPS = [
 export default function LoginPage() {
   const { signIn, isLoaded } = useSignIn();
   const [mounted, setMounted] = useState(false);
-  const { isSignedIn, getToken, signOut } = useAuth()
-  const { setUser } = useUserStore()
+  const { isSignedIn } = useAuth()
+  // const { setUser } = useUserStore()
   const router = useRouter();
   useEffect(() => { setMounted(true) }, []);
   useEffect(() => {
@@ -151,8 +151,7 @@ export default function LoginPage() {
               <h2 className="text-2xl font-bold mb-2">KIIT Gateway</h2>
               <p className="text-muted-foreground text-sm">Step into the future of assessment</p>
             </div>
-
-            <button
+            <SignInButton children={<button
               onClick={handleGoogleLogin}
               className="group relative w-full flex items-center justify-center gap-4 bg-foreground text-background font-bold py-4 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50"
               disabled={isSignedIn}
@@ -165,7 +164,8 @@ export default function LoginPage() {
               </svg>}
               <span>Sign in with KIIT Mail</span>
               <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all " />
-            </button>
+            </button>} />
+
 
             {/* Policy Info Card */}
             <div className="mt-8 p-5 rounded-2xl bg-primary/5 border border-primary/10 flex gap-4 items-start animate-[slide-in_1.2s_ease-out]">

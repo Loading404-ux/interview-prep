@@ -71,11 +71,11 @@ export class HrService {
           'Either audio file or transcript must be provided',
         );
       }
-
+      console.log(input.audioFile)
       const result = await this.assemblyAiService.transcribe(
         input.audioFile.path,
       );
-
+      console.log(result)
       transcript = result.text;
       durationSeconds = result.durationSeconds;
 
@@ -126,7 +126,7 @@ export class HrService {
       referenceId: session._id,
     });
     await this.progressService.onHrSessionCompleted(session);
-    
+
     return finalReport;
   }
 

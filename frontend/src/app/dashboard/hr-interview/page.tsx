@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { Mic, Square, ArrowRight, MessageSquare, Lightbulb, CheckCircle2 } from "lucide-react";
+import { Mic, Square, ArrowRight, MessageSquare, Lightbulb, CheckCircle2, Loader2 } from "lucide-react";
 import { Microphone } from "@/utils/Microphone";
 import { useHrInterview } from "@/hooks/useHrInterview";
 import ShinyText from "@/components/ShinyText";
@@ -26,22 +26,26 @@ const HRInterview = () => {
     nextQuestion,
     micSupported,
     micError,
-    finalReport
-
+    finalReport,
+    setMicStatus,
+    // setFinalReport
   } = useHrInterview()
   const [state, setState] = useState<InterviewState>("idle");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [waveformBars] = useState(Array.from({ length: 40 }, () => Math.random()));
-  const [showFeedback, setShowFeedback] = useState(false);
+  // const [showFeedback, setShowFeedback] = useState(false);
   const [cardKey, setCardKey] = useState(0);
   const currentQuestion = questions[currentIndex]
-  const [disabled, setDisabled] = useState(true)
+  const [disabled, setDisabled] = useState(false)
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
-  const [micStatus, setMicStatus] = useState(true)
-  const mic = useRef<Microphone>(null)
+  const router = useRouter();
+  const [pending, startTransition] = useTransition()
+  const mic = useRef<Microphone>(null);
+
   if (!mic.current) {
     mic.current = new Microphone()
   }
+
   async function requestMicPermission() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -57,6 +61,86 @@ const HRInterview = () => {
   //   { label: "Structure", score: 65, color: "bg-hr" },
   //   { label: "Confidence", score: 72, color: "bg-aptitude" },
   // ];
+
+
+  const handleStartRecording = async () => {
+    // setState("waiting");
+    try {
+      await Promise.resolve(() => setTimeout(() => { }, 1000))
+      await mic.current?.startRecording();
+      setState("recording");
+      setCardKey(prev => prev + 1);
+    } catch (error: any) {
+      console.log(error.message)
+      toast('No microphone found')
+      setDisabled(true)
+    }
+  };
+
+  const handleStopRecording = async () => {
+    try {
+      setState("completed")
+      const blob = await mic.current?.stopRecording()
+      console.log(blob)
+
+      if (blob) {
+
+        // 🔊 Create audio element
+        // const audioUrl = URL.createObjectURL(blob)
+        // const audio = document.createElement("audio")
+
+        // audio.src = audioUrl
+        // audio.controls = true
+        // audio.autoplay = true
+
+        // // Optional but recommended
+        // audio.onended = () => {
+        //   URL.revokeObjectURL(audioUrl)
+        // }
+
+        // // 🧠 Attach to DOM (pick a container you control)
+        // const container = document.getElementById("audio-preview")
+        // if (container) {
+        //   container.innerHTML = "" // clear old audio
+        //   container.appendChild(audio)
+        // }
+        startTransition(async () => {
+           await submitAnswer(blob, currentQuestion.id)
+           
+          })
+        // setShowFeedback(true)
+      } else {
+        toast("No recording found")
+      }
+    } catch (error) {
+      console.log(error)
+      toast("No microphone found")
+      //setDisabled(true)
+    }
+  }
+
+  const handleNextQuestion = () => {
+    nextQuestion()
+    setState("idle")
+  };
+
+  const handleRestart = () => {
+    setCurrentQuestionIndex(0);
+    setState("idle");
+    // setShowFeedback(false);
+    setCardKey(prev => prev + 1);
+  };
+
+  useEffect(() => {
+    start()
+  }, [])
+
+  if (sessionStatus === "RUNNING") {
+    <div className="text-center text-sm text-muted-foreground">
+      Please Wait
+    </div>
+  }
+
   if (!micSupported) {
     return (
       <div className="text-center space-y-4">
@@ -152,57 +236,6 @@ const HRInterview = () => {
     )
   }
 
-  const handleStartRecording = async () => {
-    // setState("waiting");
-    try {
-      await Promise.resolve(() => setTimeout(() => { }, 1000))
-      await mic.current?.startRecording();
-      setState("recording");
-      setCardKey(prev => prev + 1);
-    } catch (error: any) {
-      console.log(error.message)
-      toast('No microphone found')
-      setDisabled(true)
-    }
-  };
-
-  const handleStopRecording = async () => {
-    try {
-      setState("completed")
-      const blob = await mic.current?.stopRecording()
-
-      if (blob) {
-        await submitAnswer(blob, currentQuestion.id)
-        setShowFeedback(true)
-      } else {
-        toast("No recording found")
-      }
-    } catch (error) {
-      toast("No microphone found")
-      setDisabled(true)
-    }
-  }
-
-  const handleNextQuestion = () => {
-    nextQuestion()
-    setState("idle")
-  };
-
-  const handleRestart = () => {
-    setCurrentQuestionIndex(0);
-    setState("idle");
-    setShowFeedback(false);
-    setCardKey(prev => prev + 1);
-  };
-  useEffect(() => {
-    start()
-  }, [])
-  if (sessionStatus === "RUNNING") {
-    <div className="text-center text-sm text-muted-foreground">
-      Please Wait
-    </div>
-  }
-  const router = useRouter()
   if (questions?.length === 0) {
     return (<>
       <Button variant={"secondary"} className="float-right" onClick={() => router.push("/dashboard/interview")}>
@@ -240,6 +273,7 @@ const HRInterview = () => {
               disabled={false} />
           </Button>
         </div>
+
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">
             Question {currentQuestionIndex + 1} of {questions.length}
@@ -271,7 +305,6 @@ const HRInterview = () => {
             </p>
           </div>
         </div>
-
         {/* Recording Section */}
         <div className="bg-card rounded-2xl border border-border/50 p-8">
           <div
@@ -339,136 +372,153 @@ const HRInterview = () => {
             {state === "completed" && (
               <div className="space-y-6 ">
                 {/* Success indicator */}
+                {pending ?
+                  <div className="grid place-items-center">
+                    <Loader2 className=" animate-spin" />
+                    <ShinyText text="✨Generating your feedback" speed={2}
+                      delay={0}
+                      color="#b5b5b5"
+                      shineColor="#5EEAD4"
+                      spread={120}
+                      direction="left"
+                      yoyo={false}
+                      pauseOnHover={false}
+                      disabled={false} />
 
-                <div className="grid grid-cols-2 gap-4 items-center">
-                  <div className="text-center animate-fade-up-stagger" style={{ animationDelay: "0ms" }}>
-                    <div className="w-26 h-26 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-3">
-                      <CheckCircle2 className="w-14 h-14 text-success" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Recording Complete
-                    </h3>
-                  </div>
-                  <div className="space-y-4 animate-fade-up-stagger" style={{ animationDelay: "50ms" }}>
-                    <h4 className="text-sm font-medium text-muted-foreground">Performance</h4>
-                    <div className="space-y-3">
-                      <div className="space-y-3">
-                        {/* {feedbackScores.map((item) => ( */}
-                        <div className="space-y-1.5">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-foreground">Clarity</span>
-                            <span className="font-semibold text-foreground">
-                              {feedback?.clarity}%
-                            </span>
-                          </div>
-                          <div className="h-2 rounded-full bg-muted overflow-hidden">
-                            <div
-                              className={cn(
-                                "h-full rounded-full transition-all duration-500",
-                                "bg-coding"
-                              )}
-                              style={{ width: `${feedback?.clarity}%` }}
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-1.5">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-foreground">Structure</span>
-                            <span className="font-semibold text-foreground">
-                              {feedback?.structure}%
-                            </span>
-                          </div>
-                          <div className="h-2 rounded-full bg-muted overflow-hidden">
-                            <div
-                              className={cn(
-                                "h-full rounded-full transition-all duration-500",
-                                "bg-coding"
-                              )}
-                              style={{ width: `${feedback?.structure}%` }}
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-1.5">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-foreground">Confidence</span>
-                            <span className="font-semibold text-foreground">
-                              {feedback?.confidence}%
-                            </span>
-                          </div>
-                          <div className="h-2 rounded-full bg-muted overflow-hidden">
-                            <div
-                              className={cn(
-                                "h-full rounded-full transition-all duration-500",
-                                "bg-coding"
-                              )}
-                              style={{ width: `${feedback?.confidence}%` }}
-                            />
-                          </div>
-                        </div>
-                        {/* ))} */}
-                      </div>
+                  </div> : <>
 
-                    </div>
-                  </div>
-                </div>
-                {/* Preferred Answer */}
-                {showFeedback && (
-                  <div className="p-4 rounded-xl bg-muted/30 border border-border animate-fade-up-stagger"
-                    style={{ animationDelay: "100ms" }}>
-                    <div className="flex items-start gap-3">
-                      <Lightbulb className="w-5 h-5 text-aptitude flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="text-sm font-medium text-foreground mb-2">
-                          Preferred Answer Approach
-                        </h4>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {currentQuestion.preferred_answer}
-                        </p>
+
+                    <div className="grid grid-cols-2 gap-4 items-center">
+                      <div className="text-center animate-fade-up-stagger" style={{ animationDelay: "0ms" }}>
+                        <div className="w-26 h-26 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-3">
+                          <CheckCircle2 className="w-14 h-14 text-success" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground">
+                          Recording Complete
+                        </h3>
+                      </div>
+                      <div className="space-y-4 animate-fade-up-stagger" style={{ animationDelay: "50ms" }}>
+                        <h4 className="text-sm font-medium text-muted-foreground">Performance</h4>
+                        <div className="space-y-3">
+                          <div className="space-y-3">
+                            {/* {feedbackScores.map((item) => ( */}
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-foreground">Clarity</span>
+                                <span className="font-semibold text-foreground">
+                                  {feedback?.clarity}%
+                                </span>
+                              </div>
+                              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                                <div
+                                  className={cn(
+                                    "h-full rounded-full transition-all duration-500",
+                                    "bg-coding"
+                                  )}
+                                  style={{ width: `${feedback?.clarity}%` }}
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-foreground">Structure</span>
+                                <span className="font-semibold text-foreground">
+                                  {feedback?.structure}%
+                                </span>
+                              </div>
+                              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                                <div
+                                  className={cn(
+                                    "h-full rounded-full transition-all duration-500",
+                                    "bg-coding"
+                                  )}
+                                  style={{ width: `${feedback?.structure}%` }}
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-foreground">Confidence</span>
+                                <span className="font-semibold text-foreground">
+                                  {feedback?.confidence}%
+                                </span>
+                              </div>
+                              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                                <div
+                                  className={cn(
+                                    "h-full rounded-full transition-all duration-500",
+                                    "bg-coding"
+                                  )}
+                                  style={{ width: `${feedback?.confidence}%` }}
+                                />
+                              </div>
+                            </div>
+                            {/* ))} */}
+                          </div>
+
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                {/* Improvement Tips */}
-                {feedback?.improvementTips && (
-                  <div className="rounded-2xl border border-border/50 p-6 bg-muted/30 animate-fade-up-stagger"
-                    style={{ animationDelay: "400ms" }}>
-                    <h3 className="font-semibold text-foreground mb-4">Improvement Tips</h3>
-                    <ul className="space-y-3">
-                      {feedback?.improvementTips.map((suggestion, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-3 text-sm text-foreground/80"
+                    {/* Preferred Answer */}
+                    {feedback && (
+                      <div className="p-4 rounded-xl bg-muted/30 border border-border animate-fade-up-stagger"
+                        style={{ animationDelay: "100ms" }}>
+                        <div className="flex items-start gap-3">
+                          <Lightbulb className="w-5 h-5 text-aptitude flex-shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="text-sm font-medium text-foreground mb-2">
+                              Preferred Answer Approach
+                            </h4>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {currentQuestion.preferred_answer}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {/* Improvement Tips */}
+                    {feedback?.improvementTips && (
+                      <div className="rounded-2xl border border-border/50 p-6 bg-muted/30 animate-fade-up-stagger"
+                        style={{ animationDelay: "400ms" }}>
+                        <h3 className="font-semibold text-foreground mb-4">Improvement Tips</h3>
+                        <ul className="space-y-3">
+                          {feedback?.improvementTips.map((suggestion, i) => (
+                            <li
+                              key={i}
+                              className="flex items-start gap-3 text-sm text-foreground/80"
+                            >
+                              <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 text-xs font-semibold">
+                                {i + 1}
+                              </span>
+                              {suggestion}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Next Question CTA */}
+                    <div className="flex justify-end gap-3 pt-2">
+                      {isLastQuestion ? (
+                        <Button onClick={handleRestart} variant="outline" className="rounded-xl">
+                          Start Over
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={handleNextQuestion}
+                          className="bg-hr hover:bg-hr/90 text-white rounded-xl px-6"
                         >
-                          <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 text-xs font-semibold">
-                            {i + 1}
-                          </span>
-                          {suggestion}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Next Question CTA */}
-                <div className="flex justify-end gap-3 pt-2">
-                  {isLastQuestion ? (
-                    <Button onClick={handleRestart} variant="outline" className="rounded-xl">
-                      Start Over
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={handleNextQuestion}
-                      className="bg-hr hover:bg-hr/90 text-white rounded-xl px-6"
-                    >
-                      Next Question
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  )}
-                </div>
+                          Next Question
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      )}
+                    </div>
+                  </>}
               </div>
             )}
           </div>
         </div>
+
       </div >
     </>
   );

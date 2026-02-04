@@ -240,7 +240,7 @@ export class CodingSubmissionRepository {
             {
                 $lookup: {
                     from: "submissionvotes",
-                    let: { discussionId: '$_id' },
+                    let: { submissionId: '$_id' },
                     pipeline: [
                         {
                             $match: {

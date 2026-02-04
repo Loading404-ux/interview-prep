@@ -15,6 +15,7 @@ export class AssemblyAiService {
   async transcribe(filePath: string): Promise<{ durationSeconds?: number, text: string }> {
     const transcript = await this.client.transcripts.transcribe({
       audio: filePath,
+      
       speech_models: ["universal"],
     });
 

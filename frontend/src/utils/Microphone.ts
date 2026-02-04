@@ -51,7 +51,7 @@ export class Microphone {
 
     const duration = Date.now() - this.startTime
     if (duration < 800) throw new Error("Recording too short")
-
+      
     return new Promise(resolve => {
       this.mediaRecorder!.onstop = () => {
         const blob = new Blob(this.audioChunks, {

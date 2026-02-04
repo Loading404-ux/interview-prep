@@ -8,18 +8,23 @@ import { useUserStore } from "@/store/user.store"
 import Background from "@/components/Background"
 import { Quantum } from 'ldrs/react'
 import 'ldrs/react/Quantum.css'
+import { useBootstrapAuth } from "@/hooks/useBootstrapAuth"
 
 // Default values shown
 
 export default function SsoCallback() {
-    const { isLoaded, isSignedIn, } = useAuth()
+    const { isLoaded, isSignedIn } = useAuth()
+    const { user } = useBootstrapAuth()
     const router = useRouter()
 
     useEffect(() => {
         if (!isLoaded) return
-        if (isSignedIn) router.replace("/dashboard")
-        //else router.replace("/")
-    }, [isLoaded, isSignedIn])
+        if (!isSignedIn) return
+        if (!user) return
+
+        router.replace("/dashboard")
+    }, [isLoaded, isSignedIn, user])  // ✅ user added
+
 
     return (
         <div className="w-full h-dvh flex items-center justify-center">
