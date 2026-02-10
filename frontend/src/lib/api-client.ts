@@ -1,13 +1,13 @@
 import { toast } from "sonner"
-import LoadingBar from "react-top-loading-bar"
+import LoadingBar, { useLoadingBar } from "react-top-loading-bar"
+// type LoadingBarProps = React.ComponentProps<typeof LoadingBar> | null
+// let loadingRef: LoadingBarProps = null
+// export const bindLoadingBar = (ref: any) => {
+//   loadingRef = ref
+// }
 
-let loadingRef: any = null
-export const bindLoadingBar = (ref: any) => {
-  loadingRef = ref
-}
-
-export const BASE_URL = process.env.NODE_ENV === "development" ? "http://localhost:8000/api" : "/api"
-// export const BASE_URL = "http://10.5.146.66:8000/api"
+// export const BASE_URL = process.env.NODE_ENV === "development" ? "http://localhost:8000/api" : "/api"
+export const BASE_URL = "http://10.5.146.66:8000/api"
 // export const BASE_URL = "/api"
 
 export async function api<T>(
@@ -19,9 +19,13 @@ export async function api<T>(
     isMultipart = false,
   }: ApiOptions = {}
 ): Promise<T> {
-  try {
-    loadingRef?.continuousStart()
 
+  // const { start, complete, } = useLoadingBar({
+  //   color: "blue",
+  //   height: 2,
+  // });
+  try {
+    // start()
     const headers: HeadersInit = {
       ...(token && { Authorization: `Bearer ${token}` }),
     }
@@ -45,7 +49,7 @@ export async function api<T>(
 
     if (!res.ok) {
       // toast("Request failed", data?.message || "Something went wrong")
-      console.log(res,data)
+      console.log(res, data)
       throw new Error(data?.message)
     }
 
@@ -55,6 +59,6 @@ export async function api<T>(
     toast(err.message ?? "Network error", err.message ?? "Server unreachable")
     throw err
   } finally {
-    loadingRef?.complete()
+    // complete()
   }
 }

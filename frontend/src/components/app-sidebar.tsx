@@ -21,7 +21,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { useUserStore } from "@/store/user.store";
 
 const data = [
   {
@@ -51,7 +50,7 @@ const data = [
   // },
 ];
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user } = useUserStore()
+  
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -75,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={{ name: user?.name!, email: user?.email!, avatar: user?.avatar! }} />
+        <NavUser/>
       </SidebarFooter>
     </Sidebar>
   )

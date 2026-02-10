@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-// import { MainLayout } from "@/components/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -28,7 +27,6 @@ const AptitudeQuiz = () => {
     results,
     sessionStatus,
   } = useAptitude()
-  console.log(questions)
   const [mode, setMode] = useState<Mode>("select")
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [timeRemaining, setTimeRemaining] = useState(180)
@@ -248,7 +246,7 @@ const AptitudeQuiz = () => {
           <div className="bg-card rounded-2xl border border-border/50 p-8 text-center relative">
             <Button onClick={restart} className="absolute bottom-4 right-4" variant="outline">
               <RotateCcw className="w-4 h-4 mr-2" />
-              Try Again
+              <span className="hidden md:inline">Try Again</span>
             </Button>
             <div className="inline-flex p-4 rounded-2xl bg-aptitude/10 mb-4">
               {percentage >= 60 ? (
