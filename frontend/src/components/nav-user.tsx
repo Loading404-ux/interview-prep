@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { useAuth } from "@clerk/nextjs"
-import { useTransition } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useBootstrapAuth } from "@/hooks/useBootstrapAuth"
 import { Skeleton } from "./ui/skeleton"
@@ -40,13 +40,11 @@ export function NavUser() {
   const { user, loading } = useBootstrapAuth()
   const { isMobile } = useSidebar()
   const { signOut } = useAuth()
-  const [pending, startTransaction] = useTransition()
   const route = useRouter()
-  async function Logout() {
-    startTransaction(async () => {
-      await signOut()
-      route.push("/")
-    })
+  const [pending, setPending] = useState(false)
+   function Logout() {
+    setPending(true)
+    signOut()
   }
   return (
     <SidebarMenu>
@@ -126,7 +124,7 @@ export function NavUser() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => Logout()} disabled={pending}>
-              {loading ? <Loader2Icon className="animate-spin" /> : <LogOut />}
+              {pending ? <Loader2Icon className="animate-spin" /> : <LogOut />}
               <span >Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

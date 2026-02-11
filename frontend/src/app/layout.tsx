@@ -36,7 +36,23 @@ export default function RootLayout({
       <body
         className={`${quicksand.variable} ${cascadiaCode.variable}  antialiased`}
       >
-        <ClerkProvider>
+        <ClerkProvider
+          // signInFallbackRedirectUrl="/dashboard"
+          // signUpFallbackRedirectUrl="/dashboard"
+          // afterSignOutUrl="/"
+          // allowedRedirectOrigins={[
+          //   'http://10.5.146.66:3000',
+          //   'http://localhost:3000'
+          // ]}
+          // taskUrls={{
+          //   'choose-organization': '/dashboard',
+          //   'reset-password': '/dashboard'
+          // }}
+
+        // signInForceRedirectUrl="/dashboard"
+        // signUpForceRedirectUrl="/dashboard"
+
+        >
           <Toaster theme="dark" position="bottom-right" />
           {children}
         </ClerkProvider>

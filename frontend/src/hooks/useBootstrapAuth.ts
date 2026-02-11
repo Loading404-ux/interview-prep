@@ -12,12 +12,12 @@ export function useBootstrapAuth() {
   const { user, setUser, bootstrapped, markBootstrapped } = useUserStore()
   const [loading, setLoading] = useState(true)
 
-  console.log("AUTH STATE", {
-    isLoaded,
-    isSignedIn,
-    clerkUser: !!clerkUser,
-    bootstrapped,
-  })
+  // console.log("AUTH STATE", {
+  //   isLoaded,
+  //   isSignedIn,
+  //   clerkUser: !!clerkUser,
+  //   bootstrapped,
+  // })
 
   useEffect(() => {
     if (!isLoaded) return

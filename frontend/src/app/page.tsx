@@ -11,6 +11,8 @@ import {
   Info,
   LoaderCircleIcon
 } from 'lucide-react';
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 
 const REASONING_STEPS = [
@@ -23,13 +25,13 @@ export default function LoginPage() {
   const { isLoaded } = useSignIn();
   // const [mounted, setMounted] = useState(false);
   const { isSignedIn } = useAuth()
-  // const router = useRouter();
-  // useEffect(() => { setMounted(true) }, []);
-  // useEffect(() => {
-  //   if (isLoaded && isSignedIn) {
-  //     router.push("/dashboard");
-  //   }
-  // }, [isSignedIn])
+  const router = useRouter();
+  // // useEffect(() => { setMounted(true) }, []);
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.push("/dashboard");
+    }
+  }, [isSignedIn])
 
   // if (!mounted) return null;
 
@@ -115,11 +117,11 @@ export default function LoginPage() {
               <h2 className="text-2xl font-bold mb-2">KIIT Gateway</h2>
               <p className="text-muted-foreground text-sm">Step into the future of assessment</p>
             </div>
-            <SignInButton withSignUp signUpForceRedirectUrl="/dashboard" children={
+            <SignInButton>
               <button
                 // onClick={handleGoogleLogin}
                 className="group relative w-full flex items-center justify-center gap-4 bg-foreground text-background font-bold py-4 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50"
-                disabled={isSignedIn}
+                disabled={isSignedIn || !isLoaded}
               >
                 {!isLoaded ? <LoaderCircleIcon className='animate-spin' /> : <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="currentColor" />
@@ -129,7 +131,8 @@ export default function LoginPage() {
                 </svg>}
                 <span>Sign in with KIIT Mail</span>
                 <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all " />
-              </button>} />
+              </button>
+            </SignInButton>
 
 
             {/* Policy Info Card */}
