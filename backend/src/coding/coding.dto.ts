@@ -72,3 +72,13 @@ export class DiscussionVoteDto {
   @IsMongoId()
   discussionId: string;
 }
+
+export class DiscussionReplyDto {
+  @IsMongoId()
+  @IsOptional()
+  parentId: string;
+  
+  @IsMongoId()
+  questionId: string;
+}
+

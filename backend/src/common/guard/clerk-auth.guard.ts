@@ -6,8 +6,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import type { ClerkClient } from '@clerk/backend';
-import { verifyToken } from '@clerk/backend';
-import { UserRepository } from 'src/user/user.repository';
+import { verifyToken, } from '@clerk/backend';
 import { AuthService } from 'src/auth/auth.service';
 
 
@@ -22,19 +21,21 @@ export class ClerkAuthGuard implements CanActivate {
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const req = ctx.switchToHttp().getRequest();
 
-    const authHeader = req.headers.authorization;
-    console.log("Bearer ",authHeader ? "yes" : "no");
+    const authHeader = req.headers.authorization as string | undefined;
     if (!authHeader) {
       throw new UnauthorizedException('Missing Authorization header');
     }
+    console.log("Token is here. NO PROBLEM");
 
     const token = authHeader.replace('Bearer ', '');
 
     const payload = await verifyToken(token, {
       secretKey: process.env.CLERK_SECRET_KEY!,
     });
-
-    req.user = req.user = await this.authService.getOrCreateUserFromToken(payload.sub); //Entire UserSchema
+    if (!payload) {
+      throw new UnauthorizedException('Invalid token');
+    }
+    req.user = req.user = await this.authService.getOrCreateUserFromToken(payload.sub);
     return true;
   }
 }

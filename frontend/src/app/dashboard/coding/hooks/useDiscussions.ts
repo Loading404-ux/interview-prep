@@ -4,6 +4,18 @@ import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { api } from "@/lib/api-client";
 import { useDiscussionsStore } from "@/store/discussions.store";
+import { API_ROUTES } from "@/routes";
+
+export async function loadDiscussions({ problemId, parentId, token }: { problemId: string; parentId?: string, token: string | null }) {
+    const query = new URLSearchParams({
+        problemId,
+        ...(parentId && { parentId }),
+    }).toString()
+    return await api<Discussion[]>(API_ROUTES.CODING.DISCUSSIONS(query), {
+        token
+    });
+}
+
 // const initialDiscussions: Discussion[] = [
 //     {
 //         id: 1,
@@ -62,7 +74,7 @@ import { useDiscussionsStore } from "@/store/discussions.store";
 //         // showReplies: false,
 //     },
 // ];
-export function useDiscussions(problemId: string) {
+export function useDiscussions(problemId: string, parentId?: string) {
     const { getToken } = useAuth();
     const store = useDiscussionsStore();
 
@@ -72,9 +84,8 @@ export function useDiscussions(problemId: string) {
         async function load() {
             store.setLoading(true);
             const token = await getToken();
-            const data = await api<Discussion[]>(`/coding/questions/${problemId}/discussions`, {
-                token,
-            });
+
+            const data = await loadDiscussions({ problemId, parentId, token })
             console.log(data)
             if (mounted) store.setDiscussions(data);
         }

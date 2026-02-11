@@ -8,11 +8,8 @@ export class UserMapper {
             email: data.email,
             name: data.name,
             clerkUserId: data.clerkUserId,
-            college: data.university,
             avatar: data.profilePic,
-            targetCompanies: data.targetCompanies,
             id: data._id,
-            joinedDate: new Date(data.createdAt!).toDateString()
         }
     }
 }

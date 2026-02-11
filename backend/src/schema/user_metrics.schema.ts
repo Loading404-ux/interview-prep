@@ -28,7 +28,6 @@ export class HrMetrics {
 
 @Schema({ _id: false })
 export class AptitudeMetrics {
-
   @Prop({ default: 0, min: 0, max: 100 })
   accuracy: number;
 
@@ -38,7 +37,6 @@ export class AptitudeMetrics {
 
 @Schema({ _id: false })
 export class StreakMetrics {
-
   @Prop({ default: 0, min: 0 })
   current: number;
 
@@ -80,6 +78,9 @@ export class UserMetrics extends Document {
 
   @Prop({ type: StreakMetricsSchema, default: {} })
   streak: StreakMetrics;
+
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
 }
 
 

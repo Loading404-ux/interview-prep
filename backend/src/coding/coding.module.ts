@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CodingController } from './coding.controller';
 import { CodingService } from './coding.service';
-import { CodingRepository } from './coding.repository';
+import { CodingDiscussionRepository, CodingQuestionRepository,CodingSubmissionRepository } from './coding.repository';
 import { DatabaseModule } from 'src/database/database.module';
 import { ClerkProvider } from 'src/common/providers/clerk.provider';
 import { Schemas } from 'src/schema';
@@ -25,6 +25,6 @@ import { UserModule } from 'src/user/user.module';
     ActivityModule
   ],
   controllers: [CodingController],
-  providers: [CodingService, CodingRepository]
+  providers: [CodingService, CodingSubmissionRepository, CodingQuestionRepository, CodingDiscussionRepository]
 })
 export class CodingModule { }

@@ -1,6 +1,13 @@
 import type { ClerkClient } from "@clerk/backend";
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { UserRepository } from "src/user/user.repository";
+// import { JwtPayload } from "@clerk/backend/jwt"
+import { UserMapper } from "src/user/user.mapper"
+import type { JwtPayload } from "@clerk/types";
+
+// function handleJwt(payload: JwtPayload) {
+//   const userId = payload.sub;
+// }
 
 @Injectable()
 export class AuthService {
@@ -10,19 +17,25 @@ export class AuthService {
     private readonly clerkClient: ClerkClient,
   ) { }
 
-  async getOrCreateUserFromToken(sub: string) {
-    let user = await this.userRepo.findByClerkUserId(sub);
-    if (user) return user;
-
+  async getOrCreateUserFromToken(sub: NonNullable<JwtPayload['sub']>) {
     const clerk = await this.clerkClient.users.getUser(sub);
-    const email = clerk.emailAddresses[0].emailAddress.split("@")[1];
-    console.log(email)
+    let user = await this.userRepo.findByClerkUserId(sub);
+    console.log("user ",user)
+    console.log("clerk ",clerk)
+
+    
+    if (!user) {
+      user = await this.userRepo.createUser({
+        clerkUserId: sub,
+        email: clerk.emailAddresses[0].emailAddress,
+        name: `${clerk.firstName ?? ''} ${clerk.lastName ?? ''}`.trim(),
+        profilePic: clerk.imageUrl,
+      });
+      const email = clerk.emailAddresses[0].emailAddress.split("@")[1];
+      console.log(email)
+    }
+
     // if (email !== "@kiit.ac.in") throw new UnauthorizedException('This is only for KIIT students!');
-    return this.userRepo.createUser({
-      clerkUserId: sub,
-      email: clerk.emailAddresses[0].emailAddress,
-      name: `${clerk.firstName ?? ''} ${clerk.lastName ?? ''}`.trim(),
-      profilePic: clerk.imageUrl,
-    });
+    return UserMapper.UserResponse(user);
   }
 }

@@ -1,9 +1,14 @@
-import { IsMongoId, IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsMongoId, IsEnum, IsNumber, IsString, IsOptional } from 'class-validator';
+import { AptitudeSessionType } from 'src/schema/aptitude-session.schema';
 
 export class StartAptitudeSessionDto {
-    @IsEnum(['RAPID', 'STANDARD'])
+    @IsEnum(AptitudeSessionType)
     @IsString()
     mode: 'RAPID' | 'STANDARD';
+
+    @IsNumber()
+    @IsOptional()
+    onOfquestions?: number;
 }
 
 export class SubmitAptitudeAnswerDto {

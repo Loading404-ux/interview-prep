@@ -12,12 +12,12 @@ type Filters = {
 };
 
 interface ProblemsState {
-    problems: Problem[];
-    filtered: Problem[];
+    problems: CodingProblem[];
+    filtered: CodingProblem[];
     filters: Filters;
     isLoading: boolean;
 
-    setProblems: (p: Problem[]) => void;
+    setProblems: (p: CodingProblem[]) => void;
     setFilters: (f: Partial<Filters>) => void;
     applyFilters: () => void;
     setLoading: (v: boolean) => void;

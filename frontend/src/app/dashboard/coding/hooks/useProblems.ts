@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { api } from "@/lib/api-client";
 import { useProblemsStore } from "@/store/problems.store";
+import { API_ROUTES } from "@/routes";
 const problems: CodingProblem[] = [
     { id: " 1", title: "Two Sum", difficulty: "Easy", topics: ["Array", "Hash Table"], company: "Google" },
     { id: " 2", title: "Add Two Numbers", difficulty: "Medium", topics: ["Linked List", "Math"], company: "Amazon" },
@@ -31,9 +32,9 @@ export function useProblems() {
         async function load() {
             store.setLoading(true)
             const token = await getToken()
-            const data = await api<CodingProblem[]>("/coding/questions", { token })
+            const data = await api<CodingProblem[]>(API_ROUTES.CODING.QUESTIONS, { token })
 
-            if (mounted) store.setProblems(data?.length > 0 ? data : problems)
+            if (mounted) store.setProblems(data)
         }
 
         if (store.problems.length === 0) load()

@@ -9,3 +9,11 @@ export class HrMapper {
     };
   }
 }
+
+// export class CompleteHrSessionMapper  {
+//   static (q: HrQuestion) {
+//     return {
+      
+//     };
+//   }
+// }

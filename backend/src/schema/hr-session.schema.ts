@@ -23,11 +23,11 @@ class AiResult {
 
 @Schema({ _id: false })
 export class HrQuestionResponse {
-  @Prop({ type: Types.ObjectId, ref: 'HrQuestion', required: true })
+  @Prop({ type: Types.ObjectId, ref: HrQuestion.name, required: true })
   questionId: Types.ObjectId;
 
   @Prop()
-  transcript?: string;
+  transcript: string;
 
   @Prop({ default: 1 })
   attempt: number;
@@ -43,6 +43,7 @@ export class HrQuestionResponse {
 export const HrQuestionResponseSchema =
   SchemaFactory.createForClass(HrQuestionResponse);
 
+//NOTE: WEHEN A SESSION COMPLETE ADDED THIS...
 @Schema({ _id: false })
 export class HrAiEvaluation {
   @Prop({ min: 0, max: 100 })
@@ -64,6 +65,13 @@ export class HrAiEvaluation {
 export const HrAiEvaluationSchema =
   SchemaFactory.createForClass(HrAiEvaluation);
 
+export enum HrSessionStatus {
+  STARTED = 'STARTED',
+  COMPLETED = 'COMPLETED',
+  AI_PENDING = 'AI_PENDING',
+  AI_DONE = 'AI_DONE',
+  AI_FAILED = 'AI_FAILED',
+}
 
 @Schema({ timestamps: true })
 export class HrSession extends Document {
@@ -88,7 +96,7 @@ export class HrSession extends Document {
   aiEvaluation?: HrAiEvaluation;
 
   @Prop({
-    enum: ['STARTED', 'COMPLETED', 'AI_PENDING', 'AI_DONE', 'AI_FAILED'],
+    enum: HrSessionStatus,
     default: 'STARTED',
     index: true,
   })

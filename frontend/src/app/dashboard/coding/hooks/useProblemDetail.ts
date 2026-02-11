@@ -5,6 +5,7 @@ import { useAuth } from "@clerk/nextjs";
 import { api } from "@/lib/api-client";
 import { useProblemDetailStore } from "@/store/problem-detail.store";
 import { notFound } from "next/navigation";
+import { API_ROUTES } from "@/routes";
 // const problemsData: CodingProblemDetail[] = [
 //   {
 //     id: "1",
@@ -206,8 +207,9 @@ export function useProblemDetail(id: string) {
     async function load() {
       store.setLoading(true)
       const token = await getToken()
+
       const data = await api<CodingProblemDetail>(
-        `/coding/questions/${id}`,
+        API_ROUTES.CODING.QUESTION_DETAILS(id),
         { token }
       )
       if (mounted) store.setProblem(data)

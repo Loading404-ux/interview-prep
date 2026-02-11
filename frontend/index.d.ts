@@ -25,6 +25,9 @@ interface CodingProblem {
 interface CodingProblemDetail {
   id: string
   title: string
+  difficulty: string;
+  topics: string[];
+  company?: string
   problem: string
   hint: string
   examples: { input: any; output: any }[]
@@ -32,16 +35,34 @@ interface CodingProblemDetail {
     time_complexity: string
     space_complexity: string
   }
-  topics: string[]
+  isPremium?: boolean;
+}
+interface AiFeedback {
+  clarityScore?: number;
+  correctnessScore?: number;
+  suggestions?: string;
 }
 
-interface CodingSolution {
-  id: string
-  solution: string
-  explanation?: string
-  upvotes: number
-  createdAt: string
+interface Solution {
+  id: string;
+  questionId: string
+  solution: string;
+  explanation: string | undefined;
+  //aiFeedback: AiFeedback | undefined;
+  upvotes: number;
+  createdAt: Date;
+  title: string
+  isLiked: boolean
+  author: string
 }
+
+// interface CodingSolution {
+//   id: string
+//   solution: string
+//   explanation?: string
+//   upvotes: number
+//   createdAt: string
+// }
 
 
 interface Discussion {
@@ -51,6 +72,12 @@ interface Discussion {
   upvotes: number
   replyCount: number
   createdAt: string
+  author: string
+
+  parentId?: string | null
+  isLiked: boolean
+  replies?: Reply[] | null
+  showReplies: boolean // default false
 }
 
 interface Reply {
@@ -58,17 +85,24 @@ interface Reply {
   content: string
   upvotes: number
   createdAt: string
+  author: string
 }
 
-interface DashboardProfile {
+interface Auth {
   id: string
   name: string
   email: string
-  university?: string
   avatar?: string
+  // university?: string
+  // targetCompanies: string[]
+  // memberSince: string
+}
+interface Profile extends Auth {
+  university?: string
   targetCompanies: string[]
   memberSince: string
 }
+
 
 interface CodingProgress {
   totalSubmissions: number
@@ -91,7 +125,7 @@ interface StreakProgress {
   longest: number
 }
 
-interface DashboardProgress {
+interface DashboardProgressCards {
   coding: CodingProgress
   hr: HrProgress
   aptitude: AptitudeProgress
@@ -108,12 +142,24 @@ interface Achievement {
   unlockedAt: string
 }
 
+interface UserProfileResponse {
+  profile: Profile;
+  achievements: Achievement[];
+  contributions: Contribution[];
+  progressCards: {
+    codingSolved: number;
+    hrSessions: number;
+    aptitudeAttempts: number;
+  }
+  targets: string[]
+}
+
 interface DashboardResponse {
-  profile: DashboardProfile
-  progress: DashboardProgress
-  streak: StreakProgress
-  contributions: Contribution[]
-  achievements: Achievement[]
+  //profile: DashboardProfile
+  progressCards: DashboardProgressCards
+  streak?: StreakProgress
+  streakCalender: Contribution[]
+  //achievements: Achievement[]
 }
 
 
@@ -136,7 +182,13 @@ interface HrFeedback {
   generatedPreferredAnswer: string
 }
 
-
+interface HrAiEvaluation {
+  avgClarity?: number;
+  avgStructure?: number;
+  avgConfidence?: number;
+  overallFeedback?: string;
+  evaluationVersion: string;
+}
 interface AptitudeQuestion {
   id: string
   text: string
@@ -154,6 +206,8 @@ interface AptitudeAnswerResult {
   correctAnswer: number
   explanation: string
 }
+type AptitudeSessionStatus = "IDLE" | "RUNNING" | "COMPLETED"
+type AptitudeMode = "RAPID" | "STANDARD"
 
 // types/activity.ts
 type ActivityType = "coding" | "hr" | "aptitude";
@@ -166,7 +220,7 @@ interface ActivityDTO {
   createdAt: string; // ISO string from backend
   result?: string;
 }
- interface UserProfile {
+interface UserProfile {
   id: string
   name: string
   email: string
@@ -175,13 +229,13 @@ interface ActivityDTO {
   joinedAt: string
 }
 
- interface UserMetrics {
+interface UserMetrics {
   coding: { solved: number; total: number }
   hr: { completed: number; total: number }
   aptitude: { completed: number; total: number }
 }
 
- interface ContributionDay {
+interface ContributionDay {
   date: string
   count: number
 }

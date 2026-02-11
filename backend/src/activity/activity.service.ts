@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
-import { ActivityLog } from 'src/schema/activity-log.schema';
+import { ActivityLog, ActivityLogType } from 'src/schema/activity-log.schema';
 import { ActivityRepository } from './activity.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserMetrics } from 'src/schema/user_metrics.schema';
@@ -10,16 +10,16 @@ import { ActivityHistoryDto, ContributionDayDto } from './activity.dto';
 export class ActivityService {
   constructor(
     private readonly repo: ActivityRepository,
-    @InjectModel(UserMetrics.name)
-    private readonly metricsModel: Model<UserMetrics>,
-  ) {}
+    //@InjectModel(UserMetrics.name)
+    //private readonly metricsModel: Model<UserMetrics>,
+  ) { }
 
   /* ---------- WRITE ---------- */
 
   async record(event: {
     userId: Types.ObjectId;
     clerkUserId: string;
-    eventType: 'CODING_SUBMIT' | 'CODING_APPROVED' | 'HR_SESSION_COMPLETE' | 'APTITUDE_ATTEMPT';
+    eventType: ActivityLogType;
     referenceId?: Types.ObjectId;
     metadata?: Record<string, any>;
   }) {
@@ -60,13 +60,26 @@ export class ActivityService {
       contributionCount: d.contributionCount,
     }));
   }
+  async getStreakCalendar(
+    clerkUserId: string,
+    days = 90,
+  ): Promise<{ date: string; active: boolean }[]> {
+    const from = new Date();
+    from.setDate(from.getDate() - days);
 
-  /* ---------- READ: STREAK ---------- */
+    const daily = await this.repo.getDailyActivities(
+      clerkUserId,
+      from.toISOString().split('T')[0],
+    );
 
-  async getStreak(clerkUserId: string) {
-    const metrics = await this.metricsModel.findOne({ clerkUserId });
-    return metrics?.streak ?? { current: 0, longest: 0 };
+    return daily.map(d => ({
+      date: d.date,
+      active: d.didCoding || d.didHr || d.didAptitude,
+    }));
   }
+
+  //NOTE: FOR GET THE DAILY HR,APTITUDE DETAILS FOR DAILY SHOWING INPROFILE PROGRESS
+  async dailyProfileProcess() { }
 
   /* ---------- HELPERS ---------- */
 

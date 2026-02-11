@@ -3,6 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { User } from "src/schema/user.schema";
 import { CreateUser } from "./user.dto";
+import { UserAchievement } from "src/schema/user_achievements.schema";
 
 @Injectable()
 export class UserRepository {
@@ -25,4 +26,15 @@ export class UserRepository {
         return this.userModel.updateOne({ _id: userId }, data);
     }
 
+}
+
+@Injectable()
+export class UserAchievementRepository {
+    constructor(@InjectModel(UserAchievement.name) private userModel: Model<UserAchievement>) { }
+}
+
+
+@Injectable()
+export class UserMatrixRepository {
+    constructor(@InjectModel(UserAchievement.name) private userModel: Model<UserAchievement>) { }
 }

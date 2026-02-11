@@ -13,34 +13,56 @@ export class UserController {
 
     constructor(private readonly service: UserService, private readonly progressService: UserProgressService) { }
 
-    @Get('profile')
-    async getUserProfile(@Req() req: any) {
-        return this.service.getUser(req.user._id);
+    @Post('profile')
+    async verifyUser(@Req() req: any) {
+        return this.service.getUser(req.user.id);
     }
-    @Get("me/metrics")
-    async getMyMetrics(@Req() req) {
-        const metrics = await this.progressService.findOrCreate(req.user._id)
-        return UserMetricsMapper.toDashboard(metrics)
+
+    @Get('dashboard/cards')
+    async dashboardCard(@Req() req: any) {
+        return this.progressService.getProgressOverview(req.user.id);
     }
-    @Get('me/progress')
-    getMyProgress(@Req() req: any) {
-        return this.progressService.getProgressOverview(req.user._id);
+
+    @Get('dashboard/streak')
+    async getStreak(@Req() req: any) {
+        return this.progressService.getStreak(req.user.id);
     }
-    @Get('me/dashboard')
-    async getDashboard(@Req() req: any) {
-        return this.service.getDashboard(req.user);
+
+    @Get('me/profile')
+    getAchievements(@Req() req: any) {
+        return this.service.getProfile(req.user.id, req.user.clerkUserId);
     }
+    // @Get('me/targets')
+    // getTargets(@Req() req: any) {
+    //     return this.service.getTagets(req.user.id);
+    // }
+    @Get('me/contributions')
+    getContributions(@Req() req: any) {
+        return this.service.getContributionCalendar(req.user.clerkUserId);
+    }
+    @Get('dashboard/streak-calendar')
+    getStreakCalendar(@Req() req: any) {
+        return this.service.getStreakCalendar(req.user.clerkUserId, 90);
+    }
+    // @Get('me/progress-card') //NOTE: GETTING THE PROGRESS CARDS IN FROFILE
+    // getProgressCardsReport(@Req() req: any) {
+    //     return this.progressService.getProgressOverview(req.user.id);
+    // }
+
+    // @Get('me/profile')
+    // async getDashboard(@Req() req: any) {
+    //     return this.service.getDashboard(req.user);
+    // }
+
     @Patch('me/profile')
     updateProfile(@Req() req: any, @Body() dto: UpdateProfileDto) {
-        return this.service.updateProfile(req.user._id, dto);
+        return this.service.updateProfile(req.user.id, dto);
     }
+
     @Patch('me/targets')
     updateTargets(@Req() req: any, @Body() dto: UpdateTargetsDto) {
-        return this.service.updateTargets(req.user._id, dto.targetCompanies);
+        return this.service.updateTargets(req.user.id, dto.targetCompanies);
     }
-    @Get('me/achievements')
-    getAchievements(@Req() req: any) {
-        return this.service.getAchievements(req.user._id);
-    }
+
 
 }

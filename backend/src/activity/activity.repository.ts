@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { ActivityLog } from "src/schema/activity-log.schema";
+import { ActivityLog, ActivityLogType } from "src/schema/activity-log.schema";
 import { DailyActivity } from "src/schema/daily-activity.schema";
 
 @Injectable()
@@ -13,47 +13,51 @@ export class ActivityRepository {
     private readonly dailyModel: Model<DailyActivity>,
   ) { }
 
-  async logAndAggregate({
-    clerkUserId,
+ async logAndAggregate({
+  clerkUserId,
+  userId,
+  eventType,
+  referenceId,
+  metadata,
+}: {
+  clerkUserId: string;
+  userId: Types.ObjectId;
+  eventType: ActivityLogType;
+  referenceId?: Types.ObjectId;
+  metadata?: Record<string, any>;
+}) {
+  const date = new Date().toISOString().split('T')[0];
+
+  const update: any = {};
+
+  // 🔥 Contribution = ONLY accepted coding
+  if (eventType === ActivityLogType.CODING_ACCEPTED) {
+    update.$inc = { contributionCount: 1 };
+  }
+
+  // 🔥 Streak = ANY activity
+  update.$set = {
+    ...(eventType.startsWith('CODING') && { didCoding: true }),
+    ...(eventType.startsWith('HR') && { didHr: true }),
+    ...(eventType.startsWith('APTITUDE') && { didAptitude: true }),
+  };
+
+  await this.logModel.create({
     userId,
+    clerkUserId,
     eventType,
     referenceId,
     metadata,
-  }: {
-    clerkUserId: string;
-    userId: Types.ObjectId;
-    eventType: string;
-    referenceId?: Types.ObjectId;
-    metadata?: Record<string, any>;
-  }) {
-    const date = new Date().toISOString().split('T')[0];
+  });
 
-    const typeMap = {
-      CODING_SUBMIT: 'didCoding',
-      HR_SESSION_COMPLETE: 'didHr',
-      CODING_APPROVED: 'didCoding',
-      APTITUDE_ATTEMPT: 'didAptitude',
-    } as const;
+  await this.dailyModel.updateOne(
+    { clerkUserId, date },
+    update,
+    { upsert: true },
+  );
+}
 
-    const flag = typeMap[eventType];
 
-    await this.logModel.create({
-      userId,
-      clerkUserId,
-      eventType,
-      referenceId,
-      metadata,
-    });
-
-    await this.dailyModel.updateOne(
-      { clerkUserId, date },
-      {
-        $inc: { contributionCount: 1 },
-        $set: { [flag]: true },
-      },
-      { upsert: true },
-    );
-  }
 
   getRecentActivities(clerkUserId: string, limit = 20) {
     return this.logModel

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -14,6 +14,9 @@ import { AptitudeModule } from './aptitude/aptitude.module';
 import { InterviewModule } from './interview/interview.module';
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
+import { RealtimeModule } from './realtime/realtime.module';
+import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -36,8 +39,13 @@ import { join } from "path";
     AiModule,
     AptitudeModule,
     InterviewModule,
+    RealtimeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+  }
+}

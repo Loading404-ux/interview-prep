@@ -15,8 +15,9 @@ export class HrController {
   constructor(private readonly hrService: HrService) { }
 
   @Post('session/start')
-  startSession(@Req() req) {
-    return this.hrService.startSession({ userId: req.user._id, clerkUserId: req.user.clerkUserId });
+  startSession(@Req() req: any) {
+
+    return this.hrService.startSession({ userId: req.user.id, clerkUserId: req.user.clerkUserId });
   }
 
   @Post('answer/submit')
@@ -27,7 +28,7 @@ export class HrController {
         console.log(file);
         const unique =
           Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, `${unique}${extname(file.originalname)}.webm`);
+        cb(null, `${unique}${extname(file.originalname)}`);
       },
     }),
   }))
@@ -43,9 +44,9 @@ export class HrController {
     });
   }
 
-
   @Post('session/complete')
   completeSession(@Body() dto: CompleteSessionDto) {
+    //HrAiEvaluation
     return this.hrService.completeSession(dto);
   }
 }

@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GenerativeModel, GoogleGenerativeAI } from "@google/generative-ai";
 
 @Injectable()
 export class GeminiService {
-  private model;
+  private model: GenerativeModel;
   private lastCall = 0;
 
   constructor(private readonly config: ConfigService) {

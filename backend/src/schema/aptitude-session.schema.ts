@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { User } from "./user.schema";
-import { Types ,Document} from "mongoose";
+import { Types, Document } from "mongoose";
+
+
+export enum AptitudeSessionType { RAPID = 'RAPID', STANDARD = 'STANDARD' }
 
 @Schema({ timestamps: true })
 export class AptitudeSession extends Document {
@@ -10,7 +13,7 @@ export class AptitudeSession extends Document {
   @Prop({ required: true })
   clerkUserId: string;
 
-  @Prop({ enum: ['RAPID', 'STANDARD'], required: true })
+  @Prop({ enum: AptitudeSessionType, required: true })
   mode: string;
 
   @Prop({ default: 0 })
@@ -19,8 +22,8 @@ export class AptitudeSession extends Document {
   @Prop({ default: 0 })
   correctCount: number;
 
-  @Prop({ default: 0 })
-  wrongCount: number;
+  // @Prop({ default: 0 })
+  // wrongCount: number;
 
   @Prop({ default: 0 })
   timeTakenSeconds: number;

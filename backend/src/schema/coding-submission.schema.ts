@@ -72,15 +72,15 @@ export class CodingSubmission extends Document {
     index: true
   })
   verdict: SubmissionVerdict;
+
   @Prop({ default: 0, type: Number })
   upvotes: number
+
   @Prop({ type: AiFeedbackSchema })
   aiFeedback?: AiFeedback;
 
   @Prop({ type: Date, default: Date.now })
   createdAt: Date
-
-
 }
 
 export const CodingSubmissionSchema = SchemaFactory.createForClass(CodingSubmission);

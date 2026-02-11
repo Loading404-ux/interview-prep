@@ -1,19 +1,26 @@
 import { useAuth } from "@clerk/nextjs"
 import { api } from "@/lib/api-client"
 import { useHrStore } from "@/store/useHrStore"
-import { toast } from "sonner"
+import { API_ROUTES } from "@/routes"
+import { Microphone } from "@/utils/Microphone"
 
 export function useHrInterview() {
   const { getToken } = useAuth()
   const store = useHrStore()
 
   const start = async () => {
-    if (store.sessionId) return // 🔒 prevent duplicate session
+    if (store.sessionId) return
 
-    store.isLoading = true
+    const mic = await Microphone.isSupported()
+    if (!mic.supported) {
+      store.setMicStatus(false, mic.reason)
+      return
+    }
+
+    store.setMicStatus(true)
+
     const token = await getToken()
-
-    const res = await api<HrSession>("/hr/session/start", {
+    const res = await api<HrSession>(API_ROUTES.HR.SESSION_START, {
       method: "POST",
       token,
       body: {},
@@ -22,7 +29,12 @@ export function useHrInterview() {
     store.startSession(res.sessionId, res.questions)
   }
 
-  const submitAnswer = async (audio: Blob, questionId: string) => {
+
+  // SUBMIT ANSWER
+  const submitAnswer = async (
+    audio: Blob,
+    questionId: string
+  ): Promise<HrFeedback> => {
     const token = await getToken()
 
     const form = new FormData()
@@ -30,13 +42,12 @@ export function useHrInterview() {
     form.append("sessionId", store.sessionId!)
     form.append("questionId", questionId)
 
-    try {
-      const res = await api<HrFeedback>("/hr/answer/submit", {
-        method: "POST",
-        token,
-        body: form,
-        isMultipart: true,
-      })
+    const res = await api<HrFeedback>(API_ROUTES.HR.ANSWER_SUBMIT, {
+      method: "POST",
+      token,
+      body: form,
+      isMultipart: true,
+    })
 
       store.setFeedback(res)
     } catch (error: any) {
@@ -45,18 +56,24 @@ export function useHrInterview() {
   }
 
   const complete = async () => {
-    try {
-      const token = await getToken()
-      await api("/hr/session/complete", {
+    const token = await getToken()
+    const report = await api<HrAiEvaluation>(
+      API_ROUTES.HR.SESSION_COMPLETE,
+      {
         method: "POST",
         token,
         body: { sessionId: store.sessionId },
-      })
-    } catch (error: any) {
-      toast(error.message)
+      }
+    )
 
-    }
+    store.setFinalReport(report)
   }
 
-  return { ...store, start, submitAnswer, complete }
+
+  return {
+    ...store,
+    start,
+    submitAnswer,
+    complete,
+  }
 }

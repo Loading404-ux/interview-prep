@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface StreakCalendarProps {
-  data: { date: string; contributionCount: number }[];
+  data: Contribution[];
   className?: string;
 }
 
@@ -16,7 +16,7 @@ export const StreakCalendar = ({ data, className }: StreakCalendarProps) => {
   });
 
   const getActivityLevel = (date: string): number => {
-    const activity = data.find((d) => d.date === date);
+    const activity = data?.find((d) => d.date === date);
     if (!activity || activity.contributionCount === 0) return 0;
     if (activity.contributionCount === 1) return 1;
     if (activity.contributionCount <= 3) return 2;

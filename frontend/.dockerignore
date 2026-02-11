@@ -1,0 +1,24 @@
+# ---- Git ----
+.git
+.gitignore
+
+# ---- Node ----
+node_modules
+.next
+
+
+# ---- Docker ----
+docker-compose.yml
+Dockerfile.dev
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- Logs / Cache ----
+logs
+*.log
+
+# ---- IDE ----
+.vscode
+.idea
