@@ -1,98 +1,115 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+## Backend Overview
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This backend is a NestJS monolith organized by feature modules. Each module is responsible for its controller, service, repository (DB-only operations), DTOs, and any mapping logic. Authentication is handled via Clerk, and data is stored in MongoDB through Mongoose.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Key strengths already in place:
+- Clear feature boundaries (coding, hr, aptitude, interview, user, activity).
+- Consistent guard usage for protected routes.
+- Repository pattern for DB reads/writes.
+- AI utilities isolated behind a dedicated module.
 
-## Description
+## Tech Stack
+- NestJS
+- MongoDB + Mongoose
+- Clerk (auth)
+- Socket.io (realtime)
+- AssemblyAI + LLM integrations
+- Helmet + Throttler (security)
+ - SSE (notifications)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Project Structure (High Level)
+- src/app.module.ts (root module)
+- src/auth (Clerk auth and guard)
+- src/user, src/activity, src/coding, src/hr, src/aptitude, src/interview
+- src/ai (LLM + ASR)
+- src/realtime (socket gateway)
+- src/sse (planned notification stream)
+- src/security (rate limiting)
+- src/common (guards, decorators, middleware)
+- src/schema (Mongoose schemas)
 
-## Project setup
+## Environment Variables
+Set these values in your environment:
+- CLERK_SECRET_KEY
+- NIM_API_KEY (LLM provider)
+- ASSEMBLYAI_API_KEY
+- MONGO_URI or related Mongo config values
+- PUBLIC_BASE_URL (optional, used for resume uploads; defaults to http://localhost:8000)
+- RATE_LIMIT_TTL (optional, default 60 seconds)
+- RATE_LIMIT_LIMIT (optional, default 120 requests)
 
-```bash
-$ npm install
-```
+## Local Development
+Install and run:
+1. npm install
+2. npm run start:dev
 
-## Compile and run the project
+## API Summary (Core)
+Auth is required on protected routes via Clerk bearer token.
 
-```bash
-# development
-$ npm run start
+User
+- POST /user/profile
+- GET /user/dashboard/cards
+- GET /user/dashboard/streak
+- GET /user/me/profile
+- GET /user/me/contributions
+- GET /user/dashboard/streak-calendar
+- PATCH /user/me/profile
+- PATCH /user/me/targets
 
-# watch mode
-$ npm run start:dev
+Activity
+- GET /activity/history
 
-# production mode
-$ npm run start:prod
-```
+Coding
+- GET /coding/questions
+- GET /coding/question/:id
+- POST /coding/submit-solution
+- GET /coding/submission/:id
+- PATCH /coding/submission/:id/vote
+- POST /coding/discussion
+- GET /coding/discussion
+- PATCH /coding/discussion/:id/vote
 
-## Run tests
+HR
+- POST /hr/session/start
+- POST /hr/answer/submit
+- POST /hr/session/complete
 
-```bash
-# unit tests
-$ npm run test
+Aptitude
+- POST /aptitude/session/start
+- POST /aptitude/answer/submit
+- POST /aptitude/session/complete
 
-# e2e tests
-$ npm run test:e2e
+Interview
+- POST /interview/context/resume
+- POST /interview/answer/:sessionId
+- POST /interview/session/complete/:sessionId
 
-# test coverage
-$ npm run test:cov
-```
+## Recent Changes (What Was Improved)
+These changes were made to improve clarity, maintainability, and correctness without breaking routes:
 
-## Deployment
+- Cleaned unused code in controllers/services/repositories across modules.
+- Fixed user streak lookup to use userId, not clerkUserId.
+- Fixed HR metrics update to avoid double-counting sessions.
+- Ensured coding submissions map DTO fields correctly and set default verdicts.
+- Recorded CODING_ACCEPTED activity when AI approves a solution.
+- Hardened coding mappers for author and timestamp fields.
+- Tightened DTO validation for target companies.
+- Removed noisy console logs and stale TODOs.
+- Added architecture documentation in architecture.md.
+- Added realtime envelope routing and notification helpers.
+- Added security module for HTTP rate limiting.
+- Added helmet security headers in main.ts.
+- Updated activity log typing and event naming.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Architecture Notes
+See architecture.md for a detailed module-by-module breakdown, data flow, and future microservice readiness notes.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Planned (Next Milestones)
+- SSE for one-way notifications
+- Dedicated audio WebSocket gateway
+- Whisper.cpp + ffmpeg pipeline for local transcription
+- WebSocket action validation and rate limiting
+- Persist interview sessions in MongoDB or Redis
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Refactor Tracking
+See refactoring.md at the repo root for architecture refactor guidance.

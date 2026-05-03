@@ -1,10 +1,8 @@
 import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { Roles } from 'src/common/decorators/roles.decorator';
 import { ClerkAuthGuard } from 'src/common/guard/clerk-auth.guard';
 import { UserService } from './user.service';
 import { UserProgressService } from './user-progress.service';
 import { UpdateProfileDto, UpdateTargetsDto } from './user.dto';
-import { UserMetricsMapper } from './user.mapper';
 
 @Controller('user')
 @UseGuards(ClerkAuthGuard)
@@ -32,10 +30,6 @@ export class UserController {
     getAchievements(@Req() req: any) {
         return this.service.getProfile(req.user.id, req.user.clerkUserId);
     }
-    // @Get('me/targets')
-    // getTargets(@Req() req: any) {
-    //     return this.service.getTagets(req.user.id);
-    // }
     @Get('me/contributions')
     getContributions(@Req() req: any) {
         return this.service.getContributionCalendar(req.user.clerkUserId);
@@ -44,16 +38,6 @@ export class UserController {
     getStreakCalendar(@Req() req: any) {
         return this.service.getStreakCalendar(req.user.clerkUserId, 90);
     }
-    // @Get('me/progress-card') //NOTE: GETTING THE PROGRESS CARDS IN FROFILE
-    // getProgressCardsReport(@Req() req: any) {
-    //     return this.progressService.getProgressOverview(req.user.id);
-    // }
-
-    // @Get('me/profile')
-    // async getDashboard(@Req() req: any) {
-    //     return this.service.getDashboard(req.user);
-    // }
-
     @Patch('me/profile')
     updateProfile(@Req() req: any, @Body() dto: UpdateProfileDto) {
         return this.service.updateProfile(req.user.id, dto);

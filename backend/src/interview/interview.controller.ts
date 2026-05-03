@@ -17,7 +17,6 @@ export class InterviewController {
             storage: diskStorage({
                 destination: "./uploads/resumes",
                 filename: (_, file, cb) => {
-                    console.log(file);
                     const unique =
                         Date.now() + "-" + Math.round(Math.random() * 1e9);
                     cb(null, `${unique}${extname(file.originalname)}`);
@@ -29,10 +28,10 @@ export class InterviewController {
         @UploadedFile() file: Express.Multer.File,
         @Body("role") role: string
     ) {
-        const publicUrl = `http://localhost:8000/uploads/resumes/${file.filename}`;
+        const baseUrl = process.env.PUBLIC_BASE_URL || 'http://localhost:8000';
+        const publicUrl = `${baseUrl}/uploads/resumes/${file.filename}`;
         const parser = new PDFParse({ url: publicUrl });
         const result = await parser.getText();
-        console.log(result);
         return this.service.processResume(result.text, role);
     }
 
@@ -41,7 +40,6 @@ export class InterviewController {
         storage: diskStorage({
             destination: "./uploads/audios",
             filename: (_, file, cb) => {
-                console.log(file);
                 const unique =
                     Date.now() + "-" + Math.round(Math.random() * 1e9);
                 cb(null, `${unique}${extname(file.originalname)}`);
@@ -49,8 +47,6 @@ export class InterviewController {
         }),
     }))
     async submitAnswer(@Param("sessionId") sessionId: string, @UploadedFile() audio: Express.Multer.File) {
-        // 🔥 Hackathon shortcut: skip ASR, fake transcript
-        // const transcript = "User answered confidently about teamwork and problem solving.";
         const transcript = await this.assemblyAiService.transcribe(audio.path)
         return this.service.submitAnswer(sessionId, transcript.text);
     }

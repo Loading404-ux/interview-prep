@@ -8,10 +8,8 @@ import { RedirectToSignIn, SignedIn, SignedOut, useAuth } from "@clerk/nextjs"
 import { useSocketStore } from '@/store/socket.store';
 import { toast } from "sonner"
 export default function Main({ children }: { children: React.ReactNode }) {
-  // 🔑 ALL hooks at the top — no conditions
-
   const { isLoaded, isSignedIn, getToken } = useAuth()
-  const { loading, user } = useBootstrapAuth()
+  const { loading } = useBootstrapAuth()
 
   const initializeSocket = useSocketStore((state) => state.initializeSocket);
   const disconnectSocket = useSocketStore((state) => state.disconnectSocket);

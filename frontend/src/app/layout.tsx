@@ -3,15 +3,7 @@ import { Cascadia_Code, Quicksand } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs"
 import { Toaster } from "sonner";
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
 
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
 
 const quicksand = Quicksand({
   variable: "--font-quicksand",
@@ -36,23 +28,7 @@ export default function RootLayout({
       <body
         className={`${quicksand.variable} ${cascadiaCode.variable}  antialiased`}
       >
-        <ClerkProvider
-          // signInFallbackRedirectUrl="/dashboard"
-          // signUpFallbackRedirectUrl="/dashboard"
-          // afterSignOutUrl="/"
-          // allowedRedirectOrigins={[
-          //   'http://10.5.146.66:3000',
-          //   'http://localhost:3000'
-          // ]}
-          // taskUrls={{
-          //   'choose-organization': '/dashboard',
-          //   'reset-password': '/dashboard'
-          // }}
-
-        // signInForceRedirectUrl="/dashboard"
-        // signUpForceRedirectUrl="/dashboard"
-
-        >
+        <ClerkProvider>
           <Toaster theme="dark" position="bottom-right" />
           {children}
         </ClerkProvider>

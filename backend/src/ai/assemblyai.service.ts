@@ -10,13 +10,12 @@ export class AssemblyAiService {
     this.client = new AssemblyAI({
       apiKey: config.get<string>("ASSEMBLYAI_API_KEY")!,
     });
-    // console.log("ASSEMBLYAI_API_KEY")
   }
 
   async transcribe(filePath: string): Promise<{ durationSeconds?: number, text: string }> {
     const transcript = await this.client.transcripts.transcribe({
       audio: filePath,
-      
+
       speech_models: ["universal"],
     });
 

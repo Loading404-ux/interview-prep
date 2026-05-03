@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Frontend Overview
 
-## Getting Started
+This frontend is a Next.js App Router application with Clerk auth, a REST API gateway, and SSE notifications. It renders the dashboard UI and proxies API calls to the NestJS backend.
 
-First, run the development server:
+## Key Architecture
+- `src/app/*` App Router routes and layouts
+- `src/routes/index.ts` API route map
+- `src/lib/api-client.ts` REST client (same-origin `/api` gateway)
+- `src/app/api/[...all]/route.ts` Gateway handler (auth + rate limiting + proxy)
+- `src/store/socket.store.ts` (audio WS) socket state and connection
+- SSE client (planned) for one-way notifications
+- `src/hooks/*` Feature hooks (HR, Aptitude, Coding, Profile)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Auth Flow
+- Clerk middleware protects routes in `src/proxy.ts`.
+- `getToken()` is used client-side to call the API gateway.
+- The gateway verifies Clerk server-side and forwards to the backend.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Security
+- Rate limiting at the API gateway in `src/app/api/[...all]/route.ts`.
+- Security headers applied in `next.config.ts`.
+- For cookie-based auth, add CSRF protection in the gateway handlers.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Realtime
+- SSE will deliver one-way notifications from the backend.
+- WebSocket will be used only for audio chunk streaming.
+- Next.js BFF is not used for audio streaming.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Local Development
+1. npm install
+2. npm run dev
 
-## Learn More
+## Environment Variables
+- NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+- CLERK_SECRET_KEY
+- BACKEND_BASE_URL (for server proxy)
+- RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX (optional for gateway)
 
-To learn more about Next.js, take a look at the following resources:
+## Known Gaps
+- SSE client listener is not implemented yet.
+- Audio WS client still uses REST base URL (needs dedicated WS URL).
+- API gateway rate limiting is in-memory (use Redis in production).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Refactor Tracking
+See refactoring.md at the repo root for the architecture refactor plan.

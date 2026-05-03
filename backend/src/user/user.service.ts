@@ -8,7 +8,6 @@ import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schema/user.schema';
 import { UpdateProfileDto } from './user.dto';
-import { UserMetrics } from 'src/schema/user_metrics.schema';
 
 
 @Injectable()
@@ -17,9 +16,6 @@ export class UserService {
         private readonly userRepo: UserRepository,
         private readonly progressService: UserProgressService,
         private readonly activityService: ActivityService,
-        
-        @InjectModel(UserMetrics.name)
-        private readonly model: Model<UserMetrics>,
         @InjectModel(UserAchievement.name)
         private readonly achievementModel: Model<UserAchievement>,
         @InjectModel(User.name)
@@ -66,13 +62,6 @@ export class UserService {
             targets: user.targetCompanies
         };
     }
-    // async getTagets(userId: string) {
-    //     const user = await this.userRepo.findById(userId);
-    //     if (!user) {
-    //         throw new NotFoundException('User not found');
-    //     }
-    //     return user.targetCompanies;
-    // }
     async updateProfile(userId: string, dto: UpdateProfileDto) {
         await this.userRepo.updateById(userId, dto);
         return { success: true };
@@ -81,17 +70,10 @@ export class UserService {
         await this.userRepo.updateById(userId, { targetCompanies: targets });
         return { success: true };
     }
-    async getAchievements(userId: string) {
-        const achievements = await this.achievementModel.find({ userId });
-        return achievements.map(a => ({
-            key: a.achievementKey,
-            unlockedAt: a.unlockedAt,
-        }));
-    }
     async getContributionCalendar(clerkUserId: string, days = 90) {
         return this.activityService.getContributionCalendar(clerkUserId, days);
     }
-    getStreakCalendar( clerkUserId: string,days = 90) {
-        return this.activityService.getStreakCalendar(clerkUserId, 90);
+    getStreakCalendar(clerkUserId: string, days = 90) {
+        return this.activityService.getStreakCalendar(clerkUserId, days);
     }
 }

@@ -33,18 +33,25 @@ export class HrService {
   async startSession(dto: StartHrSessionDto, numberOfQuestions = 3) {
     const questions = await this.questionRepo.findRandom(numberOfQuestions);
 
-      const session = await this.sessionRepo.createSession({
-        userId: new Types.ObjectId(dto.userId),
-        clerkUserId: dto.clerkUserId,
-        status: 'STARTED',
-        questions: [],
-      });
+    const session = await this.sessionRepo.createSession({
+      userId: new Types.ObjectId(dto.userId),
+      clerkUserId: dto.clerkUserId,
+      status: 'STARTED',
+      questions: [],
+    });
 
-      return {
-        sessionId: session._id.toString(),
-        questions: questions.map(HrMapper.toQuestionView),
-      };
-    }
+    await this.activityService.record({
+      userId: new Types.ObjectId(dto.userId),
+      clerkUserId: dto.clerkUserId,
+      eventType: ActivityLogType.HR_START,
+      referenceId: session._id,
+    });
+
+    return {
+      sessionId: session._id.toString(),
+      questions: questions.map(HrMapper.toQuestionView),
+    };
+  }
 
   /* ---------- SUBMIT ANSWER ---------- */
   async submitAnswer(input: {
@@ -58,11 +65,11 @@ export class HrService {
     if (session.status !== 'STARTED')
       throw new BadRequestException('Session not active');
 
-      const question = await this.questionRepo.findById(input.questionId);
-      if (!question) throw new BadRequestException('Question not found');
+    const question = await this.questionRepo.findById(input.questionId);
+    if (!question) throw new BadRequestException('Question not found');
 
-      let transcript = input.transcript;
-      let durationSeconds: number | undefined;
+    let transcript = input.transcript;
+    let durationSeconds: number | undefined;
 
     // 🎙️ AUDIO PATH (PRIMARY)
     if (!transcript) {
@@ -71,18 +78,16 @@ export class HrService {
           'Either audio file or transcript must be provided',
         );
       }
-      console.log(input.audioFile)
       const result = await this.assemblyAiService.transcribe(
         input.audioFile.path,
       );
-      console.log(result)
       transcript = result.text;
       durationSeconds = result.durationSeconds;
 
-        if (!transcript || transcript.length < 5) {
-          throw new BadRequestException('Audio transcription failed');
-        }
+      if (!transcript || transcript.length < 5) {
+        throw new BadRequestException('Audio transcription failed');
       }
+    }
 
     // 🤖 AI evaluation
     const aiResult = await this.aiService.hrAIEvaluate({
@@ -99,8 +104,8 @@ export class HrService {
       aiResult,
     });
 
-      return aiResult;
-    }
+    return aiResult;
+  }
 
 
   async completeSession(dto: CompleteSessionDto): Promise<HrAiEvaluation> {
@@ -111,18 +116,16 @@ export class HrService {
 
     const finalReport = await this.aiService.hrFinalReport(session.questions);
 
-    //TODO:RUN both THIS PARALLELY
     await this.sessionRepo.updateStatus(dto.sessionId, HrSessionStatus.COMPLETED);
     await this.sessionRepo.updateSession(dto.sessionId, { aiEvaluation: finalReport });
 
     // HrAiEvaluation
     // ✅ Activity
 
-    //TODO:RUN both THIS PARALLELY
     await this.activityService.record({
       userId: session.userId,
       clerkUserId: session.clerkUserId,
-      eventType: ActivityLogType.HR_SESSION_COMPLETE,
+      eventType: ActivityLogType.HR_COMPLETE,
       referenceId: session._id,
     });
     await this.progressService.onHrSessionCompleted(session);
@@ -130,4 +133,4 @@ export class HrService {
     return finalReport;
   }
 
-  }
+}

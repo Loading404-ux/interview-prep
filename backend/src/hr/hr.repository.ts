@@ -57,49 +57,6 @@ export class HrSessionRepository {
       {}
     );
   }
-
-  // markCompleted(sessionId: string, userId: string) {
-  //   return this.sessionModel.findOneAndUpdate(
-  //     {
-  //       _id: sessionId,
-  //       userId: new Types.ObjectId(userId),
-  //       status: 'STARTED',
-  //     },
-  //     {
-  //       $set: {
-  //         status: 'COMPLETED',
-  //         completedAt: new Date(),
-  //       },
-  //     },
-  //     { new: true },
-  //   );
-  // }
-
-  //TODO: Later on
-  // markAiPending(sessionId: string) {
-  //   return this.sessionModel.updateOne(
-  //     { _id: sessionId, status: 'COMPLETED' },
-  //     { status: 'AI_PENDING' },
-  //   );
-  // }
-
-  // markAiDone(sessionId: string, evaluation: HrAiEvaluation) {
-  //   return this.sessionModel.updateOne(
-  //     { _id: sessionId, status: 'AI_PENDING' },
-  //     {
-  //       status: 'AI_DONE',
-  //       aiEvaluation: evaluation,
-  //     },
-  //   );
-  // }
-
-  // markAiFailed(sessionId: string) {
-  //   return this.sessionModel.updateOne(
-  //     { _id: sessionId, status: 'AI_PENDING' },
-  //     { status: 'AI_FAILED' },
-  //   );
-  // }
-
 }
 
 @Injectable()

@@ -25,7 +25,6 @@ export class HrController {
     storage: diskStorage({
       destination: "./uploads/audios",
       filename: (_, file, cb) => {
-        console.log(file);
         const unique =
           Date.now() + "-" + Math.round(Math.random() * 1e9);
         cb(null, `${unique}${extname(file.originalname)}`);

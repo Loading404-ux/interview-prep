@@ -208,7 +208,7 @@ describe('CodingService', () => {
     expect(submissionRepo.submitSolution).toHaveBeenCalled();
     expect(activityService.record).toHaveBeenCalledWith(
       expect.objectContaining({
-        eventType: ActivityLogType.CODING_SUBMIT,
+        eventType: ActivityLogType.CODING_SUBMITTED,
         referenceId: submissionId,
       }),
     );
@@ -296,9 +296,12 @@ describe('CodingService', () => {
 
     expect(submissionRepo.updateValue).toHaveBeenCalled();
     expect(progressService.onCodingAccepted).toHaveBeenCalledWith(
+      expect.any(Types.ObjectId),
+      8.5,
+    );
+    expect(activityService.record).toHaveBeenCalledWith(
       expect.objectContaining({
-        userId,
-        accuracy: 8.5,
+        eventType: ActivityLogType.CODING_ACCEPTED,
       }),
     );
   });

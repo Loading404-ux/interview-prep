@@ -34,16 +34,6 @@ function QuickStart() {
           <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
             Quick Start
           </h2>
-          <h3>
-            {
-              Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date())
-            }
-          </h3>
-          <h3>
-            {
-              Intl.DateTimeFormat('en-IN', { year: 'numeric', month: "2-digit", day: 'numeric' }).format(new Date())
-            }
-          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {quickActions.map((action) => (
               <button

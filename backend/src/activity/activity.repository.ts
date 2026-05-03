@@ -13,49 +13,49 @@ export class ActivityRepository {
     private readonly dailyModel: Model<DailyActivity>,
   ) { }
 
- async logAndAggregate({
-  clerkUserId,
-  userId,
-  eventType,
-  referenceId,
-  metadata,
-}: {
-  clerkUserId: string;
-  userId: Types.ObjectId;
-  eventType: ActivityLogType;
-  referenceId?: Types.ObjectId;
-  metadata?: Record<string, any>;
-}) {
-  const date = new Date().toISOString().split('T')[0];
-
-  const update: any = {};
-
-  // 🔥 Contribution = ONLY accepted coding
-  if (eventType === ActivityLogType.CODING_ACCEPTED) {
-    update.$inc = { contributionCount: 1 };
-  }
-
-  // 🔥 Streak = ANY activity
-  update.$set = {
-    ...(eventType.startsWith('CODING') && { didCoding: true }),
-    ...(eventType.startsWith('HR') && { didHr: true }),
-    ...(eventType.startsWith('APTITUDE') && { didAptitude: true }),
-  };
-
-  await this.logModel.create({
-    userId,
+  async logAndAggregate({
     clerkUserId,
+    userId,
     eventType,
     referenceId,
     metadata,
-  });
+  }: {
+    clerkUserId: string;
+    userId: Types.ObjectId;
+    eventType: ActivityLogType;
+    referenceId?: Types.ObjectId;
+    metadata?: Record<string, any>;
+  }) {
+    const date = new Date().toISOString().split('T')[0];
 
-  await this.dailyModel.updateOne(
-    { clerkUserId, date },
-    update,
-    { upsert: true },
-  );
-}
+    const update: any = {};
+
+    // 🔥 Contribution = ONLY accepted coding
+    if (eventType === ActivityLogType.CODING_ACCEPTED) {
+      update.$inc = { contributionCount: 1 };
+    }
+
+    // 🔥 Streak = ANY activity
+    update.$set = {
+      ...(eventType.startsWith('coding:') && { didCoding: true }),
+      ...(eventType.startsWith('hr:') && { didHr: true }),
+      ...(eventType.startsWith('aptitude:') && { didAptitude: true }),
+    };
+
+    await this.logModel.create({
+      userId,
+      clerkUserId,
+      eventType,
+      referenceId,
+      metadata,
+    });
+
+    await this.dailyModel.updateOne(
+      { clerkUserId, date },
+      update,
+      { upsert: true },
+    );
+  }
 
 
 

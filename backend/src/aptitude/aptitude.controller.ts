@@ -23,7 +23,6 @@ export class AptitudeController {
 
   @Post('answer/submit')
   submit(@Req() req: any, @Body() dto: SubmitAptitudeAnswerDto) {
-    console.log(dto)
     return this.service.submitAnswer({
       userId: req.user.id,
       clerkUserId: req.user.clerkUserId,

@@ -1,13 +1,5 @@
 import React from 'react'
 import { AppSidebar } from "@/components/app-sidebar"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
     SidebarInset,
@@ -29,13 +21,13 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
                         <Background />
                     </div>
                     <header className="flex h-16 shrink-0 items-center gap-2 relative z-10">
-                        <div className="flex items-center gap-2 px-4">
+                        <div className="flex items-center gap-2 px-4 grow">
                             <SidebarTrigger className="-ml-1" />
                             <Separator
                                 orientation="vertical"
                                 className="mr-2 data-[orientation=vertical]:h-4"
                             />
-                            <div className="flex items-center justify-between h-full">
+                            <div className="grow flex items-center justify-between h-full ">
                                 <div className="flex-1 max-w-md w-80">
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -44,6 +36,19 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
                                             className="pl-10 bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary/50"
                                         />
                                     </div>
+                                </div>
+                                <div className="text-sm leading-none text-muted-foreground">
+                                    <h5 className='text-xs'>
+                                        {
+                                            Intl.DateTimeFormat('en-IN', { year: 'numeric', month: "2-digit", day: 'numeric' }).format(new Date())
+                                        }
+                                    </h5>
+                                    <h5 className='text-right'>
+                                        {
+                                            Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date())
+                                        }
+                                    </h5>
+
                                 </div>
                             </div>
                         </div>

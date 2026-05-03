@@ -2,12 +2,17 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { User } from './user.schema';
 
-export enum ActivityLogType {
-  CODING_SUBMIT = 'CODING_SUBMIT',
-  CODING_ACCEPTED = 'CODING_ACCEPTED',
-  HR_SESSION_COMPLETE = 'HR_SESSION_COMPLETE',
-  APTITUDE_SESSION_COMPLETE = 'APTITUDE_SESSION_COMPLETE'
-}
+export const ActivityLogType = {
+  CODING_SUBMITTED: 'coding:submitted',
+  CODING_ACCEPTED: 'coding:accepted',
+  HR_START: 'hr:start',
+  HR_COMPLETE: 'hr:complete',
+  APTITUDE_START: 'aptitude:start',
+  APTITUDE_COMPLETE: 'aptitude:complete',
+} as const;
+
+export type ActivityLogType =
+  (typeof ActivityLogType)[keyof typeof ActivityLogType];
 
 @Schema({ timestamps: true })
 export class ActivityLog extends Document {
@@ -20,11 +25,11 @@ export class ActivityLog extends Document {
 
   @Prop({
     type: String,
-    enum: ActivityLogType,
+    enum: Object.values(ActivityLogType),
     required: true,
     index: true,
   })
-  eventType: string;
+  eventType: ActivityLogType;
 
   @Prop()
   referenceId: Types.ObjectId;

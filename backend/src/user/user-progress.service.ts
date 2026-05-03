@@ -16,7 +16,6 @@ export class UserProgressService {
         private readonly achievementModel: Model<UserAchievement>,
     ) { }
 
-    //FIXME WRITE A FUNCTION FOR UPDATE USER METRIX VALUE NOT on___Accepted()
     /* =====================================================
        CODING — called when AI verdict = ACCEPTED
        ===================================================== */
@@ -61,14 +60,12 @@ export class UserProgressService {
             },
             { new: true, upsert: true },
         );
-        const newAvgConfidence = session.aiEvaluation?.avgConfidence || 0
-        // running average
-        const prevTotal = (newAvgConfidence + metrics.hr.avgConfidence) / 2
-
+        const newAvgConfidence = session.aiEvaluation?.avgConfidence || 0;
+        const prevTotal = (newAvgConfidence + metrics.hr.avgConfidence) / 2;
 
         await this.metricsModel.updateOne(
             { userId: session.userId },
-            { 'hr.avgConfidence': prevTotal, 'hr.totalSessions': metrics.hr.totalSessions + 1 },
+            { 'hr.avgConfidence': prevTotal, 'hr.totalSessions': metrics.hr.totalSessions },
         );
 
         // achievements
@@ -134,8 +131,9 @@ export class UserProgressService {
 
     /* ---------- READ: STREAK ---------- */
 
-    async getStreak(clerkUserId: string) {
-        const metrics = await this.metricsModel.findOne({ clerkUserId });
+    async getStreak(userId: Types.ObjectId | string) {
+        const id = typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+        const metrics = await this.metricsModel.findOne({ userId: id });
         return metrics?.streak ?? { current: 0, longest: 0 };
     }
 
@@ -161,8 +159,9 @@ export class UserProgressService {
         );
     }
 
-    async getProgressOverview(userId: Types.ObjectId) {
-        const metrics = await this.metricsModel.findOne({ userId });
+    async getProgressOverview(userId: Types.ObjectId | string) {
+        const id = typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+        const metrics = await this.metricsModel.findOne({ userId: id });
 
         if (!metrics) {
             return {

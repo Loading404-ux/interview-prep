@@ -17,7 +17,7 @@ export class AptitudeService {
     onOfquestions?: number;
     topic?: string;
   }) {
-    const count = input.mode === 'RAPID' ? 5 : 10;
+    const count = input.onOfquestions ?? (input.mode === 'RAPID' ? 5 : 10);
 
     const questions = await this.repo.getRandomQuestions(count);
 
@@ -27,14 +27,13 @@ export class AptitudeService {
       mode: input.mode,
       totalQuestions: count,
     });
-    console.log({
-      sessionId: session.id,
-      questions: questions.map(q => ({
-        id: q._id,
-        text: q.text,
-        options: q.options,
-      })),
-    })
+
+    await this.activityService.record({
+      userId: new Types.ObjectId(input.userId),
+      clerkUserId: input.clerkUserId,
+      eventType: ActivityLogType.APTITUDE_START,
+      referenceId: session._id,
+    });
     return {
       sessionId: session.id,
       questions: questions.map(q => ({
@@ -56,7 +55,6 @@ export class AptitudeService {
   }) {
     const question = await this.repo.findQuestionById(input.questionId);
     if (!question) throw new Error('Question not found');
-    console.log(question.correctAnswerIndex, input.selectedOption)
     const isCorrect = question.correctAnswerIndex === input.selectedOption;
 
     await this.repo.updateStats(input.sessionId, isCorrect);
@@ -79,7 +77,7 @@ export class AptitudeService {
     await this.activityService.record({
       userId: session.userId,
       clerkUserId: session.clerkUserId,
-      eventType: ActivityLogType.APTITUDE_SESSION_COMPLETE,
+      eventType: ActivityLogType.APTITUDE_COMPLETE,
       referenceId: session._id,
     });
 

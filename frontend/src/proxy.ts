@@ -1,8 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
-// const isProtectedRoute = createRouteMatcher(['/dashboard(.*)'])
-
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth()
   const { pathname } = req.nextUrl
@@ -21,7 +19,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   return NextResponse.next()
 },{
-  authorizedParties:['http://10.5.146.66:3000', 'http://localhost:3000'],
+  authorizedParties:['http://10.5.146.66:3000', 'http://localhost:3000',"http://192.168.137.13:3000"],
 })
 
 export const config = {

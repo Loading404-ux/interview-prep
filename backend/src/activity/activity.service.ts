@@ -1,17 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Model, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { ActivityLog, ActivityLogType } from 'src/schema/activity-log.schema';
 import { ActivityRepository } from './activity.repository';
-import { InjectModel } from '@nestjs/mongoose';
-import { UserMetrics } from 'src/schema/user_metrics.schema';
 import { ActivityHistoryDto, ContributionDayDto } from './activity.dto';
 
 @Injectable()
 export class ActivityService {
   constructor(
     private readonly repo: ActivityRepository,
-    //@InjectModel(UserMetrics.name)
-    //private readonly metricsModel: Model<UserMetrics>,
   ) { }
 
   /* ---------- WRITE ---------- */
@@ -78,25 +74,24 @@ export class ActivityService {
     }));
   }
 
-  //NOTE: FOR GET THE DAILY HR,APTITUDE DETAILS FOR DAILY SHOWING INPROFILE PROGRESS
-  async dailyProfileProcess() { }
-
   /* ---------- HELPERS ---------- */
 
-  private mapType(eventType: string): 'coding' | 'hr' | 'aptitude' {
-    if (eventType.startsWith('CODING')) return 'coding';
-    if (eventType.startsWith('HR')) return 'hr';
+  private mapType(eventType: ActivityLogType): ActivityHistoryDto['type'] {
+    if (eventType.startsWith('coding:')) return 'coding';
+    if (eventType.startsWith('hr:')) return 'hr';
     return 'aptitude';
   }
 
   private buildTitle(log: ActivityLog): string {
     switch (log.eventType) {
-      case 'CODING_SUBMIT':
-      case 'CODING_APPROVED':
+      case ActivityLogType.CODING_SUBMITTED:
+      case ActivityLogType.CODING_ACCEPTED:
         return log.metadata?.title ?? 'Coding Problem';
-      case 'HR_SESSION_COMPLETE':
+      case ActivityLogType.HR_START:
+      case ActivityLogType.HR_COMPLETE:
         return 'HR Mock Interview';
-      case 'APTITUDE_ATTEMPT':
+      case ActivityLogType.APTITUDE_START:
+      case ActivityLogType.APTITUDE_COMPLETE:
         return log.metadata?.title ?? 'Aptitude Quiz';
       default:
         return 'Activity';
@@ -104,15 +99,15 @@ export class ActivityService {
   }
 
   private buildResult(log: ActivityLog): string | undefined {
-    if (log.eventType === 'CODING_APPROVED') {
+    if (log.eventType === ActivityLogType.CODING_ACCEPTED) {
       return 'Accepted';
     }
-    if (log.eventType === 'HR_SESSION_COMPLETE') {
+    if (log.eventType === ActivityLogType.HR_COMPLETE) {
       return log.metadata?.confidence
         ? `${log.metadata.confidence}% confidence`
         : undefined;
     }
-    if (log.eventType === 'APTITUDE_ATTEMPT') {
+    if (log.eventType === ActivityLogType.APTITUDE_COMPLETE) {
       return log.metadata?.score != null
         ? `${log.metadata.score} correct`
         : undefined;

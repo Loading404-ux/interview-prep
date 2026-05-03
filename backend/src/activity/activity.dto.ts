@@ -1,9 +1,4 @@
-type ActivityEventType =
-  | 'CODING_SUBMIT'
-  | 'HR_SESSION_COMPLETE'
-  | 'APTITUDE_ATTEMPT';
-
-  export class ActivityHistoryDto {
+export class ActivityHistoryDto {
   id: string;
   type: 'coding' | 'hr' | 'aptitude';
   title: string;
@@ -13,6 +8,6 @@ type ActivityEventType =
 }
 
 export class ContributionDayDto {
-  date: string;       // YYYY-MM-DD
-  contributionCount: number;  // did anything that day
+  date: string; // YYYY-MM-DD
+  contributionCount: number; // did anything that day
 }

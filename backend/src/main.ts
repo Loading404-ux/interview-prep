@@ -1,18 +1,26 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as bodyParser from 'body-parser';
+import helmet from 'helmet';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
-    
   });
-app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api');
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
   app.enableCors({
     origin: [
       'http://localhost:3000',      // local frontend
       'http://10.5.154.204:3000',      // local frontend
       'http://10.5.146.66:3000',      // local frontend
       'https://yourdomain.com',     // prod frontend
+      'http://192.168.137.13:3000',
+      'http://192.168.137.1:3000',
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [

@@ -22,6 +22,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { RealtimeService } from './realtime.service';
 import { EVENTS } from './realtime.events';
+import type { RealtimeEnvelope } from './realtime.types';
 
 @WebSocketGateway({
   cors: {
@@ -60,6 +61,14 @@ export class RealtimeGateway
     @MessageBody() body: { sessionId: string },
   ) {
     return this.realtimeService.joinHrSession(client, body.sessionId);
+  }
+
+  @SubscribeMessage(EVENTS.MESSAGE)
+  handleMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() envelope: RealtimeEnvelope,
+  ) {
+    return this.realtimeService.handleEnvelope(client, envelope);
   }
 }
 

@@ -16,6 +16,7 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { RealtimeModule } from './realtime/realtime.module';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
+import { SecurityModule } from './security/security.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { RequestLoggerMiddleware } from './common/middleware/request-logger.midd
     //   useClass: MongooseConfigService,
     // }),
     DatabaseModule,
+    SecurityModule,
     AuthModule,
     UserModule,
     CodingModule,

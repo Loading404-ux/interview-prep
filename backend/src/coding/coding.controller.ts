@@ -14,7 +14,6 @@ import { CodingService } from './coding.service';
 import {
   CodingDiscussionDto,
   CodingSubmissionDto,
-  DiscussionReplyDto,
   DiscussionVoteDto,
   SubmisstionVoteDto,
 } from './coding.dto';
@@ -45,8 +44,13 @@ export class CodingController {
   }
 
   @Patch('submission/:id/vote')
-  toggleSubmissionVotes(@Req() req: any, @Body() dto: SubmisstionVoteDto) {
-    return this.service.toggleSubmissionVotes(req.user.id, req.user.clerkUserId, dto);
+  toggleSubmissionVotes(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body() dto: SubmisstionVoteDto,
+  ) {
+    const payload = { submissionId: dto?.submissionId ?? id } as SubmisstionVoteDto;
+    return this.service.toggleSubmissionVotes(req.user.id, req.user.clerkUserId, payload);
   }
 
   @Post('discussion')
@@ -74,12 +78,13 @@ export class CodingController {
   }
 
   @Patch('discussion/:id/vote')
-  toggleDiscussionVotes(@Req() req: any, @Body() dto: DiscussionVoteDto) {
-    return this.service.toggleDiscussionVotes(req.user.id, req.user.clerkUserId, dto);
+  toggleDiscussionVotes(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body() dto: DiscussionVoteDto,
+  ) {
+    const payload = { discussionId: dto?.discussionId ?? id } as DiscussionVoteDto;
+    return this.service.toggleDiscussionVotes(req.user.id, req.user.clerkUserId, payload);
   }
 
-  // @Get('discussion/replies')
-  // getReplys(@Body() data: DiscussionReplyDto) {
-  //   return this.service.getReplies(data.parentId, data.questionId);
-  // }
 }

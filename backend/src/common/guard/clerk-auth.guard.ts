@@ -2,10 +2,8 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  UnauthorizedException,
-  Inject,
+  UnauthorizedException
 } from '@nestjs/common';
-import type { ClerkClient } from '@clerk/backend';
 import { verifyToken, } from '@clerk/backend';
 import { AuthService } from 'src/auth/auth.service';
 
@@ -13,8 +11,8 @@ import { AuthService } from 'src/auth/auth.service';
 @Injectable()
 export class ClerkAuthGuard implements CanActivate {
   constructor(
-    @Inject('CLERK_CLIENT')
-    private readonly clerkClient: ClerkClient, // optional, for later use
+    // @Inject('CLERK_CLIENT')
+    //private readonly clerkClient: ClerkClient, // optional, for later use
     private readonly authService: AuthService,
   ) { }
 
@@ -25,7 +23,6 @@ export class ClerkAuthGuard implements CanActivate {
     if (!authHeader) {
       throw new UnauthorizedException('Missing Authorization header');
     }
-    console.log("Token is here. NO PROBLEM");
 
     const token = authHeader.replace('Bearer ', '');
 
@@ -35,7 +32,7 @@ export class ClerkAuthGuard implements CanActivate {
     if (!payload) {
       throw new UnauthorizedException('Invalid token');
     }
-    req.user = req.user = await this.authService.getOrCreateUserFromToken(payload.sub);
+    req.user = await this.authService.getOrCreateUserFromToken(payload.sub);
     return true;
   }
 }

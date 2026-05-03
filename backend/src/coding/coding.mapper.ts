@@ -1,7 +1,6 @@
 import { CodingSubmission } from 'src/schema/coding-submission.schema';
 import { CodingDiscussion } from 'src/schema/coding-discussion.schema';
 import { CodingQuestion } from 'src/schema/coding-questions.schema';
-import { User } from 'src/schema/user.schema';
 
 export type DiscussionWithUser = Omit<CodingDiscussion, 'userId'> & {
   userId?: {
@@ -10,6 +9,7 @@ export type DiscussionWithUser = Omit<CodingDiscussion, 'userId'> & {
 };
 export class CodingSubmissionMapper {
   static toResponse(submission: any) {
+    const authorName = submission.author?.name ?? submission.user?.name;
     return {
       id: submission._id,
       questionId: submission.questionId,
@@ -20,8 +20,8 @@ export class CodingSubmissionMapper {
       upvotes: submission.upvotes ?? 0,
       createdAt: submission.createdAt,
       _id: undefined,
-      isLiked: submission.isLiked,
-      author: submission.author.name,
+      isLiked: submission.isLiked ?? false,
+      author: authorName,
     };
   }
 }
@@ -39,6 +39,7 @@ export class CodingQuestionMapper {
 
 export class CodingDiscussionMapper {
   static toResponse(d: any) {
+    const createdAt = d.createdAt ?? d.createAt;
     return {
       id: d._id,
       questionId: d.questionId,
@@ -46,13 +47,14 @@ export class CodingDiscussionMapper {
       content: d.content,
       upvotes: d.upvotes,
       replyCount: d.replyCount,
-      createdAt: d.createAt,
+      createdAt,
       author: d.user?.name,
-      isLiked: d.isLiked,
+      isLiked: d.isLiked ?? false,
       _id: undefined,
     };
   }
   static toCreateResponse(d: CodingDiscussion) {
+    const createdAt = (d as any).createdAt ?? d.createAt;
     return {
       id: d._id,
       questionId: d.questionId,
@@ -60,7 +62,7 @@ export class CodingDiscussionMapper {
       content: d.content,
       upvotes: d.upvotes,
       replyCount: d.replyCount,
-      createdAt: d.createAt,
+      createdAt,
       _id: undefined,
     };
   }

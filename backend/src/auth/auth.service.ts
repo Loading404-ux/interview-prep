@@ -19,11 +19,9 @@ export class AuthService {
 
   async getOrCreateUserFromToken(sub: NonNullable<JwtPayload['sub']>) {
     const clerk = await this.clerkClient.users.getUser(sub);
-    let user = await this.userRepo.findByClerkUserId(sub);
-    console.log("user ",user)
-    console.log("clerk ",clerk)
 
-    
+    let user = await this.userRepo.findByClerkUserId(sub);
+
     if (!user) {
       user = await this.userRepo.createUser({
         clerkUserId: sub,
@@ -31,8 +29,6 @@ export class AuthService {
         name: `${clerk.firstName ?? ''} ${clerk.lastName ?? ''}`.trim(),
         profilePic: clerk.imageUrl,
       });
-      const email = clerk.emailAddresses[0].emailAddress.split("@")[1];
-      console.log(email)
     }
 
     // if (email !== "@kiit.ac.in") throw new UnauthorizedException('This is only for KIIT students!');

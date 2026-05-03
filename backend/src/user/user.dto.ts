@@ -1,40 +1,42 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsArray, IsOptional, IsString } from "class-validator";
 
 export class CreateUser {
-    @IsString()
-    email: string
+  @IsString()
+  email: string
 
-    @IsString()
-    name: string
+  @IsString()
+  name: string
 
-    @IsString()
-    clerkUserId: string
+  @IsString()
+  clerkUserId: string
 
-    @IsString()
-    @IsOptional()
-    university?: string;
+  @IsString()
+  @IsOptional()
+  university?: string;
 
-    @IsString()
-    @IsOptional()
-    profilePic?: string;
+  @IsString()
+  @IsOptional()
+  profilePic?: string;
 
-    @IsString()
-    @IsOptional()
-    targetCompanies?: string[];
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  targetCompanies?: string[];
 
 }
 
 export class UpdateProfileDto {
-    @IsOptional()
-    @IsString()
-    name?: string;
+  @IsOptional()
+  @IsString()
+  name?: string;
 
-    @IsOptional()
-    @IsString()
-    university?: string;
+  @IsOptional()
+  @IsString()
+  university?: string;
 }
 
 export class UpdateTargetsDto {
+  @IsArray()
   @IsString({ each: true })
   targetCompanies: string[];
 }
