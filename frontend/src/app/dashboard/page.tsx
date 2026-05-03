@@ -10,7 +10,7 @@ import { StreakCalendar } from "@/components/StreakCalendar";
 import { Progress } from "@/components/ui/progress";
 import { GradientCard } from "@/components/GradientCard";
 import QuickStart from "@/components/QuickStart";
-import { useDashboard } from "@/hooks/useDashboardHook";
+import { useDashboard } from "@/hooks/useDashboard";
 import { useUserStore } from "@/store/user.store";
 
 export default function Page() {
@@ -49,7 +49,7 @@ export default function Page() {
             title="Coding Practice"
             subtitle={`${progressCards.coding.acceptedSubmissions}/${progressCards.coding.totalSubmissions} problems`}
             icon={<Code2 className="w-5 h-5 text-white" />}
-            
+
           >
             <div className="space-y-3">
               <div className="flex justify-between text-sm">

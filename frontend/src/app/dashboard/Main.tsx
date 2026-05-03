@@ -5,29 +5,29 @@ import { useEffect } from "react"
 // import { bindLoadingBar } from "@/lib/api-client"
 import { useBootstrapAuth } from "@/hooks/useBootstrapAuth"
 import { RedirectToSignIn, SignedIn, SignedOut, useAuth } from "@clerk/nextjs"
-import { useSocketStore } from '@/store/socket.store';
-import { toast } from "sonner"
+import { useSseStore } from "@/store/sse.store"
 export default function Main({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn, getToken } = useAuth()
   const { loading } = useBootstrapAuth()
 
-  const initializeSocket = useSocketStore((state) => state.initializeSocket);
-  const disconnectSocket = useSocketStore((state) => state.disconnectSocket);
+  const connectSse = useSseStore((state) => state.connect)
+  const disconnectSse = useSseStore((state) => state.disconnect)
 
 
   useEffect(() => {
     const setup = async () => {
       if (isSignedIn) {
-        const token = await getToken();
-        if (token) initializeSocket(token);
-        toast("Connected to socket")
+        const token = await getToken()
+        if (token) connectSse(token)
       } else {
-        toast("Disconnected from socket")
-        disconnectSocket(); // Auto-disconnect on logout
+        disconnectSse()
       }
     };
     setup();
-  }, [isSignedIn]);
+    return () => {
+      disconnectSse()
+    }
+  }, [isSignedIn, getToken, connectSse, disconnectSse])
 
 
   // Show loading state while Clerk is loading

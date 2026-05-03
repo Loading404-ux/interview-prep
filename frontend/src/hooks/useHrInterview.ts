@@ -1,11 +1,14 @@
-import { useAuth } from "@clerk/nextjs"
-import { api } from "@/lib/api-client"
 import { useHrStore } from "@/store/useHrStore"
-import { API_ROUTES } from "@/routes"
 import { Microphone } from "@/utils/Microphone"
+import { useClerkToken } from "@/hooks/useClerkToken"
+import {
+  completeHrSession,
+  startHrSession,
+  submitHrAnswer,
+} from "@/services/hr.service"
 
 export function useHrInterview() {
-  const { getToken } = useAuth()
+  const { getToken } = useClerkToken()
   const store = useHrStore()
 
   const start = async () => {
@@ -20,11 +23,7 @@ export function useHrInterview() {
     store.setMicStatus(true)
 
     const token = await getToken()
-    const res = await api<HrSession>(API_ROUTES.HR.SESSION_START, {
-      method: "POST",
-      token,
-      body: {},
-    })
+    const res = await startHrSession(token)
 
     store.startSession(res.sessionId, res.questions)
   }
@@ -35,36 +34,26 @@ export function useHrInterview() {
     audio: Blob,
     questionId: string
   ): Promise<HrFeedback> => {
+    if (!store.sessionId) {
+      throw new Error("No active HR session")
+    }
+
     const token = await getToken()
-
-    const form = new FormData()
-    form.append("audio", audio)
-    form.append("sessionId", store.sessionId!)
-    form.append("questionId", questionId)
-
-    const res = await api<HrFeedback>(API_ROUTES.HR.ANSWER_SUBMIT, {
-      method: "POST",
-      token,
-      body: form,
-      isMultipart: true,
+    const res = await submitHrAnswer(token, {
+      audio,
+      sessionId: store.sessionId,
+      questionId,
     })
 
-      store.setFeedback(res)
-    } catch (error: any) {
-      toast(error.message)
-    }
+    store.setFeedback(res)
+    return res
   }
 
   const complete = async () => {
+    if (!store.sessionId) return
+
     const token = await getToken()
-    const report = await api<HrAiEvaluation>(
-      API_ROUTES.HR.SESSION_COMPLETE,
-      {
-        method: "POST",
-        token,
-        body: { sessionId: store.sessionId },
-      }
-    )
+    const report = await completeHrSession(token, store.sessionId)
 
     store.setFinalReport(report)
   }

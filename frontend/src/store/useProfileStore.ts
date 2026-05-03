@@ -45,9 +45,9 @@ export const useProfileStore = create<ProfileState>((set) => ({
         set({
             profile: data.profile,
 
-            codingSolved: data.progressCards.codingSolved,
-            hrSessions: data.progressCards.hrSessions,
-            aptitudeAttempts: data.progressCards.aptitudeAttempts,
+            codingSolved: data.progress.coding.acceptedSubmissions,
+            hrSessions: data.progress.hr.totalSessions,
+            aptitudeAttempts: data.progress.aptitude.totalAttempts,
 
             targets: data.targets,
             achievements: data.achievements,

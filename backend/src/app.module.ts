@@ -15,6 +15,7 @@ import { InterviewModule } from './interview/interview.module';
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { RealtimeModule } from './realtime/realtime.module';
+import { AudioModule } from './audio/audio.module';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
 import { SecurityModule } from './security/security.module';
 
@@ -42,6 +43,7 @@ import { SecurityModule } from './security/security.module';
     AptitudeModule,
     InterviewModule,
     RealtimeModule,
+    AudioModule,
   ],
   controllers: [AppController],
   providers: [AppService],

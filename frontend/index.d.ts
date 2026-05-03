@@ -146,10 +146,10 @@ interface UserProfileResponse {
   profile: Profile;
   achievements: Achievement[];
   contributions: Contribution[];
-  progressCards: {
-    codingSolved: number;
-    hrSessions: number;
-    aptitudeAttempts: number;
+  progress: {
+    coding: CodingProgress
+    hr: HrProgress
+    aptitude: AptitudeProgress
   }
   targets: string[]
 }

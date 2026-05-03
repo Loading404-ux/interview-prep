@@ -19,16 +19,16 @@ Full-stack interview prep platform with Next.js (frontend + auth gateway) and Ne
 - **SSE** delivers one-way notifications from server to client.
 - **WebSocket** handles audio chunk streaming directly to NestJS (not via Next.js BFF).
 
-## Audio Streaming (Planned)
-- WebSocket carries audio chunks (300–500ms).
-- SSE streams partial transcripts and AI responses.
+## Audio Streaming (Current)
+- WebSocket carries audio chunks (300–500ms) to the NestJS audio gateway.
+- SSE streams notifications; transcript streaming is planned.
 - Next.js BFF is NOT used for audio streaming.
 
-## Transcription Pipeline (Planned)
+## Transcription Pipeline (Current)
 - **Input**: raw audio chunks from WebSocket.
-- **Processing**: ffmpeg for resampling + denoise.
-- **Transcription**: Whisper.cpp invoked as a worker service (not per request).
-- **Output**: partial transcripts streamed via WebSocket events.
+- **Processing**: ffmpeg converts buffered audio to temp WAV after silence.
+- **Transcription**: Whisper.cpp CLI reads the WAV file.
+- **Output**: transcript segments stored per session and streamed via WebSocket events.
 
 ## Known Bottlenecks
 - Batch chunking can cut words mid-sentence.
@@ -36,9 +36,8 @@ Full-stack interview prep platform with Next.js (frontend + auth gateway) and Ne
 - In-memory interview sessions are lost on restart.
 
 ## TODO (Next Milestones)
-- Add SSE notification stream and client listener.
 - Add a dedicated Whisper worker service (queue + batching).
-- Add WebSocket rate limiting and audio chunk validation.
+- Add transcript streaming over SSE.
 - Persist interview sessions in MongoDB or Redis.
 
 ## Docs

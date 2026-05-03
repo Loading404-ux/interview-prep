@@ -31,8 +31,6 @@ const HRInterview = () => {
     // setFinalReport
   } = useHrInterview()
 
-  const currentQuestion = questions[currentIndex]
-  const isLastQuestion = currentIndex === questions.length - 1
   const [state, setState] = useState<InterviewState>("idle");
   // const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [waveformBars] = useState(Array.from({ length: 40 }, () => Math.random()));
@@ -40,7 +38,7 @@ const HRInterview = () => {
   const [cardKey, setCardKey] = useState(0);
   const currentQuestion = questions[currentIndex]
   const [disabled, setDisabled] = useState(false)
-  const isLastQuestion = currentQuestionIndex === questions.length - 1;
+  const isLastQuestion = currentIndex === questions.length - 1
   const router = useRouter();
   const [pending, startTransition] = useTransition()
   const mic = useRef<Microphone>(null);
@@ -108,9 +106,9 @@ const HRInterview = () => {
         //   container.appendChild(audio)
         // }
         startTransition(async () => {
-           await submitAnswer(blob, currentQuestion.id)
-           
-          })
+          await submitAnswer(blob, currentQuestion.id)
+
+        })
         // setShowFeedback(true)
       } else {
         toast("No recording found")
@@ -332,7 +330,6 @@ const HRInterview = () => {
                 </div>
                 <Button
                   onClick={handleStartRecording}
-                  disabled={disabled}
                   size="lg"
                   className="bg-hr hover:bg-hr/90 text-white rounded-xl px-8"
                   disabled={disabled || pending}
@@ -472,7 +469,7 @@ const HRInterview = () => {
                       <div className="p-4 rounded-xl bg-muted/30 border border-border animate-fade-up-stagger"
                         style={{ animationDelay: "100ms" }}>
                         <div className="flex items-start gap-3">
-                          <Lightbulb className="w-5 h-5 text-aptitude flex-shrink-0 mt-0.5" />
+                          <Lightbulb className="w-5 h-5 text-aptitude shrink-0 mt-0.5" />
                           <div>
                             <h4 className="text-sm font-medium text-foreground mb-2">
                               Preferred Answer Approach
@@ -495,7 +492,7 @@ const HRInterview = () => {
                               key={i}
                               className="flex items-start gap-3 text-sm text-foreground/80"
                             >
-                              <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 text-xs font-semibold">
+                              <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-xs font-semibold">
                                 {i + 1}
                               </span>
                               {suggestion}

@@ -6,12 +6,16 @@ import { Server } from 'socket.io';
 import { EVENTS } from './realtime.events';
 import { WsException } from '@nestjs/websockets';
 import { RealtimeEnvelope } from './realtime.types';
+import { SseService } from './sse.service';
 
 @Injectable()
 export class RealtimeService {
     private server: Server;
 
-    constructor(private readonly authService: AuthService) { }
+    constructor(
+        private readonly authService: AuthService,
+        private readonly sseService: SseService,
+    ) { }
 
     setServer(server: Server) {
         this.server = server;
@@ -61,11 +65,14 @@ export class RealtimeService {
     }
 
     emitNotification(userId: string, payload: Record<string, any>) {
-        if (!this.server) {
-            throw new Error('WebSocket server not initialized');
-        }
+        this.sseService.emit(userId, {
+            type: EVENTS.NOTIFY,
+            data: payload,
+        });
 
-        this.server.to(`user:${userId}`).emit(EVENTS.NOTIFY, payload);
+        if (this.server) {
+            this.server.to(`user:${userId}`).emit(EVENTS.NOTIFY, payload);
+        }
     }
     emitHrStatus(sessionId: string, payload: any) {
         if (!this.server) {

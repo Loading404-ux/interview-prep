@@ -1,47 +1,38 @@
 // hooks/useActivityLog.ts
-import { useEffect } from "react";
-import { api } from "@/lib/api-client";
-import { useActivityStore } from "@/store/useActivityStore";
-// import { ActivityDTO } from "@/types/activity";
-import { useAuth } from "@clerk/nextjs";
-import { API_ROUTES } from "@/routes";
+import { useEffect } from "react"
+import { useActivityStore } from "@/store/useActivityStore"
+import { useClerkToken } from "@/hooks/useClerkToken"
+import { fetchActivityHistory } from "@/services/activity.service"
 
 export function useActivityLog() {
-  const { getToken } = useAuth();
-  const {
-    activities,
-    isLoading,
-    setActivities,
-    setLoading,
-  } = useActivityStore();
+  const { getToken } = useClerkToken()
+  const { activities, isLoading, setActivities, setLoading } =
+    useActivityStore()
 
   useEffect(() => {
-    let mounted = true;
+    let mounted = true
 
     async function load() {
       try {
-        setLoading(true);
-        const token = await getToken();
+        setLoading(true)
+        const token = await getToken()
+        const data = await fetchActivityHistory(token)
 
-        const data = await api<ActivityDTO[]>(API_ROUTES.ACTIVITY.HISTORY, {
-          token,
-        });
-
-        if (mounted) setActivities(data);
+        if (mounted) setActivities(data)
       } catch (e) {
-        console.error("Failed to load activity log", e);
-        setActivities([]);
+        console.error("Failed to load activity log", e)
+        setActivities([])
       }
     }
 
-    load();
+    load()
     return () => {
-      mounted = false;
-    };
-  }, []);
+      mounted = false
+    }
+  }, [getToken])
 
   return {
     activities,
     isLoading,
-  };
+  }
 }

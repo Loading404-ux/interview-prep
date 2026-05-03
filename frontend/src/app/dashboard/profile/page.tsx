@@ -28,7 +28,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useProfile } from "@/hooks/useProfileHook";
+import { useProfile } from "@/hooks/useProfile";
 // import { useAchievements } from "@/hooks/useAchievements";
 import { useProfileStore } from "@/store/useProfileStore";
 import { api } from "@/lib/api-client";
@@ -169,7 +169,7 @@ const Profile = () => {
       <div className="mx-auto space-y-6">
         {/* Profile Header */}
         <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
-          <div className="h-24 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent" />
+          <div className="h-24 bg-linear-to-r from-primary/20 via-primary/10 to-transparent" />
           <div className="px-6 pb-6">
             <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-10">
               <Avatar className="w-20 h-20 border-4 border-background">
@@ -196,7 +196,7 @@ const Profile = () => {
                     <p className="text-sm text-muted-foreground mb-4">
                       Select companies you're targeting. This helps prioritize relevant questions.
                     </p>
-                    <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto">
+                    <div className="flex flex-wrap gap-2 max-h-75 overflow-y-auto">
                       {allCompanies.map((company) => {
                         const isSelected = selectedCompanies.includes(company);
                         return (

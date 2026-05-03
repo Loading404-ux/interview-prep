@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Clock, CheckCircle2, XCircle, ArrowRight, Brain, RotateCcw, Zap, BookOpen, AlertCircle, ArrowLeft } from "lucide-react";
-import { useAptitude } from "@/hooks/useAptitudeHook"
+import { useAptitude } from "@/hooks/useAptitude"
 
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);

@@ -1,9 +1,11 @@
 "use client"
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/api-client';
 import { toast } from "sonner";
 import { useAuth } from '@clerk/nextjs';
 import { Loader2, Mic, Square, FileText, CheckCircle2, ChevronRight } from "lucide-react";
+import { AudioStreamer } from "@/utils/AudioStreamer"
+import { useAudioSocketStore } from "@/store/audioSocket.store"
 import {
     Select,
     SelectContent,
@@ -26,10 +28,17 @@ const InterviewRoom = () => {
 
     // Audio & Recording Refs
     const [isRecording, setIsRecording] = useState(false);
-    const mediaRecorder = useRef<MediaRecorder | null>(null);
     const audioChunks = useRef<Blob[]>([]);
+    const streamerRef = useRef<AudioStreamer | null>(null)
     const { getToken } = useAuth();
     const [role, setRole] = useState('fullstack_engineer');
+    const [liveTranscript, setLiveTranscript] = useState("")
+
+    const socket = useAudioSocketStore((state) => state.socket)
+    const connectAudio = useAudioSocketStore((state) => state.connect)
+    const disconnectAudio = useAudioSocketStore((state) => state.disconnect)
+    const joinAudioSession = useAudioSocketStore((state) => state.joinSession)
+    const sendChunk = useAudioSocketStore((state) => state.sendChunk)
     /**
      * STEP 1: Process Resume PDF
      */
@@ -67,17 +76,37 @@ const InterviewRoom = () => {
      */
     const startRecording = async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder.current = new MediaRecorder(stream);
-            audioChunks.current = [];
+            if (!sessionId) {
+                toast.error("Start the interview first.")
+                return
+            }
 
-            mediaRecorder.current.ondataavailable = (e) => audioChunks.current.push(e.data);
+            const supported = await AudioStreamer.isSupported()
+            if (!supported.supported) {
+                toast.error(supported.reason || "Microphone not supported")
+                return
+            }
 
-            mediaRecorder.current.onstop = async () => {
-                await handleSendAudio();
-            };
+            const token = await getToken()
+            if (token) connectAudio(token)
+            joinAudioSession(sessionId)
 
-            mediaRecorder.current.start();
+            audioChunks.current = []
+            if (!streamerRef.current) {
+                streamerRef.current = new AudioStreamer({ chunkMs: 350 })
+            }
+
+            await streamerRef.current.start(async (chunk, meta) => {
+                audioChunks.current.push(chunk)
+                const buf = await chunk.arrayBuffer()
+                sendChunk({
+                    sessionId,
+                    timestampMs: meta.timestampMs,
+                    chunkMs: meta.chunkMs,
+                    mimeType: meta.mimeType,
+                    chunk: buf,
+                })
+            })
             setIsRecording(true);
         } catch (err) {
             toast.error("Microphone access denied.");
@@ -85,11 +114,22 @@ const InterviewRoom = () => {
     };
 
     const stopRecording = () => {
-        mediaRecorder.current?.stop();
+        streamerRef.current?.stop()
         setIsRecording(false);
+        handleSendAudio();
     };
 
     const handleSendAudio = async () => {
+        if (!sessionId) {
+            toast.error("Interview session missing.")
+            return
+        }
+
+        if (!audioChunks.current.length) {
+            toast.error("No audio captured.")
+            return
+        }
+
         setIsProcessing(true);
         const token = await getToken();
         const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
@@ -108,9 +148,32 @@ const InterviewRoom = () => {
         } catch (err) {
             toast.error("Error processing audio. Please try again.");
         } finally {
+            audioChunks.current = []
             setIsProcessing(false);
         }
     };
+
+    useEffect(() => {
+        if (!socket) return
+        const handleTranscript = (payload: { text?: string }) => {
+            const nextText = payload?.text || ""
+            if (!nextText) return
+            setLiveTranscript((prev) =>
+                prev ? `${prev} ${nextText}` : nextText
+            )
+        }
+
+        socket.on("transcript_partial", handleTranscript)
+        return () => {
+            socket.off("transcript_partial", handleTranscript)
+        }
+    }, [socket])
+
+    useEffect(() => {
+        return () => {
+            disconnectAudio()
+        }
+    }, [disconnectAudio])
 
     /**
      * STEP 3: Final Report
@@ -146,7 +209,7 @@ const InterviewRoom = () => {
                 ))}
             </div>
 
-            <div className="min-h-[400px] border rounded-2xl shadow-xl bg-card p-8 flex flex-col justify-center transition-all duration-300 relative">
+            <div className="min-h-100 border rounded-2xl shadow-xl bg-card p-8 flex flex-col justify-center transition-all duration-300 relative">
                 <div className="absolute right-2 top-2">
 
                     <Select value={role} onValueChange={setRole}>
@@ -280,6 +343,12 @@ const InterviewRoom = () => {
                                 {isProcessing ? "Thinking..." : currentQuestion}
                             </p>
                         </div>
+                        {liveTranscript && (
+                            <div className="rounded-2xl border border-dashed p-4 text-sm text-muted-foreground">
+                                <span className="font-semibold text-foreground">Live transcript:</span>{" "}
+                                {liveTranscript}
+                            </div>
+                        )}
 
                         <div className="flex flex-col items-center gap-6">
                             {!isRecording ? (

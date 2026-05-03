@@ -23,7 +23,8 @@ Key strengths already in place:
 - src/user, src/activity, src/coding, src/hr, src/aptitude, src/interview
 - src/ai (LLM + ASR)
 - src/realtime (socket gateway)
-- src/sse (planned notification stream)
+- src/realtime (SSE notifications)
+- src/audio (audio WebSocket gateway)
 - src/security (rate limiting)
 - src/common (guards, decorators, middleware)
 - src/schema (Mongoose schemas)
@@ -37,14 +38,20 @@ Set these values in your environment:
 - PUBLIC_BASE_URL (optional, used for resume uploads; defaults to http://localhost:8000)
 - RATE_LIMIT_TTL (optional, default 60 seconds)
 - RATE_LIMIT_LIMIT (optional, default 120 requests)
+- FFMPEG_BIN (optional, default "ffmpeg")
+- WHISPER_CPP_BIN (optional, default "./whisper.cpp/main")
+- WHISPER_MODEL_PATH (optional, default "./models/ggml-base.en.bin")
 
 ## Local Development
-Install and run:
-1. npm install
-2. npm run start:dev
+1. Copy backend/.env.example to backend/.env and fill values.
+2. npm install
+3. npm run start:dev
 
 ## API Summary (Core)
 Auth is required on protected routes via Clerk bearer token.
+
+Realtime
+- GET /realtime/notifications (SSE stream, token via header or query)
 
 User
 - POST /user/profile
@@ -105,9 +112,7 @@ These changes were made to improve clarity, maintainability, and correctness wit
 See architecture.md for a detailed module-by-module breakdown, data flow, and future microservice readiness notes.
 
 ## Planned (Next Milestones)
-- SSE for one-way notifications
-- Dedicated audio WebSocket gateway
-- Whisper.cpp + ffmpeg pipeline for local transcription
+- AI response streaming based on transcript boundaries
 - WebSocket action validation and rate limiting
 - Persist interview sessions in MongoDB or Redis
 

@@ -7,8 +7,8 @@ This frontend is a Next.js App Router application with Clerk auth, a REST API ga
 - `src/routes/index.ts` API route map
 - `src/lib/api-client.ts` REST client (same-origin `/api` gateway)
 - `src/app/api/[...all]/route.ts` Gateway handler (auth + rate limiting + proxy)
-- `src/store/socket.store.ts` (audio WS) socket state and connection
-- SSE client (planned) for one-way notifications
+- `src/store/audioSocket.store.ts` audio WS state and connection
+- `src/store/sse.store.ts` SSE notifications store (wired in dashboard shell)
 - `src/hooks/*` Feature hooks (HR, Aptitude, Coding, Profile)
 
 ## Auth Flow
@@ -22,8 +22,8 @@ This frontend is a Next.js App Router application with Clerk auth, a REST API ga
 - For cookie-based auth, add CSRF protection in the gateway handlers.
 
 ## Realtime
-- SSE will deliver one-way notifications from the backend.
-- WebSocket will be used only for audio chunk streaming.
+- SSE delivers one-way notifications from the backend.
+- WebSocket is used only for audio chunk streaming.
 - Next.js BFF is not used for audio streaming.
 
 ## Local Development
@@ -34,11 +34,11 @@ This frontend is a Next.js App Router application with Clerk auth, a REST API ga
 - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 - CLERK_SECRET_KEY
 - BACKEND_BASE_URL (for server proxy)
+- NEXT_PUBLIC_WS_URL (audio WS base, defaults to http://localhost:8000)
 - RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX (optional for gateway)
 
 ## Known Gaps
-- SSE client listener is not implemented yet.
-- Audio WS client still uses REST base URL (needs dedicated WS URL).
+- AI response streaming is not wired to UI yet.
 - API gateway rate limiting is in-memory (use Redis in production).
 
 ## Refactor Tracking

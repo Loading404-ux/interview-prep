@@ -1,12 +1,15 @@
-import { toast } from "sonner"
-import LoadingBar, { useLoadingBar } from "react-top-loading-bar"
-// type LoadingBarProps = React.ComponentProps<typeof LoadingBar> | null
-// let loadingRef: LoadingBarProps = null
-// export const bindLoadingBar = (ref: any) => {
-//   loadingRef = ref
-// }
+import { ApiError, normalizeUnknownError, parseApiError } from "@/lib/api-errors"
+import { useApiStore } from "@/store/api.store"
 
 export const BASE_URL = "/api"
+
+export type ApiRequestOptions = ApiOptions & {
+  signal?: AbortSignal
+  timeoutMs?: number
+  onStart?: () => void
+  onFinish?: () => void
+  onError?: (error: ApiError) => void
+}
 
 export async function api<T>(
   endpoint: string,
@@ -15,15 +18,24 @@ export async function api<T>(
     body,
     token,
     isMultipart = false,
-  }: ApiOptions = {}
+    signal,
+    timeoutMs,
+    onStart,
+    onFinish,
+    onError,
+  }: ApiRequestOptions = {}
 ): Promise<T> {
+  const apiStore = useApiStore.getState()
+  const controller = new AbortController()
+  const timerId = timeoutMs
+    ? globalThis.setTimeout(() => controller.abort(), timeoutMs)
+    : null
 
-  // const { start, complete, } = useLoadingBar({
-  //   color: "blue",
-  //   height: 2,
-  // });
+  const requestSignal = signal || controller.signal
   try {
-    // start()
+    onStart?.()
+    apiStore.startRequest()
+
     const headers: HeadersInit = {
       ...(token && { Authorization: `Bearer ${token}` }),
     }
@@ -41,22 +53,25 @@ export async function api<T>(
           ? body // FormData goes RAW
           : JSON.stringify(body)
         : undefined,
+      signal: requestSignal,
     })
-
-    const data = await res.json()
-
     if (!res.ok) {
-      // toast("Request failed", data?.message || "Something went wrong")
-      console.log(res, data)
-      throw new Error(data?.message)
+      throw await parseApiError(res)
     }
 
-    return data
-  } catch (err: any) {
-    console.log(err.message)
-    toast(err.message ?? "Network error", err.message ?? "Server unreachable")
-    throw err
+    if (res.status === 204) {
+      return undefined as T
+    }
+
+    return (await res.json()) as T
+  } catch (err) {
+    const normalized = normalizeUnknownError(err)
+    apiStore.setError(normalized)
+    onError?.(normalized)
+    throw normalized
   } finally {
-    // complete()
+    if (timerId) globalThis.clearTimeout(timerId)
+    apiStore.endRequest()
+    onFinish?.()
   }
 }
